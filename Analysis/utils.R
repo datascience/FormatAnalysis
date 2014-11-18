@@ -1,28 +1,18 @@
 mime <- function(x) {
-  c <- c(length(x))
-  for (i in 1:length(x)) {
-    values <- unlist(strsplit(x[i], split=";"))
-    c[i] <- values[1]
-  }
+  values <- strsplit(x, split=";")
+  c <- sapply(values, "[", 1) 
   c
 }
 
 property <- function(x, prop) {
-  c <- c(length(x))
-  for (i in 1:length(x)) {
-    values <- unlist(strsplit(x[i], split=";"))
-    found = FALSE
-    for (j in 1:length(values)) {
-      if (length(grep(prop,values[j]))>0) {
-        values2 <- unlist(strsplit(values[j], split="="))
-        c[i] <- values2[2]
-        found = TRUE
-        break
-      }
-    }
-    if (found==FALSE) {
-      c[i] <- NA
-    }
-  }
+  values <- strsplit(x, split="; ")
+  c <- unlist(sapply(values, extractProperty, prop))
+  c
+}
+
+extractProperty <- function(x, property) {
+  x  <- unlist(x)
+  c <- unlist(strsplit(x[grep(property,x)], split="="))[2]
+  c[is.null(c)] <- NA
   c
 }
