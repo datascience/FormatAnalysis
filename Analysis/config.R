@@ -1,11 +1,13 @@
 # config file with all configurations 
 
-#file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
-file <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
+file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+#file <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
-colNames <- c("SERVER", "TIKA", "DROID", "YEAR", "AMOUNT")
+colNames <- c("server", "tika", "droid", "year", "amount")
 
-col <- "DROID"
+col <- "tika"
 propertyToTake <- "version"
 
-formats <- c("application/pdf", "image/jpeg")
+formats <- c("application/pdf")
+
+releases <- read.table("release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)

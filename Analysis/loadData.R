@@ -6,10 +6,10 @@ loadData <- function(x, names) {
   data <- matrix(unlist(processed), nrow=length(processed), byrow=TRUE)
   colnames(data) <- names
   data <- as.data.frame(data, stringAsFactors=FALSE)
-  data$SERVER <- as.character(data$SERVER)
-  data$TIKA <- as.character(data$TIKA)
-  data$DROID <- as.character(data$DROID)
-  data$YEAR <- as.integer(as.character(data$YEAR))
-  data$AMOUNT <- as.integer(data$AMOUNT)
-  data
+  data$server <- as.character(data$server)
+  data$tika <- as.character(data$tika)
+  data$droid <- as.character(data$droid)
+  data$year <- as.integer(as.character(data$year))
+  data$amount <- as.integer(as.character(data$amount))
+  return(data)
 }

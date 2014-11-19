@@ -12,7 +12,7 @@ property <- function(x, prop) {
 
 extractProperty <- function(x, property) {
   x  <- unlist(x)
-  c <- unlist(strsplit(x[grep(property,x)], split="="))[2]
+  c <- unlist(strsplit(x[grep(property, x, fixed=TRUE)], split="="))[2]
   c[is.null(c)] <- NA
   c
 }
