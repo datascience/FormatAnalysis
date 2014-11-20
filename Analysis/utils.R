@@ -40,3 +40,33 @@ resolveConflictsProperty <- function(x,y) {
   }
   return (NA)
 }
+
+loadDataFromFile <- function(x, names) {
+  txt <- readLines(x)
+  splitTxt <- strsplit(txt, split="\t")
+  processed <- lapply(splitTxt, processLine)
+  data <- matrix(unlist(processed), nrow=length(processed), byrow=TRUE)
+  colnames(data) <- c("server", "tika", "droid", "year", "amount")
+  data <- as.data.frame(data, stringAsFactors=FALSE)
+  data$server <- as.character(data$server)
+  data$tika <- as.character(data$tika)
+  data$droid <- as.character(data$droid)
+  data$year <- as.integer(as.character(data$year))
+  data$amount <- as.integer(as.character(data$amount))
+  return(data)
+}
+
+processLine <- function(x) {
+  out <- character(5)
+  out[1] <- x[1]
+  out[2] <- x[2]
+  out[3] <- x[3]
+  out[4] <- x[4]
+  out[5] <- x[5]
+  out
+}
+
+
+mySum <- function(x,y) {
+  return (sum(y[x]))
+}
