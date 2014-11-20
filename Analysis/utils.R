@@ -16,3 +16,27 @@ extractProperty <- function(x, property) {
   c[is.null(c)] <- NA
   c
 }
+
+resolveConflicts <- function(x,y) {
+  if (x==y) {
+    return (x)
+  } else if (x=="application/octet-stream" & y!="application/octet-stream") {
+    return (y)
+  } else if (x!="application/octet-stream" & y=="application/octet-stream") {
+    return (x)
+  }
+  return (NA)
+}
+
+resolveConflictsProperty <- function(x,y) {
+  if (is.na(x) & is.na(y)) {
+   return (NA) 
+  }else if (is.na(x) & !is.na(y)) {
+    return (y)
+  }else if (!is.na(x) & is.na(y)) {
+    return (x)
+  } else if (x==y) {
+    return (x)
+  }
+  return (NA)
+}
