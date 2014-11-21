@@ -70,3 +70,20 @@ processLine <- function(x) {
 mySum <- function(x,y) {
   return (sum(y[x]))
 }
+
+estimateS <- function(p,q,m,num) {
+  c <- c(1:num) 
+  sum <- 0
+  for (i in 1:num) {
+    if (i==1) {
+      c[i] <- p*m
+      sum <- c[i]
+    } else {
+      c[i] <- p*m +(q-p)*sum-(q/m)*sum^2
+      sum <- sum + c[i]
+    } 
+  }
+  return (c)
+}
+
+
