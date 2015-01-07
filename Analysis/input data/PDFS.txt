@@ -1,0 +1,12 @@
+mime	version
+application/pdf	1.0
+application/pdf	1.1
+application/pdf	1.2
+application/pdf	1.3
+application/pdf	1.4
+application/pdf	1.5
+application/pdf	1.6
+application/pdf	1.7
+application/pdf	1a
+application/pdf	1a:2003
+application/pdf	1b

@@ -1,0 +1,8 @@
+MIME	VERSION
+text/html	2.0
+text/html	3.2
+text/html	4.0
+text/html	4.01
+application/xhtml+xml	1.0
+application/xhtml+xml	1.1
+text/html	2.0abs

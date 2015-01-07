@@ -17,36 +17,15 @@ extractProperty <- function(x, property) {
   c
 }
 
-resolveConflicts <- function(x,y) {
-  if (x==y) {
-    return (x)
-  } else if (x=="application/octet-stream" & y!="application/octet-stream") {
-    return (y)
-  } else if (x!="application/octet-stream" & y=="application/octet-stream") {
-    return (x)
-  }
-  return (NA)
-}
 
-resolveConflictsProperty <- function(x,y) {
-  if (is.na(x) & is.na(y)) {
-   return (NA) 
-  }else if (is.na(x) & !is.na(y)) {
-    return (y)
-  }else if (!is.na(x) & is.na(y)) {
-    return (x)
-  } else if (x==y) {
-    return (x)
-  }
-  return (NA)
-}
 
 loadDataFromFile <- function(x, names) {
   txt <- readLines(x)
   splitTxt <- strsplit(txt, split="\t")
   processed <- lapply(splitTxt, processLine)
   data <- matrix(unlist(processed), nrow=length(processed), byrow=TRUE)
-  colnames(data) <- c("server", "tika", "droid", "year", "amount")
+  colnames(data) <- names
+  #colnames(data) <- c("server", "tika", "droid", "year", "amount")
   data <- as.data.frame(data, stringAsFactors=FALSE)
   data$server <- as.character(data$server)
   data$tika <- as.character(data$tika)

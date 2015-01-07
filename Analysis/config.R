@@ -3,11 +3,15 @@
 file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #file <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
+
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-col <- "tika"
-propertyToTake <- "version"
 
-formats <- c("application/pdf")
 
-releases <- read.table("release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+fileData <- read.table("input data/PDFS.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE) 
+
+releases <- read.table("input data/release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+
+source('conflictResolution.R')
+resolveConflictsMime <- resolveConflictsMimeDefault
+resoresolveConflictsProperty <- resolveConflictsPropertyDefault

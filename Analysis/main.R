@@ -1,10 +1,16 @@
 source('loadData.R')
 source('config.R')
 source('utils.R')
-data <- loadData(file, colnames, propertyToTake)
 
+data <- loadData(file, colNames)
 
-t <- data[data$version=="1.3",]
+propertyToTake <- names(fileData)[2]
+
+for (entry in fileData) {
+  print(entry$mime)
+}
+
+t <- data[data$version=="1.1",]
 t <- t[t$age >= 0,]
 years <- t$year
 sSum <- lapply(years, ">=", t$year)
@@ -23,13 +29,14 @@ c <-summary(y)$coefficients["I(T^2)", "Estimate"]
 
 m1 <- (-b + sqrt(b^2-4*c*a))/(2*c)
 m2 <- (-b - sqrt(b^2-4*c*a))/(2*c)
-ifelse (m1 >m2, m <- m1, m <- m2)
+ifelse (m1 > m2, m <- m1, m <- m2)
 p <- a / m
 q <- b + p
 
-t$Sest <- estimateS(p,q,m,11)
+t$Sest <- estimateS(p,q,m,15)
 plot(t$age,t$S)
-lines(t$age, t$Sest)
+points(t$age, t$Sest, pch=24)
 
 #move ploting 
 #plot(pData[pData$version=="1a",]$age,pData[pData$version=="1a",]$percentage)
+
