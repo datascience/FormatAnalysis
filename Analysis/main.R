@@ -10,8 +10,17 @@ for (entry in fileData) {
   print(entry$mime)
 }
 
-t <- data[data$version=="1.1",]
+t <- data[data$version=="1.7",]
 t <- t[t$age >= 0,]
+b1 <- 0.2
+c1 <- 1
+plot(t$age, t$percentage)
+fit <- nls(percentage ~ b * exp (-(b*age + c*age))*(1+c*(1-exp(-b*age))), data=t, start=list(b=b1, c=c1), trace=T)
+summary(fit)
+ne = data.frame(age = seq(min(t$age),max(t$age),len=200))
+ne$percentage <- predict(fit,newdata=ne) 
+lines(ne$age, ne$percentage)
+
 years <- t$year
 sSum <- lapply(years, ">=", t$year)
 tSum <- lapply(years, ">", t$year)

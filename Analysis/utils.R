@@ -58,7 +58,7 @@ estimateS <- function(p,q,m,num) {
       c[i] <- p*m
       sum <- c[i]
     } else {
-      c[i] <- p*m +(q-p)*sum-(q/m)*sum^2
+      c[i] <- p*m +(q-p)*sum-(q/m)*sum*sum
       sum <- sum + c[i]
     } 
   }

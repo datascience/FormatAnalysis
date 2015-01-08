@@ -1,0 +1,4 @@
+mime	software	releaseYear
+application/pdf	"Acrobat Distiller 2.0 for Windows"	1994
+application/pdf	"Acrobat Distiller 3.0 for Windows"	1996
+application/pdf	"Acrobat Distiller 4.0 for Windows"	1999

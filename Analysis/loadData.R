@@ -40,7 +40,7 @@ loadData <- function(file, colNames) {
     pData[[propertyToTake]] <- apply(pData[,grep(propertyToTake, names(pData))], 1, resoresolveConflictsProperty)
   }
   
-  pData <- pData[,names(pData) %in% c("mime", "version", "year", "amount")]
+  pData <- pData[,names(pData) %in% c("mime", propertyToTake, "year", "amount")]
 
   #filter once more just to be sure we have removed all unwanted elements
   pData <- pData[!is.na(pData$mime) & pData$mime %in% fileData$mime,]

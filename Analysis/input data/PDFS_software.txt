@@ -1,0 +1,8 @@
+mime	software
+application/pdf	"Acrobat Distiller 2.0 for Windows"
+application/pdf	"Acrobat PDFWriter 2.0 for Windows"
+application/pdf	"Acrobat Distiller 3.0 for Windows"
+application/pdf	"Acrobat PDFWriter 3.0 for Windows"
+application/pdf	"Acrobat Acrobat PDFWriter 4.0 for Windows"
+application/pdf	"Acrobat Acrobat PDFWriter 4.0 for Windows"
+application/pdf	"Acrobat Distiller 4.0 for Windows"
