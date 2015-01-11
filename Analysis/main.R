@@ -1,51 +1,30 @@
 source('loadData.R')
-source('config.R')
 source('utils.R')
 
-data <- loadData(file, colNames)
+
+
+file <- "/home/kresimir/Projects/BenchmarkDP/fmts-cleaned.tsv"
+colNames <- c("server", "tika", "droid", "year", "amount")
+
+fileData <- read.table("input data/IMAGES.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE) 
+releases <- read.table("input data/release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+
+source('conflictResolution.R')
+resolveConflictsMime <- resolveConflictsMimeDefault
+resoresolveConflictsProperty <- resolveConflictsPropertyDefault
 
 propertyToTake <- names(fileData)[2]
 
-for (entry in fileData) {
-  print(entry$mime)
-}
+data <- loadData(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty)
 
-t <- data[data$version=="1.7",]
-t <- t[t$age >= 0,]
-b1 <- 0.2
-c1 <- 1
-plot(t$age, t$percentage)
-fit <- nls(percentage ~ b * exp (-(b*age + c*age))*(1+c*(1-exp(-b*age))), data=t, start=list(b=b1, c=c1), trace=T)
-summary(fit)
-ne = data.frame(age = seq(min(t$age),max(t$age),len=200))
-ne$percentage <- predict(fit,newdata=ne) 
-lines(ne$age, ne$percentage)
+source('calculateAge.R')
+data2 <- calculateAge(data, releases, propertyToTake)
 
-years <- t$year
-sSum <- lapply(years, ">=", t$year)
-tSum <- lapply(years, ">", t$year)
+source('calculatePercentage.R')
+data3 <- calculatePercentage(data2,propertyToTake)
 
-t$S <- t$amount
-#t$S <- unlist(lapply(sSum,mySum, t$amount))
-t$T <- unlist(lapply(tSum,mySum, t$amount))
-class(t$S)
-y <- lm(S~1+I(T)+I(T^2), data=t)
-print(summary(y)$coefficients)
-a <-summary(y)$coefficients["(Intercept)", "Estimate"]
-b <-summary(y)$coefficients["I(T)", "Estimate"]
-c <-summary(y)$coefficients["I(T^2)", "Estimate"]
+source('estimateModel.R')
+models <- estimateModel(data3,propertyToTake)
 
-
-m1 <- (-b + sqrt(b^2-4*c*a))/(2*c)
-m2 <- (-b - sqrt(b^2-4*c*a))/(2*c)
-ifelse (m1 > m2, m <- m1, m <- m2)
-p <- a / m
-q <- b + p
-
-t$Sest <- estimateS(p,q,m,15)
-plot(t$age,t$S)
-points(t$age, t$Sest, pch=24)
-
-#move ploting 
-#plot(pData[pData$version=="1a",]$age,pData[pData$version=="1a",]$percentage)
-
+source('plotResults.R')
+plotResults(data3, NA, propertyToTake)

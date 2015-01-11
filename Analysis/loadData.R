@@ -2,14 +2,13 @@
 
 source('utils.R')
 
-loadData <- function(file, colNames) {
+loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty) {
 
   options( warn = -1 )
   
   #load data from a file into a data frame
   rawData <- loadDataFromFile(file, colNames)
 
-  propertyToTake <- names(fileData)[2]
   
   #extrcating mime and property into seprate columns and 
   #unifying everything into one data frame (pData)
@@ -48,46 +47,15 @@ loadData <- function(file, colNames) {
     pData <- pData[!is.na(pData[[propertyToTake]]) & pData[[propertyToTake]] %in% fileData[[propertyToTake]], ]
   }
 
-  # aggregation 
   if (is.na(propertyToTake)) {
     pData <- aggregate(amount~mime+year, FUN=sum, data=pData)
-    aggreg <- aggregate(amount~year , FUN=sum, data=pData) 
-    aggreg <- setNames(aggreg, c("year", "total"))
-    releases2 <- aggregate(releaseYear~mime, FUN=min, data=releases)
-    
-    pData <- merge(pData,releases2, by=c("mime"))
-    rm(releases2)
-    pData$age <- pData$year - pData$releaseYear
-    pData <- pData[!(names(pData)=="releaseYear")]
-    
-    pData <- merge(pData, aggreg, by=c("year"))
-    pData$percentage <- pData$amount / pData$total
-    pData <- pData[!(names(pData)=="total")]
-    
-    pData <- pData[c("mime", "year", "amount", "age", "percentage")]
-    rm(aggreg)
-    
-  } else {
+  }else {
     pData <- aggregate(as.formula(paste("amount~", paste(c("mime", propertyToTake, "year"), collapse="+"))), 
-                       FUN=sum, data=pData)
-    aggreg <- aggregate(amount~year , FUN=sum, data=pData) 
-    aggreg <- setNames(aggreg, c("year", "total"))
-    
-    pData <- merge(pData,releases, by=c("mime", propertyToTake))
-    pData$age <- pData$year - pData$releaseYear
-    pData <- pData[!(names(pData)=="releaseYear")]
-    
-    pData <- merge(pData, aggreg, by="year")
-    pData$percentage <- pData$amount / pData$total
-    pData <- pData[!(names(pData)=="total")]
-
-    pData <- pData[c("mime", propertyToTake, "year", "amount", "age", "percentage")]
-    rm(aggreg)
-    
+                       FUN=sum, data=pData)    
   }
- 
-  options( warn = 0 )
+  options(warn=0)
   return (pData)
+  
 }
 
            
