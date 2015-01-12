@@ -1,4 +1,4 @@
-MIME	VERSION
+mime	version
 application/x-shockwave-flash	1
 application/x-shockwave-flash	2
 application/x-shockwave-flash	3

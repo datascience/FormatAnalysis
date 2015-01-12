@@ -11,7 +11,8 @@ plotResults <- function(pData, modelData, propertyToTake) {
   for (i in (1:nrow(unig))) {
     if (is.na(propertyToTake)) {
       X <- pData[pData$mime == unig[i,]$mime,]$age
-      Y <- pData[pData$mime == unig[i,]$mime,]$percentage
+      Yper <- pData[pData$mime == unig[i,]$mime,]$percentage
+      Yavg <- pData[pData$mime == unig[i,]$mime,]$average
       title <- paste(unig[i,]$mime," ", sep="")
 #       model <- estimate(X,Y)
 #       if (!is.na(modelData)) {
@@ -19,22 +20,27 @@ plotResults <- function(pData, modelData, propertyToTake) {
 #       }
     }else {
       X <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$age
-      Y <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$percentage
+      Yper <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$percentage
+      Yavg <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$average
       title <- paste(unig[i,]$mime, unig[i,][[propertyToTake]], sep=" ")
 #       model <- NA
 #       if (!is.na(modelData)) {
 #         model <- modelData[modelData[["mime"]]==unig[i,]$mime & modelData[[propertyTotake]]==unig[i,][[propertyToTake]],]$model
 #       }
     }
-    model <- estimate(X,Y)
-    drawPlot(X,Y, title, model)
+    model <- estimate(X,Yavg)
+    drawPlot(X,Yper, Yavg, title, model)
   }
   
 }
 
 
-drawPlot <- function(X,Y, title, model) {
-  plot(X,Y, main=title)
+drawPlot <- function(X,Yper, Yavg, title, model) {
+  plot(X,Yper, main=title)
+  points(X,Yavg, pch=19)
+#   lo <- loess(Yper ~ X)
+#   X1 <- seq(min(X),max(X), (max(X) - min(X))/1000)
+#   lines(X1, predict(lo, X1),col='red')
   if (!is.na(model)) {
     f <- data.frame(x=seq(min(X),max(X), len=200))
     f$y <- predict(model, newdata=f)
@@ -44,7 +50,7 @@ drawPlot <- function(X,Y, title, model) {
 
 estimate <- function(X,Y) {
   f <- data.frame(x=X, y=Y)
-  fit <- lm(y ~ 1 + I(x) + I(x^2) + I(x^3) + I(x^4), data=f)
+  fit <- lm(y ~ 1 + I(x) + I(x^2) + I(x^3) + I(x^4) , data=f)
   return (fit)
 }
 

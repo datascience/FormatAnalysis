@@ -3,10 +3,10 @@ source('utils.R')
 
 
 
-file <- "/home/kresimir/Projects/BenchmarkDP/fmts-cleaned.tsv"
+file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-fileData <- read.table("input data/IMAGES.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE) 
+fileData <- read.table("input data/HTMLS.txt", header=TRUE, sep="\t", colClasses=c("character","character"), stringsAsFactors=FALSE) 
 releases <- read.table("input data/release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 source('conflictResolution.R')
