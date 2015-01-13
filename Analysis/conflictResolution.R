@@ -1,3 +1,6 @@
+
+rules <- read.table("input data/conflicts_rules.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+
 resolveConflictsMimeDefault <- function(row) {
   x <- row[2]
   y <- row[3]
@@ -14,7 +17,13 @@ resolveConflictsMimeDefault <- function(row) {
   } else if (x!="application/octet-stream" & y=="application/octet-stream") {
     return (x)
   }else if (x!=y) {
-    return (x)
+    value <- rules[rules$element=="mime" & ((rules$value1==x & rules$value2==y) | 
+                                              (rules$value1==y & rules$value2==x)),]$value2
+    if (!is.na(value)) {
+      return (value)
+    }else {
+      return (x)
+    }
   }
   return (NA)
 }

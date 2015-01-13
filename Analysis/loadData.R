@@ -2,7 +2,7 @@
 
 source('utils.R')
 
-loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty) {
+loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unificationRules) {
 
   options( warn = -1 )
   
@@ -29,6 +29,7 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
   #filter according to mime type 
   pData <- pData[apply(pData[,grep("mime", names(pData))], 1, function(row) any(row %in% fileData$mime)), ]
   
+  #filter according to property 
   if (!is.na(propertyToTake)) {
     pData <- pData[apply(pData[,grep(propertyToTake, names(pData))], 1, function(row) any(row %in% fileData[[propertyToTake]])), ]
   }
@@ -39,6 +40,7 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
     pData[[propertyToTake]] <- apply(pData[,grep(propertyToTake, names(pData))], 1, resoresolveConflictsProperty)
   }
   
+  
   pData <- pData[,names(pData) %in% c("mime", propertyToTake, "year", "amount")]
 
   #filter once more just to be sure we have removed all unwanted elements
@@ -47,6 +49,17 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
     pData <- pData[!is.na(pData[[propertyToTake]]) & pData[[propertyToTake]] %in% fileData[[propertyToTake]], ]
   }
 
+  #unification 
+  if (!is.na(unificationRules)) {
+    for (i in c(1:nrow(unificationRules))) {
+      element <- unificationRules[i,]$element
+      from <- unificationRules[i,]$from
+      to <- unificationRules[i,]$to
+      pData[pData[[element]]==from,][[element]] <- to
+    }
+  }
+
+  #aggregate if there are some repeating entries
   if (is.na(propertyToTake)) {
     pData <- aggregate(amount~mime+year, FUN=sum, data=pData)
   }else {

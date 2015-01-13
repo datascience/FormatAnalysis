@@ -1,0 +1,2 @@
+property	value1	value2
+mime	image/x-bmp	image/bmp

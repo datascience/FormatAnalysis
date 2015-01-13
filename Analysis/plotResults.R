@@ -1,4 +1,6 @@
 
+library(minpack.lm)
+
 plotResults <- function(pData, modelData, propertyToTake) {
   
   if (is.na(propertyToTake)) {
@@ -28,7 +30,7 @@ plotResults <- function(pData, modelData, propertyToTake) {
 #         model <- modelData[modelData[["mime"]]==unig[i,]$mime & modelData[[propertyTotake]]==unig[i,][[propertyToTake]],]$model
 #       }
     }
-    model <- estimate(X,Yavg)
+    model <- estimateBass(X,Yavg)
     drawPlot(X,Yper, Yavg, title, model)
   }
   
@@ -36,13 +38,15 @@ plotResults <- function(pData, modelData, propertyToTake) {
 
 
 drawPlot <- function(X,Yper, Yavg, title, model) {
-  plot(X,Yper, main=title)
+  plot(X,Yper, main=title, xlim=c(0,20))
   points(X,Yavg, pch=19)
 #   lo <- loess(Yper ~ X)
 #   X1 <- seq(min(X),max(X), (max(X) - min(X))/1000)
 #   lines(X1, predict(lo, X1),col='red')
   if (!is.na(model)) {
-    f <- data.frame(x=seq(min(X),max(X), len=200))
+    f <- data.frame(x=seq(0,20, len=200))
+    #print(model)
+    #f <- data.frame(x=seq(min(X),max(X), len=200))
     f$y <- predict(model, newdata=f)
     lines(f$x,f$y)
   }
@@ -54,3 +58,8 @@ estimate <- function(X,Y) {
   return (fit)
 }
 
+estimateBass <- function(X,Y) {
+  f <- data.frame(x=X, y=Y)
+  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=0.03,q=0.3,m=1))
+  return (fit)
+}
