@@ -19,7 +19,7 @@ resolveConflictsMimeDefault <- function(row) {
   }else if (x!=y) {
     value <- rules[rules$element=="mime" & ((rules$value1==x & rules$value2==y) | 
                                               (rules$value1==y & rules$value2==x)),]$value2
-    if (!is.na(value)) {
+    if (length(value)>0) {
       return (value)
     }else {
       return (x)
