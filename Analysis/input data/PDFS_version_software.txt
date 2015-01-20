@@ -1,0 +1,12 @@
+mime	version	software
+application/pdf	1.0	Acrobat Distiller 5.0.5 (Windows)
+application/pdf	1.1	Acrobat Distiller 4.0 for Windows
+application/pdf	1.2	Acrobat PDFWriter 3.02 for Windows NT
+application/pdf	1.3	
+application/pdf	1.4	
+application/pdf	1.5	
+application/pdf	1.6	
+application/pdf	1.7	
+application/pdf	1a	
+application/pdf	1a:2003	
+application/pdf	1b	

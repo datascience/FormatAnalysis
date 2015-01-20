@@ -18,8 +18,10 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
     tmp <- paste("mime",i,sep="")
     pData[[tmp]] <- mime(rawData[[i]]) 
     if (!is.na(propertyToTake)) {
-      tmp <- paste(propertyToTake,i,sep="")
-      pData[[tmp]] <- property(rawData[[i]], propertyToTake)
+      for (prop in propertyToTake)   {
+        tmp <- paste(prop,i,sep="")
+        pData[[tmp]] <- property(rawData[[i]], prop)
+      }
     }
   }
   
@@ -31,13 +33,17 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
   
   #filter according to property 
   if (!is.na(propertyToTake)) {
-    pData <- pData[apply(pData[,grep(propertyToTake, names(pData))], 1, function(row) any(row %in% fileData[[propertyToTake]])), ]
+    for (prop in propertyToTake) {
+      pData <- pData[apply(pData[,grep(prop, names(pData))], 1, function(row) any(row %in% fileData[[prop]])), ]
+    }
   }
   
   # resolving conflicts
   pData$mime <- apply(pData[,grep("mime", names(pData))], 1, resolveConflictsMime)
   if (!is.na(propertyToTake)) {
-    pData[[propertyToTake]] <- apply(pData[,grep(propertyToTake, names(pData))], 1, resoresolveConflictsProperty)
+    for (prop in propertyToTake) {
+      pData[[prop]] <- apply(pData[,grep(prop, names(pData))], 1, resoresolveConflictsProperty)
+    }
   }
   
   
@@ -46,7 +52,9 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
   #filter once more just to be sure we have removed all unwanted elements
   pData <- pData[!is.na(pData$mime) & pData$mime %in% fileData$mime,]
   if (!is.na(propertyToTake)) {
-    pData <- pData[!is.na(pData[[propertyToTake]]) & pData[[propertyToTake]] %in% fileData[[propertyToTake]], ]
+    for (prop in propertyToTake) {
+      pData <- pData[!is.na(pData[[prop]]) & pData[[prop]] %in% fileData[[prop]], ]
+    }
   }
 
   #unification 

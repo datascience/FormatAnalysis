@@ -13,6 +13,7 @@ property <- function(x, prop) {
 extractProperty <- function(x, property) {
   x  <- unlist(x)
   c <- unlist(strsplit(x[grep(property, x, fixed=TRUE)], split="="))[2]
+  c[grep("\"*\"",c)] <- substring(c[grep("\"*\"",c)], 2, nchar(c[grep("\"*\"",c)])-1)
   c[is.null(c)] <- NA
   c
 }
