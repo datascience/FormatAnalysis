@@ -6,9 +6,10 @@ source('utils.R')
 file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-fileData <- read.table("input data/PDFS_version_software.txt", header=TRUE, sep="\t", colClasses=c("character", "character", "character"), stringsAsFactors=FALSE) 
+fileData <- read.table("input data/IMAGES.txt", header=TRUE, sep="\t", colClasses=c("character"), stringsAsFactors=FALSE) 
 releases <- read.table("input data/release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
-
+#unification <- read.table("input data/unification_rules.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+unification <- NA
 source('conflictResolution.R')
 resolveConflictsMime <- resolveConflictsMimeDefault
 resoresolveConflictsProperty <- resolveConflictsPropertyDefault
@@ -19,7 +20,7 @@ if (length(nam)==1) {
 } else {
   propertyToTake <- nam[2:length(nam)]
 }
-data <- loadData(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty, NA)
+data <- loadData(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unification)
 
 source('calculateAge.R')
 data2 <- calculateAge(data, releases, propertyToTake)

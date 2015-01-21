@@ -19,40 +19,47 @@ calculatePercentage <- function(pData, propertyToTake) {
     aggreg <- setNames(aggreg, c("mime", propertyToTake, "total"))
     pData <- merge(pData, aggreg, by=c("mime",propertyToTake))
   }
-  pData$percentage2 <- pData$amount / pData$total
-  pData <- pData[!(names(pData)=="total")]
-  rm(aggreg)
-  print(pData)
+  #pData$percentage2 <- pData$amount / pData$total
+  #pData <- pData[!(names(pData)=="total")]
+  #rm(aggreg)
+  #print(pData)
   pData$average <- c(1:nrow(pData))
-  pData$average2 <- c(1:nrow(pData))
+  #pData$average2 <- c(1:nrow(pData))
   for (i in (1:nrow(pData))) {
     age<- pData[i,]$age
     if (is.na(propertyToTake)) {
-      data <- data.frame(age=pData[pData$mime==pData[i,]$mime,]$age, 
-                         percentage=pData[pData$mime==pData[i,]$mime,]$percentage)
-      data2 <- data.frame(age=pData[pData$mime==pData[i,]$mime,]$age, 
-                         percentage=pData[pData$mime==pData[i,]$mime,]$percentage2)
+      data <- merge(pData, pData[i,][names(pData) %in% c("mime")], by="mime")
+      
+#       data <- data.frame(age=pData[pData$mime==pData[i,]$mime,]$age, 
+#                          percentage=pData[pData$mime==pData[i,]$mime,]$percentage)
+#       data2 <- data.frame(age=pData[pData$mime==pData[i,]$mime,]$age, 
+#                          percentage=pData[pData$mime==pData[i,]$mime,]$percentage2)
     } else {
-      data <- data.frame(age=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==
-                                     pData[i,][[propertyToTake]],]$age,
-                         percentage=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==pData[i,][[propertyToTake]],]$percentage)
-      data2 <- data.frame(age=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==
-                                     pData[i,][[propertyToTake]],]$age,
-                         percentage=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==pData[i,][[propertyToTake]],]$percentage2)
+      data <- merge(pData, pData[i,][names(pData) %in% c("mime",propertyToTake)], by=c("mime",propertyToTake))
+      
+#       data <- data.frame(age=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==
+#                                      pData[i,][[propertyToTake]],]$age,
+#                          percentage=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==pData[i,][[propertyToTake]],]$percentage)
+#       data2 <- data.frame(age=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==
+#                                      pData[i,][[propertyToTake]],]$age,
+#                          percentage=pData[pData$mime==pData[i,]$mime & pData[[propertyToTake]]==pData[i,][[propertyToTake]],]$percentage2)
     }
     avrg <- average(age,data)
-    avrg2 <- average(age,data2) 
+#     avrg2 <- average(age,data2) 
     pData[i,]$average <- avrg
-    pData[i,]$average2 <- avrg2
+#     pData[i,]$average2 <- avrg2
   }
   
   if (is.na(propertyToTake)) {
-    pData <- pData[c("mime", "year", "amount", "age", "percentage", 
-                     "average", "percentage2", "average2")]
+    pData <- pData[c("mime", "year", "amount", "age", "percentage", "average")]
+#     pData <- pData[c("mime", "year", "amount", "age", "percentage", 
+#                      "average", "percentage2", "average2")]
   }
   else {
     pData <- pData[c("mime", propertyToTake, "year", "amount", "age", 
-                     "percentage", "average", "percentage2", "average2")]
+                     "percentage", "average")]
+#     pData <- pData[c("mime", propertyToTake, "year", "amount", "age", 
+#                      "percentage", "average", "percentage2", "average2")]
   }
 
   return (pData)

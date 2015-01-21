@@ -21,10 +21,16 @@ plotResults <- function(pData, modelData, propertyToTake) {
 #         model <- modelData[modelData$mime==unig[i,]$mime,]$model
 #       }
     }else {
-      X <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$age
-      Yper <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$percentage
-      Yavg <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$average
-      title <- paste(unig[i,]$mime, unig[i,][[propertyToTake]], sep=" ")
+      data <- merge(pData, unig[i,][names(pData) %in% c("mime",propertyToTake)], by=c("mime",propertyToTake))
+      X <- data$age
+      Yper <- data$percentage
+      Yavg <- data$average
+      
+#       X <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$age
+#       Yper <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$percentage
+#       Yavg <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$average
+      
+        title <- paste(unig[i,][names(unig) %in% c("mime",propertyToTake)], collapse=" ")
 #       model <- NA
 #       if (!is.na(modelData)) {
 #         model <- modelData[modelData[["mime"]]==unig[i,]$mime & modelData[[propertyTotake]]==unig[i,][[propertyToTake]],]$model
@@ -38,7 +44,7 @@ plotResults <- function(pData, modelData, propertyToTake) {
 
 
 drawPlot <- function(X,Yper, Yavg, title, model) {
-  plot(X,Yper, main=title, xlim=c(0,20))
+  plot(X,Yper, main=title, xlim=c(0,20), xlab="age", ylab="percentage")
   points(X,Yavg, pch=19)
 #   lo <- loess(Yper ~ X)
 #   X1 <- seq(min(X),max(X), (max(X) - min(X))/1000)
