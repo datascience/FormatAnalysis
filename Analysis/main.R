@@ -7,8 +7,8 @@ file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 fileData <- read.table("input data/IMAGES.txt", header=TRUE, sep="\t", colClasses=c("character"), stringsAsFactors=FALSE) 
-releases <- read.table("input data/release_years.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
-#unification <- read.table("input data/unification_rules.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+releases <- read.table("input data/release_years_formats.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+unification <- read.table("input data/unification_rules.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
 unification <- NA
 source('conflictResolution.R')
 resolveConflictsMime <- resolveConflictsMimeDefault
@@ -32,4 +32,5 @@ data3 <- calculatePercentage(data2,propertyToTake)
 #models <- estimateModel(data3,propertyToTake)
 
 source('plotResults.R')
-plotResults(data3, NA, propertyToTake)
+estimates <- plotResults(data3, NA, propertyToTake)
+write.table(estimates, file="images_estimates.txt", quote=FALSE, sep="\t", col.names=TRUE)

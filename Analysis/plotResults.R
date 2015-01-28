@@ -9,7 +9,7 @@ plotResults <- function(pData, modelData, propertyToTake) {
     unig <- aggregate(as.formula(paste(".~", paste(c("mime", propertyToTake), collapse="+"))), 
                       FUN=length, data=pData)
   }
-  
+  modelEstimates <- data.frame(properties=character(), p=character(), q=character(), m=character(), residual=character(), stringsAsFactors=FALSE)
   for (i in (1:nrow(unig))) {
     if (is.na(propertyToTake)) {
       X <- pData[pData$mime == unig[i,]$mime,]$age
@@ -37,14 +37,20 @@ plotResults <- function(pData, modelData, propertyToTake) {
 #       }
     }
     model <- estimateBass(X,Yavg)
+    print(model)
+    modelEstimates[i,]$properties <- title 
+    modelEstimates[i,]$p <- coef(model)["p"]
+    modelEstimates[i,]$q <- coef(model)["q"]
+    modelEstimates[i,]$m <- coef(model)["m"]
+    modelEstimates[i,]$residual <- sum(residuals(model)^2)
     drawPlot(X,Yper, Yavg, title, model)
   }
-  
+  return (modelEstimates)
 }
 
 
 drawPlot <- function(X,Yper, Yavg, title, model) {
-  plot(X,Yper, main=title, xlim=c(0,20), xlab="age", ylab="percentage")
+  plot(X,Yper, main=title, xlim=c(0,20), ylim=c(0,max(Yper)+0.1*max(Yper)),xlab="age", ylab="percentage")
   points(X,Yavg, pch=19)
 #   lo <- loess(Yper ~ X)
 #   X1 <- seq(min(X),max(X), (max(X) - min(X))/1000)

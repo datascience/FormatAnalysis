@@ -40,4 +40,5 @@ image/jpeg	1.02	1992
 image/tiff	3.0	1986
 image/tiff	4.0	1987
 image/tiff	5.0	1988
+image/tiff	6.0	1992
 

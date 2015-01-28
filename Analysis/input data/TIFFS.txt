@@ -1,0 +1,5 @@
+mime	version
+image/tiff	3.0
+image/tiff	4.0
+image/tiff	5.0
+image/tiff	6.0

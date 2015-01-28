@@ -63,7 +63,6 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
       element <- unificationRules[i,]$element
       from <- unificationRules[i,]$from
       to <- unificationRules[i,]$to
-      print(paste(c(element,from,to), sep=" "))
       pData[pData[[element]]==from, element] <- to
     }
   }

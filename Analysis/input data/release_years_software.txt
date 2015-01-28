@@ -6,5 +6,5 @@ Acrobat Distiller 4	1999
 Acrobat Distiller 5	2001
 Acrobat Distiller 6	2003
 Acrobat Distiller 7	2004
-Acrobat Distiller 8	1993
-Acrobat Distiller 9	1993
+Acrobat Distiller 8	2006
+Acrobat Distiller 9	2008
