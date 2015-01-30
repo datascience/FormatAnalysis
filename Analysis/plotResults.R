@@ -1,7 +1,9 @@
 
 library(minpack.lm)
 
-plotResults <- function(pData, modelData, propertyToTake) {
+plotResults <- function(pData, propertyToTake) {
+  
+  options( warn = -1 )
   
   if (is.na(propertyToTake)) {
     unig <- aggregate(.~mime, FUN=length, data=pData)
@@ -37,7 +39,6 @@ plotResults <- function(pData, modelData, propertyToTake) {
 #       }
     }
     model <- estimateBass(X,Yavg)
-    print(model)
     modelEstimates[i,]$properties <- title 
     modelEstimates[i,]$p <- coef(model)["p"]
     modelEstimates[i,]$q <- coef(model)["q"]
@@ -46,11 +47,13 @@ plotResults <- function(pData, modelData, propertyToTake) {
     drawPlot(X,Yper, Yavg, title, model)
   }
   return (modelEstimates)
+
+options( warn = 0 )
 }
 
 
 drawPlot <- function(X,Yper, Yavg, title, model) {
-  plot(X,Yper, main=title, xlim=c(0,20), ylim=c(0,max(Yper)+0.1*max(Yper)),xlab="age", ylab="percentage")
+  plot(X,Yper, main=title, xlim=c(0,20), ylim=c(0,max(Yper)+0.1*max(Yper)),xlab="age", ylab="adoption")
   points(X,Yavg, pch=19)
 #   lo <- loess(Yper ~ X)
 #   X1 <- seq(min(X),max(X), (max(X) - min(X))/1000)

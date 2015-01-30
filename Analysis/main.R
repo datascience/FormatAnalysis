@@ -1,36 +1,45 @@
+source('config.R')
 source('loadData.R')
-source('utils.R')
+#source('utils.R')
 
 
+groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, colClasses=rep("character", each=ncol(groupData)), sep="\t", stringsAsFactors=FALSE)
+releases <- read.table(paste("input data/", releaseFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
-file <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
-colNames <- c("server", "tika", "droid", "year", "amount")
+# read unification rules file is it is defined
+if (is.na(unificationFile)) {
+  unification <- NA
+} else {
+  unification <- read.table(paste("input data/", unificationFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+}
 
-fileData <- read.table("input data/IMAGES.txt", header=TRUE, sep="\t", colClasses=c("character"), stringsAsFactors=FALSE) 
-releases <- read.table("input data/release_years_formats.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
-unification <- read.table("input data/unification_rules.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
-unification <- NA
+# conflict reduction functions 
 source('conflictResolution.R')
 resolveConflictsMime <- resolveConflictsMimeDefault
 resoresolveConflictsProperty <- resolveConflictsPropertyDefault
 
-nam <- names(fileData)
+# calculate properties to take  
+nam <- names(groupData)
 if (length(nam)==1) {
   propertyToTake <- NA
 } else {
   propertyToTake <- nam[2:length(nam)]
 }
-data <- loadData(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unification)
+# load raw data, filter and reduce conflicts and save the resulting dataset to a file  
+data <- loadData(fileName, colNames, groupData, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unification)
+write.table(data, file=paste("output data/", paste(name,"_filtered.csv"), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
+# calculate age 
 source('calculateAge.R')
 data2 <- calculateAge(data, releases, propertyToTake)
 
+# calculate percentage and moving average of each value
 source('calculatePercentage.R')
 data3 <- calculatePercentage(data2,propertyToTake)
+write.table(data3, file=paste("output data/", paste(name,"_adoption.csv", sep=""), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
-#source('estimateModel.R')
-#models <- estimateModel(data3,propertyToTake)
-
+# estimate the model and plot the curves
 source('plotResults.R')
-estimates <- plotResults(data3, NA, propertyToTake)
-write.table(estimates, file="images_estimates.txt", quote=FALSE, sep="\t", col.names=TRUE)
+estimates <- plotResults(data3, propertyToTake)
+write.table(estimates, file=paste("output data/", paste(name,"_estimates.csv", sep=""), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)

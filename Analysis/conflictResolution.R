@@ -1,5 +1,5 @@
 
-rules <- read.table("input data/conflicts_rules.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+rules <- read.table("input data/conflicts_rules.csv", header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 resolveConflictsMimeDefault <- function(row) {
   x <- row[2]

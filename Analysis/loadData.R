@@ -2,7 +2,7 @@
 
 source('utils.R')
 
-loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unificationRules) {
+loadData <- function(file, colNames, groupData, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unificationRules) {
 
   options( warn = -1 )
   
@@ -29,12 +29,12 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
   rm(rawData)
   
   #filter according to mime type 
-  pData <- pData[apply(pData[,grep("mime", names(pData))], 1, function(row) any(row %in% fileData$mime)), ]
+  pData <- pData[apply(pData[,grep("mime", names(pData))], 1, function(row) any(row %in% groupData$mime)), ]
   
   #filter according to property 
   if (!is.na(propertyToTake)) {
     for (prop in propertyToTake) {
-      pData <- pData[apply(pData[,grep(prop, names(pData))], 1, function(row) any(row %in% fileData[[prop]])), ]
+      pData <- pData[apply(pData[,grep(prop, names(pData))], 1, function(row) any(row %in% groupData[[prop]])), ]
     }
   }
   
@@ -50,10 +50,10 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
   pData <- pData[,names(pData) %in% c("mime", propertyToTake, "year", "amount")]
 
   #filter once more just to be sure we have removed all unwanted elements
-  pData <- pData[!is.na(pData$mime) & pData$mime %in% fileData$mime,]
+  pData <- pData[!is.na(pData$mime) & pData$mime %in% groupData$mime,]
   if (!is.na(propertyToTake)) {
     for (prop in propertyToTake) {
-      pData <- pData[!is.na(pData[[prop]]) & pData[[prop]] %in% fileData[[prop]], ]
+      pData <- pData[!is.na(pData[[prop]]) & pData[[prop]] %in% groupData[[prop]], ]
     }
   }
 
@@ -61,9 +61,11 @@ loadData <- function(file, colNames, propertyToTake, resolveConflictsMime, resol
   if (!is.na(unificationRules)) {
     for (i in c(1:nrow(unificationRules))) {
       element <- unificationRules[i,]$element
-      from <- unificationRules[i,]$from
-      to <- unificationRules[i,]$to
-      pData[pData[[element]]==from, element] <- to
+      if (element %in% c("mime", propertyToTake)) {        
+        from <- unificationRules[i,]$from
+        to <- unificationRules[i,]$to
+        pData[pData[[element]]==from, element] <- to
+      }
     }
   }
 
