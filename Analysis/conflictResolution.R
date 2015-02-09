@@ -1,5 +1,5 @@
 
-rules <- read.table("input data/conflicts_rules.csv", header=TRUE, sep="\t", stringsAsFactors=FALSE)
+rules <- read.table("input data/conflicts_rules.csv", header=TRUE, sep="\t", colClasses=c("character","character","character"), stringsAsFactors=FALSE)
 
 resolveConflictsMimeDefault <- function(row) {
   x <- row[2]
@@ -17,9 +17,12 @@ resolveConflictsMimeDefault <- function(row) {
   } else if (x!="application/octet-stream" & y=="application/octet-stream") {
     return (x)
   }else if (x!=y) {
-    value <- rules[rules$element=="mime" & ((rules$value1==x & rules$value2==y) | 
+    print (paste(x,y,sep="  "))
+    value <- rules[rules$property=="mime" & ((rules$value1==x & rules$value2==y) | 
                                               (rules$value1==y & rules$value2==x)),]$value2
+    print (value)
     if (length(value)>0) {
+      print(value)
       return (value)
     }else {
       return (x)
