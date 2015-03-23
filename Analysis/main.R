@@ -41,5 +41,5 @@ write.table(data3, file=paste("output data/", paste(name,"_adoption.csv", sep=""
 
 # estimate the model and plot the curves
 source('plotResults.R')
-estimates <- plotResults(data3, propertyToTake)
+estimates <- plotResults(data3, propertyToTake, start, end)
 write.table(estimates, file=paste("output data/", paste(name,"_estimates.csv", sep=""), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)

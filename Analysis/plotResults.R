@@ -1,9 +1,12 @@
 
 library(minpack.lm)
+library(propagate)
 
-plotResults <- function(pData, propertyToTake) {
-  
+plotResults <- function(pData, propertyToTake, start, end) {
+ 
   options( warn = -1 )
+  pData <- pData[pData$year >= start & pData$year<=end,]
+ 
   
   if (is.na(propertyToTake)) {
     unig <- aggregate(.~mime, FUN=length, data=pData)
@@ -62,8 +65,12 @@ drawPlot <- function(X,Yper, Yavg, title, model) {
     f <- data.frame(x=seq(0,20, len=200))
     #print(model)
     #f <- data.frame(x=seq(min(X),max(X), len=200))
-    f$y <- predict(model, newdata=f)
+    temp <- predictNLS(model, newdata=f, interval="prediction", level=0.95)
+    print(temp)
+    f$y <- predict(model, newdata=f, interval="confidence")
     lines(f$x,f$y)
+    title <- gsub("/","-",title)
+    write.table(f, file=paste("output data/", paste(title,"_curve.csv"), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   }
 }
 
