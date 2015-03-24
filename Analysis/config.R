@@ -8,5 +8,5 @@ groupFile <- "PDFS.csv"
 releaseFile <- "release_years_format_versions.csv"
 unificationFile <- "unification_rules.csv"
 start <- 1994
-end <- 2009
+end <- 2010
 
