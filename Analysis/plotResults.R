@@ -20,6 +20,7 @@ plotResults <- function(pData, propertyToTake, start, end) {
       X <- pData[pData$mime == unig[i,]$mime,]$age
       Yper <- pData[pData$mime == unig[i,]$mime,]$percentage
       Yavg <- pData[pData$mime == unig[i,]$mime,]$average
+      year <- pData[pData$mime == unig[i,]$mime,]$year
       title <- paste(unig[i,]$mime," ", sep="")
 #       model <- estimate(X,Y)
 #       if (!is.na(modelData)) {
@@ -30,6 +31,7 @@ plotResults <- function(pData, propertyToTake, start, end) {
       X <- data$age
       Yper <- data$percentage
       Yavg <- data$average
+      year <- data$year
       
 #       X <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$age
 #       Yper <- pData[pData[["mime"]]==unig[i,]$mime & pData[[propertyToTake]]==unig[i,][[propertyToTake]],]$percentage
@@ -41,11 +43,6 @@ plotResults <- function(pData, propertyToTake, start, end) {
 #         model <- modelData[modelData[["mime"]]==unig[i,]$mime & modelData[[propertyTotake]]==unig[i,][[propertyToTake]],]$model
 #       }
     }
-    print(length(X))
-    if (length(X)<=3) {
-      print("next")
-      next
-    }
     print("estimating")
     model <- estimateBass(X,Yavg)
     modelEstimates[i,]$properties <- title 
@@ -53,7 +50,8 @@ plotResults <- function(pData, propertyToTake, start, end) {
     modelEstimates[i,]$q <- coef(model)["q"]
     modelEstimates[i,]$m <- coef(model)["m"]
     modelEstimates[i,]$residual <- sum(residuals(model)^2)
-    drawPlot(X,Yper, Yavg, title, model)
+    releaseYear <- year[1]-X[1]
+    drawPlot(X,Yper, Yavg, title, model, releaseYear)
   }
   return (modelEstimates)
 
@@ -61,7 +59,7 @@ options( warn = 0 )
 }
 
 
-drawPlot <- function(X,Yper, Yavg, title, model) {
+drawPlot <- function(X,Yper, Yavg, title, model, releaseYear) {
   #plot(X,Yper, main=title, xlim=c(0,20), ylim=c(0,max(Yper)+0.1*max(Yper)),xlab="age", ylab="adoption")
   #points(X,Yavg, pch=19)
 #   lo <- loess(Yper ~ X)
@@ -85,7 +83,14 @@ drawPlot <- function(X,Yper, Yavg, title, model) {
     lines(f$x,f$lwr, lty=2)
     lines(f$x,f$upr, lty=2)
     title <- gsub("/","-",title)
-    write.table(f, file=paste("output data/", paste(title,"_curve.csv"), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+    
+    f <- data.frame(x=seq(0,20))
+    temp <- predictNLS(model, newdata=f, interval="prediction", alpha=0.01)
+    f$year <- f$x + releaseYear
+    f$y <- temp$summary[,1]
+    f$lwr <- temp$summary[,5]
+    f$upr <- temp$summary[,6]
+    write.table(f, file=paste("output data/", paste(title,"_predictions.csv"), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   }
 }
 
