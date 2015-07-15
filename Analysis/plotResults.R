@@ -51,7 +51,7 @@ plotResults <- function(pData, propertyToTake, start, end) {
     modelEstimates[i,]$m <- coef(model)["m"]
     modelEstimates[i,]$residual <- sum(residuals(model)^2)
     releaseYear <- year[1]-X[1]
-    drawPlot(X,Yper, Yavg, title, model, releaseYear)
+    drawPlot(X,Yper, Yavg, title, model, releaseYear, modelEstimates[i,])
   }
   return (modelEstimates)
 
@@ -59,33 +59,44 @@ options( warn = 0 )
 }
 
 
-drawPlot <- function(X,Yper, Yavg, title, model, releaseYear) {
-  #plot(X,Yper, main=title, xlim=c(0,20), ylim=c(0,max(Yper)+0.1*max(Yper)),xlab="age", ylab="adoption")
-  #points(X,Yavg, pch=19)
-#   lo <- loess(Yper ~ X)
-#   X1 <- seq(min(X),max(X), (max(X) - min(X))/1000)
-#   lines(X1, predict(lo, X1),col='red')
+drawPlot <- function(X,Yper, Yavg, title, model, releaseYear, modelEstimates) {
+
   if (!is.na(model)) {
-    f <- data.frame(x=seq(0,20, len=200))
-    #print(model)
-    #f <- data.frame(x=seq(min(X),max(X), len=200))
-    temp <- predictNLS(model, newdata=f, interval="prediction", alpha=0.01)
+    f <- data.frame(x=seq(0,30, len=200))
+
+    temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01)
     #print(temp$summary[,1])
     #f$y <- predict(model, newdata=f)
     f$y <- temp$summary[,1]
     f$lwr <- temp$summary[,5]
     f$upr <- temp$summary[,6]
-    plot(NULL, main=title, xlim=c(0,20), ylim=c(min(f$lwr)-0.1*abs(min(f$lwr)), max(f$upr)+0.1*max(f$upr)),xlab="age", ylab="adoption")
-    polygon(c(f$x,rev(f$x)), c(f$lwr,rev(f$upr)), col='grey96', border=NA)
+    p <- as.numeric(modelEstimates$p);
+    m <- as.numeric(modelEstimates$m);
+    q <- as.numeric(modelEstimates$q);
+    f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
+    #plot(NULL, main=title, xlim=c(0,30), ylim=c(min(f$lwr)-0.1*abs(min(f$lwr)), max(f$upr)+0.1*max(f$upr)),xlab="age", ylab="adoption")
+  
+    #par(mfrow = c(2,1))  
+    layout(matrix(c(1,2), 2, 1, byrow = TRUE), heights = c(1.5,1))
+    
+    par(mar=c(2,4,2,1))
+    plot(NULL, main=title, xlim=c(0,30), ylim=c(min(f$y)-0.1*min(f$y),max(f$y)+0.1*max(f$y)), ylab="adoption", xlab="")
+   # polygon(c(f$x,rev(f$x)), c(f$lwr,rev(f$upr)), col='grey96', border=NA)
     points(X,Yper, pch=17)
     points(X,Yavg, pch=19)
     lines(f$x,f$y)
-    lines(f$x,f$lwr, lty=2)
-    lines(f$x,f$upr, lty=2)
+    
+    par(mar=c(4,4,2,1))
+    plot(NULL, xlim=c(0,30), ylim=c(min(f$derv)-0.1*abs(min(f$derv)),max(f$derv)+0.1*max(f$derv)),xlab="age", ylab="rate of change")
+    polygon(c(f$x,rev(f$x)), c(rep(0,length(f$x)),rev(f$derv)), col='grey96', border=NA)
+    lines(f$x,f$derv)
+    
+    #lines(f$x,f$lwr, lty=2)
+    #lines(f$x,f$upr, lty=2)
     title <- gsub("/","-",title)
     
-    f <- data.frame(x=seq(0,20))
-    temp <- predictNLS(model, newdata=f, interval="prediction", alpha=0.01)
+    f <- data.frame(x=seq(0,30))
+    temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01)
     f$year <- f$x + releaseYear
     f$y <- temp$summary[,1]
     f$lwr <- temp$summary[,5]
