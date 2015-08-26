@@ -21,6 +21,26 @@ application/postscript	1982
 application/rtf	1987
 application/msword	1983
 application/vnd.oasis.opendocument.text	1999
+application/vnd.ms-htmlhelp	1997
+application/vnd.ms-word.document.macroEnabled.12	2007
+application/vnd.openxmlformats-officedocument.wordprocessingml.document	2007
+application/vnd.openxmlformats-officedocument.wordprocessingml.template	2007
+application/eps	1992
+application/vnd.oasis.opendocument.text	2005
+application/x-iwork-pages-sffpages	2005
+application/x-mspublisher	1991
+application/vnd.sun.xml.writer	1985
+application/wordperfect	1979
+application/vnd.ms-works	1988
+application/vnd.ms-xpsdocument	2006
+application/x-7z-compressed	1999
+application/x-bzip2	2000
+application/x-gzip	1992
+application/x-rar-compressed	1993
+application/x-tar	1988
+application/x-gtar	1990
+application/zip	1989
+	
 
 
 

@@ -1,13 +1,18 @@
 mime <- function(x) {
   values <- strsplit(x, split=";")
   c <- sapply(values, "[", 1) 
-  c
+  return (c)
 }
 
 property <- function(x, prop) {
+  print (prop)
+  if (prop=="mime" | prop=="Mime") {
+    print ("returning mime")
+    return (mime(x))
+  } 
   values <- strsplit(x, split="; ")
   c <- unlist(sapply(values, extractProperty, prop))
-  c
+  return (c)
 }
 
 extractProperty <- function(x, property) {
@@ -15,7 +20,7 @@ extractProperty <- function(x, property) {
   c <- unlist(strsplit(x[grep(property, x, fixed=TRUE)], split="="))[2]
   c[grep("\"*\"",c)] <- substring(c[grep("\"*\"",c)], 2, nchar(c[grep("\"*\"",c)])-1)
   c[is.null(c)] <- NA
-  c
+  return (c)
 }
 
 
@@ -64,6 +69,23 @@ estimateS <- function(p,q,m,num) {
     } 
   }
   return (c)
+}
+
+
+unifyValues <- function(row, groupProps) {
+  bo <- row
+  print(row)
+  if (!is.na(row) & row!=" "){
+    tmp <- unlist(lapply(groupProps, function(x) row %in% unlist(x)))
+    poz <- min(which(tmp==TRUE))
+    if (is.finite(poz)) {
+      tmpList <- unlist(groupProps[poz])
+      boOld <- bo
+      bo <- tmpList[1]
+      print (paste(c(boOld," changed to ",bo)))
+    } 
+  }
+  return (bo)
 }
 
 

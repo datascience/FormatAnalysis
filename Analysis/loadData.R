@@ -15,27 +15,28 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   pData <- data.frame(rawData$year, rawData$amount)
   colnames(pData) <- c("year", "amount");
   for (i in colNames[1:(length(colNames)-2)]) {
-    tmp <- paste("mime",i,sep="")
-    pData[[tmp]] <- mime(rawData[[i]]) 
-    if (!is.na(propertyToTake)) {
-      for (prop in propertyToTake)   {
+    for (prop in propertyToTake)   {
         tmp <- paste(prop,i,sep="")
         pData[[tmp]] <- property(rawData[[i]], prop)
-      }
     }
   }
+
   
   #remove raw data from memory
   rm(rawData)
   
   #filter according to mime type 
-  pData <- pData[apply(pData[,grep("mime", names(pData))], 1, function(row) any(row %in% groupData$mime)), ]
+  #pData <- pData[apply(pData[,grep("mime", names(pData))], 1, function(row) any(row %in% groupData$mime)), ]
   
-  #filter according to property 
-  if (!is.na(propertyToTake)) {
-    for (prop in propertyToTake) {
-      pData <- pData[apply(pData[,grep(prop, names(pData))], 1, function(row) any(row %in% groupData[[prop]])), ]
-    }
+  #filter according to selected properties and unify different values 
+  for (prop in propertyToTake) {
+    tempProp <- groupData[[prop]]
+    tempNames <- grep(prop, names(pData))
+    pData[,tempNames] <- apply(pData[,tempNames], c(1,2), function(value) unifyValues(value, tempProp))
+    tempProp <- sapply(tempProp, "[",1)
+    pData <- pData[apply(pData[,tempNames], 1, function(row) any(row %in% tempProp)), ]
+    #vec <- apply(pData[,tempNames], 1, function(row) any(length(which(row==tempProp))>0))
+    #pData <- pData[vec, ]
   }
   
   # resolving conflicts

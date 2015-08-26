@@ -43,7 +43,7 @@ plotResults <- function(pData, propertyToTake, start, end) {
 #         model <- modelData[modelData[["mime"]]==unig[i,]$mime & modelData[[propertyTotake]]==unig[i,][[propertyToTake]],]$model
 #       }
     }
-    print("estimating")
+    #print("estimating")
     model <- estimateBass(X,Yavg)
     modelEstimates[i,]$properties <- title 
     modelEstimates[i,]$p <- coef(model)["p"]
@@ -65,8 +65,6 @@ drawPlot <- function(X,Yper, Yavg, title, model, releaseYear, modelEstimates) {
     f <- data.frame(x=seq(0,30, len=200))
 
     temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01)
-    #print(temp$summary[,1])
-    #f$y <- predict(model, newdata=f)
     f$y <- temp$summary[,1]
     f$lwr <- temp$summary[,5]
     f$upr <- temp$summary[,6]
@@ -74,26 +72,40 @@ drawPlot <- function(X,Yper, Yavg, title, model, releaseYear, modelEstimates) {
     m <- as.numeric(modelEstimates$m);
     q <- as.numeric(modelEstimates$q);
     f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
-    #plot(NULL, main=title, xlim=c(0,30), ylim=c(min(f$lwr)-0.1*abs(min(f$lwr)), max(f$upr)+0.1*max(f$upr)),xlab="age", ylab="adoption")
-  
-    #par(mfrow = c(2,1))  
-    layout(matrix(c(1,2), 2, 1, byrow = TRUE), heights = c(1.5,1))
     
-    par(mar=c(2,4,2,1))
-    plot(NULL, main=title, xlim=c(0,30), ylim=c(min(f$y)-0.1*min(f$y),max(f$y)+0.1*max(f$y)), ylab="adoption", xlab="")
-   # polygon(c(f$x,rev(f$x)), c(f$lwr,rev(f$upr)), col='grey96', border=NA)
-    points(X,Yper, pch=17)
-    points(X,Yavg, pch=19)
+    title <- gsub("/","-",title) 
+    dir.create(paste("output data/",name,sep=""))
+    png(filename=paste("output data/", paste(name, paste("/", paste(title,".png", sep=""),sep=""),sep=""),sep=""))
+    
+    if (includeRateOfChange) { 
+      layout(matrix(c(1,2), 2, 1, byrow = TRUE), heights = c(1.5,1))
+      par(mar=c(2,4,2,1))
+    }  
+    if (includeInterval) {
+      plot(NULL, main=title, xlim=c(0,30), ylim=c(min(f$lwr)-0.1*abs(min(f$lwr)), max(f$upr)+0.1*max(f$upr)),xlab="age", ylab="adoption")
+      polygon(c(f$x,rev(f$x)), c(f$lwr,rev(f$upr)), col='grey96', border=NA)
+      lines(f$x,f$lwr, lty=2)
+      lines(f$x,f$upr, lty=2)
+    } else {
+      plot(NULL, main=title, xlim=c(0,30), ylim=c(min(f$y)-0.1*min(f$y),max(f$y)+0.1*max(f$y)), ylab="adoption", xlab="")
+    }
+    if (includePoints) {
+      points(X,Yper, pch=17)
+      points(X,Yavg, pch=19)
+    }
     lines(f$x,f$y)
     
-    par(mar=c(4,4,2,1))
-    plot(NULL, xlim=c(0,30), ylim=c(min(f$derv)-0.1*abs(min(f$derv)),max(f$derv)+0.1*max(f$derv)),xlab="age", ylab="rate of change")
-    polygon(c(f$x,rev(f$x)), c(rep(0,length(f$x)),rev(f$derv)), col='grey96', border=NA)
-    lines(f$x,f$derv)
+    if (includeRateOfChange) {
+      par(mar=c(4,4,2,1))
+      plot(NULL, xlim=c(0,30), ylim=c(min(f$derv)-0.1*abs(min(f$derv)),max(f$derv)+0.1*max(f$derv)),xlab="age", ylab="rate of change")
+      polygon(c(f$x,rev(f$x)), c(rep(0,length(f$x)),rev(f$derv)), col='grey96', border=NA)
+      lines(f$x,f$derv)
+    }
     
-    #lines(f$x,f$lwr, lty=2)
-    #lines(f$x,f$upr, lty=2)
-    title <- gsub("/","-",title)
+    
+    
+    #dev.print(png, filename=paste("output data/", paste(name, paste("/", paste(title,".png", sep=""),sep=""),sep=""),sep=""),sep="")
+    dev.off()
     
     f <- data.frame(x=seq(0,30))
     temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01)

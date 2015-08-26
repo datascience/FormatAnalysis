@@ -5,4 +5,15 @@ application/rtf
 application/msword
 application/vnd.openxmlformats-officedocument.wordprocessingml.document
 application/vnd.oasis.opendocument.text
+application/vnd.ms-htmlhelp
+application/vnd.ms-word.document.macroEnabled.12
+application/vnd.openxmlformats-officedocument.wordprocessingml.template
+application/eps
+application/vnd.oasis.opendocument.text
+application/x-iwork-pages-sffpages
+application/x-mspublisher
+application/vnd.sun.xml.writer
+application/wordperfect
+application/vnd.ms-works
+application/vnd.ms-xpsdocument
 

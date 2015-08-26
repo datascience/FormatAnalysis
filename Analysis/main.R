@@ -5,14 +5,14 @@ source('loadData.R')
 
 groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
 groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, colClasses=rep("character", each=ncol(groupData)), sep="\t", stringsAsFactors=FALSE)
-releases <- read.table(paste("input data/", releaseFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+#releases <- read.table(paste("input data/", releaseFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 # read unification rules file is it is defined
-if (is.na(unificationFile)) {
-  unification <- NA
-} else {
-  unification <- read.table(paste("input data/", unificationFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-}
+#if (is.na(unificationFile)) {
+#  unification <- NA
+#} else {
+#  unification <- read.table(paste("input data/", unificationFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+#}
 
 # conflict reduction functions 
 source('conflictResolution.R')
@@ -21,11 +21,14 @@ resoresolveConflictsProperty <- resolveConflictsPropertyDefault
 
 # calculate properties to take  
 nam <- names(groupData)
-if (length(nam)==1) {
-  propertyToTake <- NA
-} else {
-  propertyToTake <- nam[2:length(nam)]
+propertyToTake <- nam[!(nam %in% c("ID", "name", "release.year", "comments"))]
+
+#make a list from multiple mime and other property values
+for (prop in propertyToTake) {
+  groupData[[prop]] <- strsplit(groupData[[prop]], split = " ")
 }
+
+
 # load raw data, filter and reduce conflicts and save the resulting dataset to a file  
 data <- loadData(fileName, colNames, groupData, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unification)
 write.table(data, file=paste("output data/", paste(name,"_filtered.csv"), sep=""), quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
