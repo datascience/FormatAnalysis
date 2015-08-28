@@ -74,7 +74,7 @@ drawPlot <- function(X,Yper, Yavg, title, model, releaseYear, modelEstimates) {
     f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
     
     title <- gsub("/","-",title) 
-    dir.create(paste("output data/",name,sep=""))
+    #dir.create(paste("output data/",name,sep=""))
     png(filename=paste("output data/", paste(name, paste("/", paste(title,".png", sep=""),sep=""),sep=""),sep=""))
     
     if (includeRateOfChange) { 

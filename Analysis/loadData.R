@@ -2,16 +2,18 @@
 
 source('utils.R')
 
-loadData <- function(file, colNames, groupData, propertyToTake, resolveConflictsMime, resolveConflictsProperty, unificationRules) {
+loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts) {
 
   options( warn = -1 )
   
   #load data from a file into a data frame
+  print("Loading raw data")
   rawData <- loadDataFromFile(file, colNames)
-
+  print("Raw data loaded, starting processing")
   
   #extrcating mime and property into seprate columns and 
   #unifying everything into one data frame (pData)
+  print("Extracting properties as separate values")
   pData <- data.frame(rawData$year, rawData$amount)
   colnames(pData) <- c("year", "amount");
   for (i in colNames[1:(length(colNames)-2)]) {
@@ -20,63 +22,59 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
         pData[[tmp]] <- property(rawData[[i]], prop)
     }
   }
-
   
   #remove raw data from memory
   rm(rawData)
   
-  #filter according to mime type 
-  #pData <- pData[apply(pData[,grep("mime", names(pData))], 1, function(row) any(row %in% groupData$mime)), ]
   
-  #filter according to selected properties and unify different values 
+  #filter according to selected properties
   for (prop in propertyToTake) {
-    tempProp <- groupData[[prop]]
-    tempNames <- grep(prop, names(pData))
-    pData[,tempNames] <- apply(pData[,tempNames], c(1,2), function(value) unifyValues(value, tempProp))
-    tempProp <- sapply(tempProp, "[",1)
-    pData <- pData[apply(pData[,tempNames], 1, function(row) any(row %in% tempProp)), ]
-    #vec <- apply(pData[,tempNames], 1, function(row) any(length(which(row==tempProp))>0))
-    #pData <- pData[vec, ]
+    print (paste("Filtering according to: ", prop))
+    tempNames <- grep(prop, names(pData)) 
+    tempV <- unique(unlist(groupData[[prop]]))
+    pData <- pData[apply(pData[,tempNames], 1, function(row) any(row %in% tempV)), ]
   }
+  
+  recordConflicts(pData, propertyToTake, 1)
+  
+  #unify all equal properties
+  for (prop in propertyToTake) {
+    print (paste("Unifying according to: ", prop))
+    tempNames <- grep(prop, names(pData))
+    pData[,tempNames] <- apply(pData[,tempNames], c(1,2), function(value) unifyValues(value, groupData[[prop]]))
+    groupData[[prop]] <- sapply(groupData[[prop]], "[",1)
+  }
+  
+  recordConflicts(pData, propertyToTake, 2)
   
   # resolving conflicts
-  pData$mime <- apply(pData[,grep("mime", names(pData))], 1, resolveConflictsMime)
-  if (!is.na(propertyToTake)) {
+  print("Resolving conflicts")
+  if (!is.na(resolveConflicts)) {
     for (prop in propertyToTake) {
-      pData[[prop]] <- apply(pData[,grep(prop, names(pData))], 1, resoresolveConflictsProperty)
+        pData[[prop]] <- apply(pData[,grep(prop, names(pData))], 1, function(row) resolveConflicts(row,prop))
     }
   }
   
+  recordConflicts(pData, propertyToTake, 3)
+
   
-  pData <- pData[,names(pData) %in% c("mime", propertyToTake, "year", "amount")]
-
-  #filter once more just to be sure we have removed all unwanted elements
-  pData <- pData[!is.na(pData$mime) & pData$mime %in% groupData$mime,]
-  if (!is.na(propertyToTake)) {
-    for (prop in propertyToTake) {
-      pData <- pData[!is.na(pData[[prop]]) & pData[[prop]] %in% groupData[[prop]], ]
-    }
+  print ("Final processing")
+  # filter once more to remove those elements that do not belong to the selected group
+  # conflict reduction could have resolved some entries to not needed values
+  for (prop in propertyToTake) {
+    pData <- pData[pData[[prop]] %in% groupData[[prop]],]
+    pData[[prop]] <- as.character(pData[[prop]])
   }
+  
+  recordConflicts(pData, propertyToTake, 4)
+  
+  #discard columns that are not needed anymore
+  pData <- pData[,names(pData) %in% c(propertyToTake, "year", "amount")]
 
-  #unification 
-  if (!is.na(unificationRules)) {
-    for (i in c(1:nrow(unificationRules))) {
-      element <- unificationRules[i,]$element
-      if (element %in% c("mime", propertyToTake)) {        
-        from <- unificationRules[i,]$from
-        to <- unificationRules[i,]$to
-        pData[pData[[element]]==from, element] <- to
-      }
-    }
-  }
 
-  #aggregate if there are some repeating entries
-  if (is.na(propertyToTake)) {
-    pData <- aggregate(amount~mime+year, FUN=sum, data=pData)
-  }else {
-    pData <- aggregate(as.formula(paste("amount~", paste(c("mime", propertyToTake, "year"), collapse="+"))), 
+  #aggregate if there are some duplicate entries
+  pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year"), collapse="+"))), 
                        FUN=sum, data=pData)    
-  }
   options(warn=0)
   return (pData)
   
