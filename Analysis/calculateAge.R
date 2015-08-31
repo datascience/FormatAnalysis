@@ -1,24 +1,15 @@
 
-calculateAge <- function(pData, releaseYears, propertyToTake) {
+calculateAge <- function(pData, gData, pTake) {
 
   options( warn = -1 )
-  
-  #if (is.na(propertyToTake)) {
-    
-    #releases <- aggregate(releaseYear~mime, FUN=min, data=releaseYears)
-  
-    #pData <- merge(pData,releases, by=c("mime"))
-    #rm(releases)
-    #pData$age <- pData$year - pData$releaseYear
-    #pData <- pData[!(names(pData)=="releaseYear")]
-  
-  #} else {
-    nam <- names(releaseYears)
-    nam <- nam[nam != "releaseYear"]
-    pData <- merge(pData,releaseYears, by=nam)
-    pData$age <- pData$year - pData$releaseYear
-    pData <- pData[!(names(pData)=="releaseYear")]
-  #}
+
+  nam <- names(gData)
+  nam <- nam[!(nam %in% c("release.year", "name", "comments", "ID"))]
+  pData <- merge(pData,gData, by=nam)
+  pData$age <- pData$year - as.numeric(pData$release.year)
+  pData <- pData[!(names(pData)=="comments")]
+  #pData <- pData[!(names(pData)=="releaseYear")]
+
   pData <- pData[pData$age>=0,]
   options(warn=0)
   return (pData)
