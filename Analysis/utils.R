@@ -102,24 +102,9 @@ recordConflicts <-function(data, properties, x) {
                             FUN=sum, data=tempData, na.rm=TRUE, na.action=NULL)
       tempData <- tempData[order(tempData$amount, na.last = TRUE, decreasing=TRUE),]
     }
-    path <- paste("output data/", name, "/statistics",sep="")
-    dir.create(path)
-    write.table(tempData, file=paste(path, "/conflictstats", prop, x, ".tsv", sep=""), 
+    pathTemp <- paste(path, "/statistics",sep="")
+    dir.create(pathTemp)
+    write.table(tempData, file=paste(pathTemp, "/conflictstats", prop, x, ".tsv", sep=""), 
               quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   }
 }
-
-# recordConflictsAfterResolution <-function(data) {
-#   data <- data[, c(grep("mime", names(data)), grep("amount", names(data)))]
-#   data <- data[is.na(data$mime) | is.null(data$mime),]
-#   data <- data[,!(names(data)=="mime")]
-#   #data <- data[!(data$mimeserver==data$mimedroid & data$mimeserver==data$mimetika),]
-#   if (nrow(data)>0) {
-#     data <- aggregate(amount~mimeserver+mimedroid+mimetika, FUN=sum, data=data)
-#     data <- data[order(-data$amount),]
-#   }
-#   path <- paste("output data/", name, "/statistics",sep="")
-#   dir.create(path)
-#   write.table(data, file=paste(path, "/conflictstats2.tsv", sep=""), 
-#               quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
-# }

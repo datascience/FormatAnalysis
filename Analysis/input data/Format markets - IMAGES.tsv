@@ -1,0 +1,49 @@
+ID	name	mime	release year	comments
+1	Portable Network Graphics	image/png	1996	
+2	Graphics Interchange Format	image/gif	1987	
+3	Bitmap Image File	image/bmp	1985	
+4	Joint Photographic Experts Group	image/jpeg	1991	
+5	Tagged Image File Format	image/tiff	1986	
+6	Flexible Image Transport System	image/fits	1980	
+7	HD Photo (formerly Windows Media Photo)	image/vnd.ms-photo	2006	
+8	JPEG 2000 File Formats	image/jp2	2000	
+9	Scalable Vector Graphics	image/svg+xml	2003	
+10	Truevision TGA File format	image/x-tga	1984	
+11	X BitMap	image/x-xbitmap	1989	
+12	PICT, Apple Macintosh QuickDraw/picture file	image/x-pict	1984	https://en.wikipedia.org/wiki/PICT  http://www.online-convert.com/file-format/pict
+13	Computer Graphics Metafile	image/cgm	1986	
+14	Drawing Interchange Format	image/vnd.dxf	1982	
+15	WebP	image/webp	2010	from Google
+16	Multiple-image Network Graphics	image/x-mng video/x-mng	2001	
+17	DjVu	image/vnd.djvu image/x-djvu	1998	https://en.wikipedia.org/wiki/DjVu
+18	Photoshop Document	image/vnd.adobe.photoshop		
+19	Silicon Graphics Image	image/sgi	1995	https://en.wikipedia.org/wiki/Silicon_Graphics_Image
+20	eXperimental Computing Facility	image/xcf		https://en.wikipedia.org/wiki/XCF_%28file_format%29
+21	Seattle FilmWorks image	image/sfw		
+22	PiCture eXchange	image/x-pcx	1985	https://en.wikipedia.org/wiki/PCX  http://www.online-convert.com/file-format/pcx
+23	ICO Microsoft icon file	image/x-icon	1987	https://en.wikipedia.org/wiki/ICO_%28file_format%29  http://www.online-convert.com/file-format/ico
+24	FlashPix	application/vnd.fpx		http://www.online-convert.com/file-format/fpx https://en.wikipedia.org/wiki/FlashPix
+25	BTIF	image/prs.btif		
+26	CMU Image	image/x-cmu-raster		
+27	Corel Metafile Exchange (CMX)	image/x-cmx		
+28	DECE Graphic	image/vnd.dece.graphic		
+29	DWG Drawing	image/vnd.dwg		
+30	EDMICS 2000	image/vnd.fujixerox.edmics-mmr image/vnd.fujixerox.edmics-rlc		
+31	eXtended Image File Format (XIFF)	image/vnd.xiff		
+32	FAST Search & Transfer ASA	image/vnd.fst		
+33	FastBid Sheet	image/vnd.fastbidsheet		
+34	FreeHand MX	image/x-freehand		
+35	G3 Fax Image	image/g3fax		
+36	Image Exchange Format	image/ief		
+37	Microsoft Document Imaging Format	image/vnd.ms-modi		
+38	OpenDocument Image	application/vnd.oasis.opendocument.image		
+39	OpenGL Textures (KTX)	image/ktx		
+40	Photoshop Document	image/vnd.adobe.photoshop		
+41	Portable Anymap Image	image/x-portable-anymap		
+42	Portable Bitmap Format	image/x-portable-bitmap		
+43	Portable Graymap Format	image/x-portable-graymap		
+44	Portable Pixmap Format	image/x-portable-pixmap		
+45	Silicon Graphics RGB Bitmap	image/x-rgb		
+46	WAP Bitamp (WBMP)	image/vnd.wap.wbmp		
+47	 X PixMap	image/x-xpixmap		
+48	X Window Dump	image/x-xwindowdump		

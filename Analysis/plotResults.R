@@ -2,8 +2,8 @@
 plotResults <- function(pData, includeRateOfChange, includeInterval, includePoints) {
   
   options( warn = -1 )
-  path <- paste("output data/", name, "/graphs/", sep="")
-  dir.create(path)
+  pathGraph <- paste(path, "/graphs/", sep="")
+  dir.create(pathGraph)
   
   for (i in (1:nrow(pData))) {
     
@@ -17,7 +17,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     lower <- unlist(pData[i,]$lower)
     derv <- unlist(pData[i,]$derv)
     
-    png(filename=paste(path, title, ".png", sep=""))
+    png(filename=paste(pathGraph, title, ".png", sep=""))
     
     if (includeRateOfChange) { 
       layout(matrix(c(1,2), 2, 1, byrow = TRUE), heights = c(1.5,1))
@@ -52,13 +52,14 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
   }
   
   #plot the cluster 
-  png(filename=paste("output data/", paste(name, paste("/graphs/cluster.png", sep=""),sep=""),sep=""))
+  png(filename=paste(pathGraph, "cluster.png", sep=""))
   plot(NULL, main="cluster", xlim=c(0,30), ylim=c(0,1.2), xlab="age", ylab="adoption")
   for (i in (1:nrow(pData))) {
     interval <- unlist(pData[i,]$interval)
     model <- unlist(pData[i,]$model)
-    lines(interval,model)
+    lines(interval,model, col=i)
   }
+  legend('topright', pData$name, lty=c(1,1), col=1:nrow(pData))
   dev.off()
 }
 

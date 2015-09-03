@@ -2,7 +2,7 @@
 
 source('utils.R')
 
-loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts) {
+loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts, afterResolution) {
 
   options( warn = -1 )
   
@@ -54,6 +54,7 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
         pData[[prop]] <- apply(pData[,grep(prop, names(pData))], 1, function(row) resolveConflicts(row,prop))
     }
   }
+  afterResolution()
   
   recordConflicts(pData, propertyToTake, 3)
 

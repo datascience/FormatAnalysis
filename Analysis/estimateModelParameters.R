@@ -26,9 +26,18 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     year <- data$year
     
     #model estimation
-    model <- estimateBass(X,Yavg)
+    t <- try(model <- estimateBass(X,Yavg))
+    if("try-error" %in% class(t)) {
+      print("error")
+      next
+    }
+    print(model)
     f <- data.frame(x=seq(0,30, len=200))
-    temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01)
+    t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01))
+    if("try-error" %in% class(t)) {
+      print("error")
+      next
+    } 
     
     modelEstimates[k,]$ID <- data[1,]$ID
     modelEstimates[k,]$name <- data[1,]$name
@@ -71,6 +80,6 @@ estimate <- function(X,Y) {
 
 estimateBass <- function(X,Y) {
   f <- data.frame(x=X, y=Y)
-  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=0.03,q=0.3,m=1))
+  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=0.03,q=0.3,m=10))
   return (fit)
 }

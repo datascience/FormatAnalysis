@@ -1,0 +1,13 @@
+ID	property	server	tika	droid	resolveTo
+1	mime	application/pdf	application/pdf	application/octet-stream	application/pdf
+2	mime	application/pdf	application/octet-stream	application/pdf	application/pdf
+3	version		A-1b	1b	1b
+4	mime	application/vnd.oasis.opendocument.text	application/vnd.oasis.opendocument.text	application/octet-stream	application/vnd.oasis.opendocument.text
+5	mime	application/msword	application/octet-stream	application/msword	application/msword
+6	mime	application/postscript	application/postscript	application/octet-stream	application/postscript
+7	mime	application/ms-word	application/octet-stream	application/msword	application/msword
+8	mime	application/doc	application/octet-stream	application/msword	application/msword
+9	mime	application/msword	application/msword	application/octet-stream	application/msword
+10	mime	application/x-msword	application/octet-stream	application/msword	application/msword
+11	mime	Application/msword	application/octet-stream	application/msword	application/msword
+12	mime	application/xml	application/rss+xml	application/xml	application/xml
