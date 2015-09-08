@@ -96,7 +96,9 @@ recordConflicts <-function(data, properties, x) {
         tempData <- tempData[,!(names(tempData)==prop)]
         tempNames <- tempNames[!(tempNames %in% which(names(data)==prop))]
     }
-    if (nrow(tempData)) {
+    if (nrow(tempData)>0) {
+      tempData$amount <- as.numeric(tempData$amount)
+      tempData <- tempData[!is.na(tempData$amount),]
       tempData[is.na(tempData)] <- "NA"
       tempData <- aggregate(as.formula(paste("amount~", paste(names(data)[tempNames], collapse="+"), sep="")), 
                             FUN=sum, data=tempData, na.rm=TRUE, na.action=NULL)

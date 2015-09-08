@@ -4,9 +4,8 @@ fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-name <- "IMAGES"
-groupFile <- "Format markets - IMAGES.tsv"
-releaseFile <- "release_years_formats.csv"
+name <- "BMPS"
+groupFile <- "Format markets - BMPS.tsv"
 start <- 1994
 end <- 2010
 
@@ -14,6 +13,7 @@ end <- 2010
 includeInterval <- FALSE
 includeRateOfChange <- TRUE
 includePoints <- TRUE
+includeResidual <- TRUE
 
 source('conflictResolution.R')
 resolveConflicts <- conflictResolution

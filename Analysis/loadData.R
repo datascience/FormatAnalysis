@@ -77,6 +77,7 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year"), collapse="+"))), 
                        FUN=sum, data=pData)    
   options(warn=0)
+  print("Data loading finished")
   return (pData)
   
 }

@@ -16,11 +16,13 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     upper <- unlist(pData[i,]$upper)
     lower <- unlist(pData[i,]$lower)
     derv <- unlist(pData[i,]$derv)
+    residual <- unlist(pData[i,]$residual)
+    prediction <- unlist(pData[i,]$prediction)
     
     png(filename=paste(pathGraph, title, ".png", sep=""))
     
-    if (includeRateOfChange) { 
-      layout(matrix(c(1,2), 2, 1, byrow = TRUE), heights = c(1.5,1))
+    if (includeRateOfChange & includeResidual) { 
+      layout(matrix(c(1, 2, 3), 3, 1, byrow = TRUE), heights = c(1.5, 1, 1.5))
       par(mar=c(2,4,2,1))
     } 
     
@@ -36,7 +38,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     
     if (includePoints) {
       points(ages,percentages, pch=17)
-      points(ages,averages, pch=19)
+      #points(ages,averages, pch=19)
     }
     lines(interval,model)
     
@@ -47,11 +49,17 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
       lines(interval,derv)
     }
     
+    if (includeResidual) {
+      plot(prediction,residual, pch=19)
+      abline(0,0,untf=FALSE)
+    }
+    
     dev.off()
     
   }
   
   #plot the cluster 
+  print ("Plotting the cluster")
   png(filename=paste(pathGraph, "cluster.png", sep=""))
   plot(NULL, main="cluster", xlim=c(0,30), ylim=c(0,1.2), xlab="age", ylab="adoption")
   for (i in (1:nrow(pData))) {

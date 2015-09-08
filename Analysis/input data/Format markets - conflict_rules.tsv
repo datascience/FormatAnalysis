@@ -11,3 +11,25 @@ ID	property	server	tika	droid	resolveTo
 10	mime	application/x-msword	application/octet-stream	application/msword	application/msword
 11	mime	Application/msword	application/octet-stream	application/msword	application/msword
 12	mime	application/xml	application/rss+xml	application/xml	application/xml
+13	mime	video/mpeg	application/octet-stream	video/mpeg	video/mpeg
+14	mime	video/quicktime	video/quicktime	application/octet-stream	video/quicktime
+15	mime	video/mpeg	video/mpeg	application/octet-stream	video/mpeg
+16	mime	video/quicktime	application/octet-stream	video/quicktime	video/quicktime
+17	mime		audio/x-ms-wmv	video/x-ms-wmv	video/x-ms-wmv
+18	mime	video/mp4	video/mp4	application/octet-stream	video/mp4
+19	mime	audio/mpeg	audio/mpeg	application/octet-stream	audio/mpeg
+20	mime	audio/x-mpeg	audio/mpeg	application/octet-stream	audio/mpeg
+21	mime	audio/x-pn-realaudio	text/plain	application/vnd.rn-realmedia	application/vnd.rn-realmedia
+22	mime	audio/x-pn-realaudio-plugin	text/plain	application/vnd.rn-realmedia	application/vnd.rn-realmedia
+23	mime	audio/x-ms-wma	audio/x-ms-wma	application/vnd.ms-asf	audio/x-ms-wma
+24	mime	application/ogg	audio/vorbis	application/ogg	application/ogg
+25	mime	audio/x-ms-wma	video/x-ms-asf	audio/x-ms-wma	audio/x-ms-wma
+26	mime	application/vnd.rn-realmedia	text/plain	application/vnd.rn-realmedia	application/vnd.rn-realmedia
+27	mime	audio/x-realaudio	audio/x-pn-realaudio	application/vnd.rn-realmedia	application/vnd.rn-realmedia
+28	mime	audio/x-pn-realaudio	audio/x-pn-realaudio	application/vnd.rn-realmedia	application/vnd.rn-realmedia
+29	mime	image/gif	image/gif	application/octet-stream	image/gif
+30	mime	image/jpeg	image/jpeg	application/octet-stream	image/jpeg
+31	mime	image/jpeg	image/jpeg	image/x-pict	image/jpeg
+32	mime	image/jpg	image/jpeg	application/octet-stream	image/jpeg
+33	mime	image/x-icon	image/x-icon	image/vnd.microsoft.icon	image/x-icon
+		 	 		

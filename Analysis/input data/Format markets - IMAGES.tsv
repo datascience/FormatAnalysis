@@ -1,7 +1,7 @@
 ID	name	mime	release year	comments
 1	Portable Network Graphics	image/png	1996	
 2	Graphics Interchange Format	image/gif	1987	
-3	Bitmap Image File	image/bmp	1985	
+3	Bitmap Image File	image/bmp image/x-windows-bmp	1985	
 4	Joint Photographic Experts Group	image/jpeg	1991	
 5	Tagged Image File Format	image/tiff	1986	
 6	Flexible Image Transport System	image/fits	1980	
@@ -10,13 +10,13 @@ ID	name	mime	release year	comments
 9	Scalable Vector Graphics	image/svg+xml	2003	
 10	Truevision TGA File format	image/x-tga	1984	
 11	X BitMap	image/x-xbitmap	1989	
-12	PICT, Apple Macintosh QuickDraw/picture file	image/x-pict	1984	https://en.wikipedia.org/wiki/PICT  http://www.online-convert.com/file-format/pict
+12	PICT, Apple Macintosh QuickDraw-picture file	image/x-pict	1984	https://en.wikipedia.org/wiki/PICT  http://www.online-convert.com/file-format/pict
 13	Computer Graphics Metafile	image/cgm	1986	
 14	Drawing Interchange Format	image/vnd.dxf	1982	
 15	WebP	image/webp	2010	from Google
 16	Multiple-image Network Graphics	image/x-mng video/x-mng	2001	
 17	DjVu	image/vnd.djvu image/x-djvu	1998	https://en.wikipedia.org/wiki/DjVu
-18	Photoshop Document	image/vnd.adobe.photoshop		
+18	Photoshop Document	image/vnd.adobe.photoshop	1990	https://en.wikipedia.org/wiki/Adobe_Photoshop
 19	Silicon Graphics Image	image/sgi	1995	https://en.wikipedia.org/wiki/Silicon_Graphics_Image
 20	eXperimental Computing Facility	image/xcf		https://en.wikipedia.org/wiki/XCF_%28file_format%29
 21	Seattle FilmWorks image	image/sfw		

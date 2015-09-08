@@ -10,11 +10,11 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
   unig <- unique(pData$ID)
   
 
-  modelEstimates <- data.frame(matrix(vector(),0,15+length(propertyToTake), 
+  modelEstimates <- data.frame(matrix(vector(),0,16+length(propertyToTake), 
                                       dimnames = list(c(),c("ID", "name", propertyToTake, "release.year", 
                                                             "ages", "percentages", "averages",
-                                                            "p", "q", "m", "residual", "interval", "model",
-                                                            "upper", "lower", "derv"))))
+                                                            "p", "q", "m", "prediction", "residual", "interval", 
+                                                            "model", "upper", "lower", "derv"))))
 
   k <- 1
   for (i in unig) {
@@ -31,13 +31,21 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
       print("error")
       next
     }
-    print(model)
+    #print(summary(model))
     f <- data.frame(x=seq(0,30, len=200))
-    t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01))
+    t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
+    #t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01))
     if("try-error" %in% class(t)) {
       print("error")
       next
     } 
+    
+    r <- data.frame(x=X)
+    t <- try(tempRes <- predictNLS(model, newdata=r, interval="none"))
+    if("try-error" %in% class(t)) {
+      print("error")
+    } 
+    residual <- Yper - tempRes$summary[,1] 
     
     modelEstimates[k,]$ID <- data[1,]$ID
     modelEstimates[k,]$name <- data[1,]$name
@@ -54,7 +62,8 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     q <- as.numeric(modelEstimates[k,]$q)
     modelEstimates[k,]$m <- coef(model)["m"]
     m <- as.numeric(modelEstimates[k,]$m)
-    modelEstimates[k,]$residual <- sum(residuals(model)^2)
+    modelEstimates[k,]$prediction <- list(tempRes$summary[,1])
+    modelEstimates[k,]$residual <- list(residual)
     modelEstimates[k,]$interval <- list(f$x)
     modelEstimates[k,]$model <- list(temp$summary[,1])
     modelEstimates[k,]$upper <- list(temp$summary[,5])
