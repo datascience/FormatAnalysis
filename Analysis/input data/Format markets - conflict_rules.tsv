@@ -32,4 +32,7 @@ ID	property	server	tika	droid	resolveTo
 31	mime	image/jpeg	image/jpeg	image/x-pict	image/jpeg
 32	mime	image/jpg	image/jpeg	application/octet-stream	image/jpeg
 33	mime	image/x-icon	image/x-icon	image/vnd.microsoft.icon	image/x-icon
-		 	 		
+34	mime	image/x-xbitmap	text/plain	image/x-xbitmap	image/x-xbitmap
+35	mime	image/png	image/png	application/octet-stream	image/png
+36	mime	text/plain	image/x-icon	image/vnd.microsoft.icon	image/x-icon
+37	mime	image/pjpeg	image/jpeg	application/octet-stream	image/jpeg

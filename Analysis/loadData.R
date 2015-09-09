@@ -51,9 +51,11 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   print("Resolving conflicts")
   if (!is.na(resolveConflicts)) {
     for (prop in propertyToTake) {
-        pData[[prop]] <- apply(pData[,grep(prop, names(pData))], 1, function(row) resolveConflicts(row,prop))
+        pData[[prop]] <- apply(pData[,c(grep(prop, names(pData)),which(names(pData)=="amount"))], 
+                               1, function(row) resolveConflicts(row,prop))
     }
   }
+  
   afterResolution()
   
   recordConflicts(pData, propertyToTake, 3)

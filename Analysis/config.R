@@ -4,8 +4,8 @@ fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-name <- "BMPS"
-groupFile <- "Format markets - BMPS.tsv"
+name <- "PDF"
+groupFile <- "Format markets - PDF versions.tsv"
 start <- 1994
 end <- 2010
 
