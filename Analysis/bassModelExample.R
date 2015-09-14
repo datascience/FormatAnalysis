@@ -2,7 +2,7 @@ path <- paste("output data/")
 
 png(filename=paste(path, "bass.png", sep=""))
 layout(matrix(c(1, 2, 3,4), 2, 2, byrow = TRUE), heights = c(1.5, 1.5, 1.5, 1.5))
-par(mar=c(3.3,3.3,0.3,0.3), font=2)
+par(mar=c(0.3,0.3,0.3,0.3), font=2)
 
 p <- 0.004
 q <- 0.2
@@ -62,7 +62,7 @@ q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
 yq <- y - yp
 plot(NULL, main ="Bass", xlim=c(0,15), ylim=c(0,max(y)+0.1*max(y)),
-      ann=FALSE, xaxs="i", yaxs="i")
+     xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
 lines(x,y)
 polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
 lines(x,yp)
