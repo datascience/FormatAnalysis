@@ -24,7 +24,7 @@ conflictResolution <- function(row, prop) {
   }
     
   #if only one tool managed to return a value pick that value
-  test <- row[!is.na(row) & row!=" " & row!="application/octet-stream"]
+  test <- row[!is.na(row) & row!=" " & row!="" & row!="application/octet-stream"]
   if (length(test)==1) {
     return (test[1])
   }
