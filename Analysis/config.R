@@ -1,5 +1,9 @@
 
-fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+#linux
+#fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+#mac
+fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
+#test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
