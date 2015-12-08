@@ -1,8 +1,8 @@
 
 #linux
-fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+#fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #mac
-#fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
+fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
