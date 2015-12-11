@@ -10,6 +10,7 @@ cResolution <- data.frame(prop=character(), type=character(),amount=numeric(), s
 cResolution$amount <- as.numeric(cResolution$amount)
 
 conflictResolution <- function(row, prop) {
+  
   if (!(prop %in% unique(cResolution$prop))) {
     cResolution[nrow(cResolution)+1,] <<- c(prop, "custom rule", 0)
     cResolution[nrow(cResolution)+1,] <<- c(prop, "no conflict", 0)
