@@ -82,6 +82,16 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   print("Data loading finished")
   return (pData)
   
+  
+#   nam <- names(groupData)
+#   nam <- nam[!(nam %in% c("release.year", "name", "comments", "ID"))]
+#   pData <- merge(pData,groupData, by=nam)
+#   pData$age <- pData$year - as.numeric(pData$release.year)
+#   pData <- pData[!(names(pData)=="comments")]
+#   #pData <- pData[!(names(pData)=="releaseYear")]
+#   
+#   pData <- pData[pData$age>=0,]
+  
 }
 
            

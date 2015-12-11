@@ -6,10 +6,19 @@ rulesCounter <- rules
 rulesCounter$used <- 0
 type <- c("no conflict", "special rule used", "tika & droid agree", "only one tool returned value", "conflict not resolved")
 num <- c(0,0,0,0,0)
-cResolution <- data.frame(type,num)
-
+cResolution <- data.frame(prop=character(), type=character(),amount=numeric(), stringsAsFactors = FALSE)
+cResolution$amount <- as.numeric(cResolution$amount)
 
 conflictResolution <- function(row, prop) {
+  
+  if (!(prop %in% unique(cResolution$prop))) {
+    cResolution[nrow(cResolution)+1,] <<- c(prop, "custom rule", 0)
+    cResolution[nrow(cResolution)+1,] <<- c(prop, "no conflict", 0)
+    cResolution[nrow(cResolution)+1,] <<- c(prop, "tikadroid", 0)
+    cResolution[nrow(cResolution)+1,] <<- c(prop, "one tool", 0)
+    cResolution[nrow(cResolution)+1,] <<- c(prop, "not resolved", 0)
+  }
+  
   amount <- as.numeric(row[4])
   row <- row[1:3]
   row[is.na(row)] <- ""
@@ -23,31 +32,44 @@ conflictResolution <- function(row, prop) {
     count <- count + amount
     # warning this referes to the global variable rulesCounter!!!
     rulesCounter[rulesCounter$ID == test[1,]$ID,]$used <<- count
-    cResolution[2,]$num <<- cResolution[2,]$num + amount  
+    cResolution[cResolution$prop==prop & cResolution$type=="custom rule",]$amount <<- 
+      as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="custom rule",]$amount) + amount
     return (temp)
   }
     
   #if all three agree . not a conflict but needs to be recorded for the stats
   if (row[1]==row[2] & row[2]==row[3]) {
-    cResolution[1,]$num <<- cResolution[1,]$num + amount
+    cResolution[cResolution$prop==prop & cResolution$type=="no conflict",]$amount <<- 
+      as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="no conflict",]$amount) + amount
+    #cResolution[1,]$num <<- cResolution[1,]$num + amount
+    return (row[1])
   }
   
   #if tika and droid agree then pick that value
   if (row[2]==row[3] & !is.na(row[2]) & row[2]!="application/octet-stream" & row[2]!=" ") {
-    cResolution[3,]$num <<- cResolution[3,]$num + amount
+    cResolution[cResolution$prop==prop & cResolution$type=="tikadroid",]$amount <<- 
+      as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="tikadroid",]$amount) + amount
+    #cResolution[nrow(cResolution)+1,] <<- c(prop, "tika=droid", amount)
+    #cResolution[3,]$num <<- cResolution[3,]$num + amount
     return(row[2])
   }
   
   #if only one tool managed to return a value pick that value
   test <- row[!is.na(row) & row!=" " & row!="" & row!="application/octet-stream"]
   if (length(test)==1) {
-    cResolution[4,]$num <<- cResolution[4,]$num + amount
+    cResolution[cResolution$prop==prop & cResolution$type=="one tool",]$amount <<- 
+      as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="one tool",]$amount) + amount
+    #cResolution[nrow(cResolution)+1,] <<- c(prop, "one tool", amount)
+    #cResolution[4,]$num <<- cResolution[4,]$num + amount
     return (test[1])
   }
   
   
   #if nothing works return NA
-  cResolution[5,]$num <<- cResolution[5,]$num + amount
+  cResolution[cResolution$prop==prop & cResolution$type=="not resolved",]$amount <<- 
+    as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="not resolved",]$amount) + amount
+  #cResolution[nrow(cResolution)+1,] <<- c(prop, "not resolved", amount)
+  #cResolution[5,]$num <<- cResolution[5,]$num + amount
   return (NA)
 }
 
@@ -60,22 +82,32 @@ afterResolution <-function() {
   write.table(cResolution, file= paste(path, "/statistics/conflictsStats.tsv", sep=""), 
               quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   
-  sA <- sum(cResolution$num)
-  tcS <- c("no conflict", "resolved", "not resolved")
-  ncS <- c(cResolution[1,]$num/sA, (cResolution[2,]$num+cResolution[3,]$num+cResolution[4,]$num)/sA, cResolution[5,]$num/sA)
-  cS <- data.frame(tcS, ncS)
-  
-  sR <- cResolution[2,]$num+cResolution[3,]$num+cResolution[4,]$num
-  trS <- c("special rule used", "tika & droid agree", "only one tool returned value")
-  nrS <- c(cResolution[2,]$num/sR, cResolution[3,]$num/sR, cResolution[4,]$num/sR)
-  rS <- data.frame(trS, nrS)
-  
-  png(filename=paste(path,"/statistics/conflicts.png", sep=""))
-  pie(cS$ncS, labels=cS$tcS, main="Amount of conflicts")
-  dev.off()
-  
-  png(filename=paste(path,"/statistics/conflitRules.png", sep=""))
-  pie(rS$nrS, labels=rS$trS, main="Ratio of conflict rules used")
-  dev.off()
+  cResolution$amount<<- as.numeric(cResolution$amount)
+  print (cResolution)
+  #cResolution <<- aggregate(amount~prop+type, FUN=sum, data=cResolution)
+  for(p in unique(cResolution$prop)) {
+    tempCR <- cResolution[cResolution$prop==p,]
+    sA <- sum(tempCR$amount)
+    tcS <- c("no conflict", "resolved", "not resolved")
+    ncS <- c(tempCR[tempCR$type=="no conflict",]$amount/sA, (tempCR[tempCR$type=="custom rule",]$amount+
+                                                              tempCR[tempCR$type=="tikadroid",]$amount+
+                                                              tempCR[tempCR$type=="one tool",]$amount)/sA, 
+             tempCR[tempCR$type=="not resolved",]$amount/sA)
+    print (ncS)
+    cS <- data.frame(tcS, ncS)
+    png(filename=paste(path,"/statistics/conflicts-", p, ".png", sep=""))
+    pie(cS$ncS, labels=cS$tcS, main="Amount of conflicts")
+    dev.off()
+
+    sR <- tempCR[tempCR$type=="custom rule",]$amount+tempCR[tempCR$type=="tikadroid",]$amount+tempCR[tempCR$type=="one tool",]$amount
+    trS <- c("custom rule used", "tika & droid agree", "only one tool returned value")
+    nrS <- c(tempCR[tempCR$type=="custom rule",]$amount/sR, tempCR[tempCR$type=="tikadroid",]$amount/sR, 
+             tempCR[tempCR$type=="one tool",]$amount/sR)
+    rS <- data.frame(trS, nrS)
+    
+    png(filename=paste(path,"/statistics/conflitRules-",p,".png", sep=""))
+    pie(rS$nrS, labels=rS$trS, main="Ratio of conflict rules used")
+    dev.off()
+  }
   
 }
