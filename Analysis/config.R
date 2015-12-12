@@ -1,15 +1,15 @@
 
 #linux
-fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+#fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #mac
-#fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
+fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-name <- "PDF"
-groupFile <- "Format markets - PDF versions.tsv"
+name <- "IMAGES"
+groupFile <- "Format markets - IMAGES.tsv"
 start <- 1994
 end <- 2010
 
@@ -22,3 +22,4 @@ includeResidual <- TRUE
 source('conflictResolution.R')
 resolveConflicts <- conflictResolution
 afterConflictsResolution <- afterResolution
+conflictCategory <- conflictCategoryDetermination

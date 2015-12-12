@@ -2,7 +2,7 @@
 
 source('utils.R')
 
-loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts, afterResolution) {
+loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts, afterResolution, conflictCategory) {
 
   options( warn = -1 )
   
@@ -34,7 +34,8 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
     tempV <- unique(unlist(groupData[[prop]]))
     pData <- pData[apply(pData[,tempNames], 1, function(row) any(row %in% tempV)), ]
   }
-  
+  # remove if there are amounts equal to NA 
+  pData <- pData[!is.na(pData$amount),]
   recordConflicts(pData, propertyToTake, 1)
   
   #unify all equal properties
@@ -69,6 +70,19 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
     pData[[prop]] <- as.character(pData[[prop]])
   }
   
+  pData[["category"]] <- apply(pData, 1, function(row) conflictCategory(row,propertyToTake))
+  nam <- names(groupData)
+  nam <- nam[!(nam %in% c("release.year", "name", "comments", "ID"))]
+  pData <- merge(pData,groupData, by=nam)
+  
+  library(plyr)
+  library(ggplot2)
+  boxDF <- ddply(pData, "name", transform, percent = amount / sum(amount)*100)
+  boxDF <- aggregate(percent~name+category, data=boxDF, FUN=sum)
+  
+  png(filename=paste(path, "/statistics/elements.png", sep=""), width = 800, height = 680)
+  ggplot(boxDF, aes(x=name, y=percent, fill=category)) + geom_bar(stat="identity") + coord_flip()
+  dev.off()
   recordConflicts(pData, propertyToTake, 4)
   
   #discard columns that are not needed anymore

@@ -111,3 +111,37 @@ afterResolution <-function() {
   }
   
 }
+
+conflictCategoryDetermination <- function(row, propertyToTake) {
+  category <- 1
+#  print(row)
+  for (prop in propertyToTake) {
+#     print(prop)
+#     print(names(row))
+#     print(grep(prop, names(row)))
+#     print(row[grep(prop, names(row))])
+    print(unique(row[grep(prop, names(row))]))
+    if (length(unique(row[grep(prop, names(row))]))==1 & category<=1) {
+      print("cat 1")
+      category <- 1
+      next
+    }
+    print((c(row[paste(prop,"tika", sep="")], row[paste(prop,"droid", sep="")], row[prop])))
+    if (length(unique(c(row[paste(prop,"tika", sep="")], row[paste(prop,"droid", sep="")], row[prop])))==1 & category<=2) {
+      print("cat 2")
+      category <- 2
+      next
+    }  
+    print("cat 3")
+    category <- 3
+  }
+  if (category==1) {
+    return ("no conflict")
+  }
+  if (category==2) {
+    return ("tika=droid")
+  }
+  if (category==3) {
+    return ("conflict resolved")
+  }  
+}

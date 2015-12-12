@@ -25,7 +25,8 @@ for (prop in propertyToTake) {
 }
 
 # load raw data, filter and reduce conflicts and save the resulting dataset to a file  
-data <- loadData(fileName, colNames, groupData, propertyToTake, resolveConflicts, afterConflictsResolution)
+data <- loadData(fileName, colNames, groupData, propertyToTake, resolveConflicts, 
+                 afterConflictsResolution, conflictCategory)
 write.table(data, file=paste(path,"/cleaned_data.tsv",sep=""), quote=FALSE, 
             sep="\t", col.names=TRUE, row.names=FALSE)
 
