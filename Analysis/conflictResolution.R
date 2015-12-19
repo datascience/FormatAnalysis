@@ -1,3 +1,6 @@
+library(plyr)
+library(ggplot2)
+
 rules <- read.table("input data/Format markets - conflict_rules.tsv", header=TRUE, sep="\t", 
                     colClasses=c("character","character","character"), stringsAsFactors=FALSE)
 print (paste("Loaded ", nrow(rules), " rules.", sep=""))
@@ -85,54 +88,46 @@ afterResolution <-function() {
   cResolution$amount<<- as.numeric(cResolution$amount)
   print (cResolution)
   #cResolution <<- aggregate(amount~prop+type, FUN=sum, data=cResolution)
-  for(p in unique(cResolution$prop)) {
-    tempCR <- cResolution[cResolution$prop==p,]
-    sA <- sum(tempCR$amount)
-    tcS <- c("no conflict", "resolved", "not resolved")
-    ncS <- c(tempCR[tempCR$type=="no conflict",]$amount/sA, (tempCR[tempCR$type=="custom rule",]$amount+
-                                                              tempCR[tempCR$type=="tikadroid",]$amount+
-                                                              tempCR[tempCR$type=="one tool",]$amount)/sA, 
-             tempCR[tempCR$type=="not resolved",]$amount/sA)
-    print (ncS)
-    cS <- data.frame(tcS, ncS)
-    png(filename=paste(path,"/statistics/conflicts-", p, ".png", sep=""))
-    pie(cS$ncS, labels=cS$tcS, main="Amount of conflicts")
-    dev.off()
 
-    sR <- tempCR[tempCR$type=="custom rule",]$amount+tempCR[tempCR$type=="tikadroid",]$amount+tempCR[tempCR$type=="one tool",]$amount
-    trS <- c("custom rule used", "tika & droid agree", "only one tool returned value")
-    nrS <- c(tempCR[tempCR$type=="custom rule",]$amount/sR, tempCR[tempCR$type=="tikadroid",]$amount/sR, 
-             tempCR[tempCR$type=="one tool",]$amount/sR)
-    rS <- data.frame(trS, nrS)
-    
-    png(filename=paste(path,"/statistics/conflitRules-",p,".png", sep=""))
-    pie(rS$nrS, labels=rS$trS, main="Ratio of conflict rules used")
-    dev.off()
-  }
+  tempCR <- cResolution
+  
+  tempCR[tempCR$type=="custom rule" | tempCR$type=="tikadroid" | tempCR$type=="one tool",]$type <- "resolved"
+  tempCR <- ddply(tempCR, "prop", transform, percent = amount / sum(amount)*100)
+  tempCR <- aggregate(percent~prop+type, data=tempCR, FUN=sum)
+  
+  png(filename=paste(path,"/statistics/conflicts.png", sep=""),width = 800, height = 680)
+  plot1 <- ggplot(tempCR, aes(x=type, y=percent)) + geom_bar(aes(fill=prop),position = "dodge", stat="identity") + 
+    scale_y_sqrt(expand=c(0,0),breaks=c(0.25,0.5,1,5,10,25,50,75,100),limits=c(0,100)) +
+    scale_fill_brewer(palette = "Set2")
+  print(plot1)
+  dev.off()
+
+  tempCR <- cResolution
+  
+  tempCR<- tempCR[tempCR$type %in% c("custom rule", "tikadroid", "one tool"), ]
+  tempCR <- ddply(tempCR, "prop", transform, percent = amount / sum(amount)*100)
+  tempCR <- aggregate(percent~prop+type, data=tempCR, FUN=sum)
+  
+  png(filename=paste(path,"/statistics/conflictsRules.png", sep=""),width = 800, height = 680)
+  plot2 <- ggplot(tempCR, aes(x=type, y=percent)) + geom_bar(aes(fill=prop),position = "dodge", stat="identity") + 
+    scale_y_sqrt(expand=c(0,0),breaks=c(0.25,0.5,1,5,10,25,50,75,100),limits=c(0,100)) +
+    scale_fill_brewer(palette = "Set2")
+  print(plot2)
+  dev.off()
   
 }
 
 conflictCategoryDetermination <- function(row, propertyToTake) {
   category <- 1
-#  print(row)
   for (prop in propertyToTake) {
-#     print(prop)
-#     print(names(row))
-#     print(grep(prop, names(row)))
-#     print(row[grep(prop, names(row))])
-    print(unique(row[grep(prop, names(row))]))
     if (length(unique(row[grep(prop, names(row))]))==1 & category<=1) {
-      print("cat 1")
       category <- 1
       next
     }
-    print((c(row[paste(prop,"tika", sep="")], row[paste(prop,"droid", sep="")], row[prop])))
     if (length(unique(c(row[paste(prop,"tika", sep="")], row[paste(prop,"droid", sep="")], row[prop])))==1 & category<=2) {
-      print("cat 2")
       category <- 2
       next
     }  
-    print("cat 3")
     category <- 3
   }
   if (category==1) {

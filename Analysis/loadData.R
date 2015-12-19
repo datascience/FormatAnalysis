@@ -1,6 +1,8 @@
 #loading the data
 
 source('utils.R')
+library(plyr)
+library(ggplot2)
 
 loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts, afterResolution, conflictCategory) {
 
@@ -62,7 +64,7 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   recordConflicts(pData, propertyToTake, 3)
 
   
-  print ("Final processing")
+  print ("Final processing, merging with market data and adding age")
   # filter once more to remove those elements that do not belong to the selected group
   # conflict reduction could have resolved some entries to not needed values
   for (prop in propertyToTake) {
@@ -75,36 +77,32 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   nam <- nam[!(nam %in% c("release.year", "name", "comments", "ID"))]
   pData <- merge(pData,groupData, by=nam)
   
-  library(plyr)
-  library(ggplot2)
+
   boxDF <- ddply(pData, "name", transform, percent = amount / sum(amount)*100)
   boxDF <- aggregate(percent~name+category, data=boxDF, FUN=sum)
   
   png(filename=paste(path, "/statistics/elements.png", sep=""), width = 800, height = 680)
-  ggplot(boxDF, aes(x=name, y=percent, fill=category)) + geom_bar(stat="identity") + coord_flip()
+  elPlot <- ggplot(boxDF, aes(x=name, y=percent, fill=category)) + geom_bar(stat="identity") + coord_flip() +
+    scale_fill_brewer(palette = "Set1")
+  print(elPlot)
   dev.off()
   recordConflicts(pData, propertyToTake, 4)
   
   #discard columns that are not needed anymore
-  pData <- pData[,names(pData) %in% c(propertyToTake, "year", "amount")]
+  pData <- pData[,names(pData) %in% c(propertyToTake, "year", "amount", "release.year", "name")]
 
 
   #aggregate if there are some duplicate entries
-  pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year"), collapse="+"))), 
-                       FUN=sum, data=pData)    
+  pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year", "amount", "release.year", "name"), collapse="+"))), 
+                       FUN=sum, data=pData)  
+  
+  #calculate age
+  pData$age <- pData$year - as.numeric(pData$release.year)
+  
   options(warn=0)
   print("Data loading finished")
   return (pData)
-  
-  
-#   nam <- names(groupData)
-#   nam <- nam[!(nam %in% c("release.year", "name", "comments", "ID"))]
-#   pData <- merge(pData,groupData, by=nam)
-#   pData$age <- pData$year - as.numeric(pData$release.year)
-#   pData <- pData[!(names(pData)=="comments")]
-#   #pData <- pData[!(names(pData)=="releaseYear")]
-#   
-#   pData <- pData[pData$age>=0,]
+
   
 }
 
