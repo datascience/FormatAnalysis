@@ -1,4 +1,11 @@
 
+
+
+#######
+
+# OBSOLETE AND NOT USED!!!!!!!
+
+#############
 estimateModel <- function(pData, propertyToTake) {
   
   if (is.na(propertyToTake)) {

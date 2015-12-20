@@ -15,7 +15,7 @@ end <- 2010
 
 #plot settings
 includeInterval <- FALSE
-includeRateOfChange <- TRUE
+includeRateOfChange <- FALSE
 includePoints <- TRUE
 includeResidual <- TRUE
 

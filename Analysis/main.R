@@ -30,23 +30,23 @@ data <- loadData(fileName, colNames, groupData, propertyToTake, resolveConflicts
 write.table(data, file=paste(path,"/cleaned_data.tsv",sep=""), quote=FALSE, 
             sep="\t", col.names=TRUE, row.names=FALSE)
 
-for (prop in propertyToTake) {
-  groupData[[prop]] <- sapply(groupData[[prop]], "[",1)
-}
+# for (prop in propertyToTake) {
+#   groupData[[prop]] <- sapply(groupData[[prop]], "[",1)
+# }
 
-# calculate age 
-source('calculateAge.R')
-data2 <- calculateAge(data, groupData, propertyToTake)
+# # calculate age 
+# source('calculateAge.R')
+# data2 <- calculateAge(data, groupData, propertyToTake)
 
 # calculate percentage and moving average of each value
 source('calculatePercentage.R')
-data3 <- calculatePercentage(data2,propertyToTake)
-write.table(data3, file=paste(path, "/adoption.tsv", sep=""), 
+data2 <- calculatePercentage(data,propertyToTake)
+write.table(data2, file=paste(path, "/adoption.tsv", sep=""), 
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 # estimate the model and plot the curves
 source('estimateModelParameters.R')
-estimates <- estimateModelParameters(data3, propertyToTake, start, end)
+estimates <- estimateModelParameters(data2, propertyToTake, start, end)
 #write.table(estimates, file=paste("output data/", paste(name,"_estimates.csv", sep=""), sep=""), 
 #            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 

@@ -89,16 +89,16 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   recordConflicts(pData, propertyToTake, 4)
   
   #discard columns that are not needed anymore
-  pData <- pData[,names(pData) %in% c(propertyToTake, "year", "amount", "release.year", "name")]
+  pData <- pData[,names(pData) %in% c(propertyToTake, "year", "amount", "release.year", "name", "ID")]
 
 
   #aggregate if there are some duplicate entries
-  pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year", "amount", "release.year", "name"), collapse="+"))), 
+  pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year", "amount", "release.year", "name","ID"), collapse="+"))), 
                        FUN=sum, data=pData)  
   
   #calculate age
   pData$age <- pData$year - as.numeric(pData$release.year)
-  
+  pData <- pData[pData$age>=0,]
   options(warn=0)
   print("Data loading finished")
   return (pData)

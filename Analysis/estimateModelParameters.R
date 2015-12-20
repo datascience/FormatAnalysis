@@ -33,15 +33,15 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     }
     #print(summary(model))
     f <- data.frame(x=seq(0,30, len=200))
-    t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
-    #t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.01))
+    #t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
+    t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.05))
     if("try-error" %in% class(t)) {
       print("error")
       next
     } 
     
     r <- data.frame(x=X)
-    t <- try(tempRes <- predictNLS(model, newdata=r, interval="none"))
+    t <- try(tempRes <- predictNLS(model, newdata=r, interval="confidence", alpha=0.05))
     if("try-error" %in% class(t)) {
       print("error")
     } 
