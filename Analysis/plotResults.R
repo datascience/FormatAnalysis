@@ -1,5 +1,5 @@
 library(ggplot2)
-library(grid)
+library(gridExtra)
 plotResults <- function(pData, includeRateOfChange, includeInterval, includePoints) {
   
   options( warn = -1 )
@@ -38,26 +38,26 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
     }
-    
+    modelPlot <- modelPlot + labs(x="age", y="% of the market share")
     dfChange <- data.frame(interval, derv)
     changePlot <- ggplot(dfChange, aes(x=interval, y=derv)) +
       geom_area(fill="gray", alpha=0.3) +
-      geom_line()
+      geom_line() + labs(x="age", y="change rate")
     
     if (includeRateOfChange) {
-      png(filename=paste(pathGraph, title, ".png", sep=""), width = 680, height = 480)
+      png(filename=paste(pathGraph, title, ".png", sep=""))
         print(grid.arrange(modelPlot, changePlot))
       dev.off()
     }else {
-      png(filename=paste(pathGraph, title, ".png", sep=""), width = 680, height = 480)
+      png(filename=paste(pathGraph, title, ".png", sep=""))
       print(modelPlot)
       dev.off()
     }
     
     if (includeResidual) {
       dfResidual <- data.frame(percentages, residual)
-      residualPlot <- ggplot(dfResidual, aes(x=percentages, y=residual)) + geom_point()
-      png(filename=paste(pathGraph, title, "-residual.png", sep=""), width = 680, height = 480)
+      residualPlot <- ggplot(dfResidual, aes(x=percentages, y=residual)) + geom_point() + labs(x="real value", y="residual")
+      png(filename=paste(pathGraph, title, "-residual.png", sep=""))
       print(residualPlot)
       dev.off()
     }
@@ -65,9 +65,9 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
   
   png(filename=paste(pathGraph, "cluster.png", sep=""))
   clusterPlot <- ggplot(dfCluster, aes(x=interval, y=model, colour=title)) + geom_line() +
-    theme(legend.position=c(0.8,0.7), legend.background=element_rect(fill="white"),
-          legend.text=element_text(size=10), 
-          legend.key=element_blank())
+    theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
+          legend.text=element_text(size=10), legend.title=element_blank(),
+          legend.key=element_blank()) + labs(x="age", y="% of the market share")
   print(clusterPlot)
   dev.off()
   

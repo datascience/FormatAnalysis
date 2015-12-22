@@ -87,8 +87,8 @@ yq <- y - yp
 
 df <- data.frame(x, y, yp, yq)
 
-png(filename=paste(path, "bass3.png", sep=""), width = 800, height = 680)
-ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
+
+bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
   geom_line(aes(y=y, colour="col1", linetype="col1"), size=1) + 
   geom_line(aes(y=yp, colour="col2", linetype="col2"), size=1) + 
   geom_line(aes(y=yq, color="col3", linetype="col3"), size=1) +
@@ -108,7 +108,8 @@ ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
         legend.key=element_blank(), legend.key.width=unit(3.5,"line"), 
         legend.key.height=unit(3,"line"))
 
-#ggsave(paste(path,"bass3.png",sep=""), width=4, height=3, unit="in", dpi=300)
+png(filename=paste(path, "bass3.png", sep=""))
+print(bassGraph)
 dev.off()
   
   
