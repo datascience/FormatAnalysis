@@ -26,26 +26,37 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     year <- data$year
     
     #model estimation
-    t <- try(model <- estimateBass(X,Yavg))
-    if("try-error" %in% class(t)) {
-      print("error")
-      next
+    pInterval <- c(0.01, 0.03, 0.05, 0.07, 0.1, 0.2, 0.3)
+    qInterval <- c(0.01, 0.05, 0.1, 0.3, 0.5, 0.7, 1.0)
+    mInterval <- c(0.01, 0.1, 1, 5, 10, 50, 100)
+    model <- NA
+    tempRes <- Inf
+    for (iP in pInterval) {
+      for (iQ in qInterval) {
+        for (iM in mInterval) {
+          
+          t <- try(mod <- estimateBass(X,Yavg, iP, iQ, iM))
+          if("try-error" %in% class(t)) {
+            print("error")
+            next
+          }
+          
+          p <- as.numeric(coef(mod)["p"])
+          q <- as.numeric(coef(mod)["q"])
+          m <- as.numeric(coef(mod)["m"])
+          
+          if ((m*(p+q)^2)/(4*q) <= 1) {
+            sumRes <- sum(resid(mod)^2)
+            if (sumRes < tempRes) {
+              model <- mod
+              tempRes <- sumRes
+            }
+          }
+          
+        }
+      }
     }
-    #print(summary(model))
-    f <- data.frame(x=seq(0,30, len=200))
-    #t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
-    t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.05))
-    if("try-error" %in% class(t)) {
-      print("error")
-      next
-    } 
     
-    r <- data.frame(x=X)
-    t <- try(tempRes <- predictNLS(model, newdata=r, interval="confidence", alpha=0.05))
-    if("try-error" %in% class(t)) {
-      print("error")
-    } 
-    residual <- Yper - tempRes$summary[,1] 
     
     modelEstimates[k,]$ID <- data[1,]$ID
     modelEstimates[k,]$name <- data[1,]$name
@@ -56,20 +67,55 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     modelEstimates[k,]$ages <- list(X)
     modelEstimates[k,]$percentages <- list(Yper)
     modelEstimates[k,]$averages <- list(Yavg)
-    modelEstimates[k,]$p <- coef(model)["p"]
-    p <- as.numeric(modelEstimates[k,]$p)
-    modelEstimates[k,]$q <- coef(model)["q"]
-    q <- as.numeric(modelEstimates[k,]$q)
-    modelEstimates[k,]$m <- coef(model)["m"]
-    m <- as.numeric(modelEstimates[k,]$m)
-    modelEstimates[k,]$prediction <- list(tempRes$summary[,1])
-    modelEstimates[k,]$residual <- list(residual)
-    modelEstimates[k,]$interval <- list(f$x)
-    modelEstimates[k,]$model <- list(temp$summary[,1])
-    modelEstimates[k,]$upper <- list(temp$summary[,5])
-    modelEstimates[k,]$lower <- list(temp$summary[,6])
-    f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
-    modelEstimates[k,]$derv <- list(f$derv)
+    
+    if (is.na(model)) {
+    
+      modelEstimates[k,]$p <- NA
+      modelEstimates[k,]$q <- NA
+      modelEstimates[k,]$m <- NA
+      modelEstimates[k,]$prediction <- NA
+      modelEstimates[k,]$residual <- NA
+      modelEstimates[k,]$interval <- NA
+      modelEstimates[k,]$model <- NA
+      modelEstimates[k,]$upper <- NA
+      modelEstimates[k,]$lower <- NA
+      modelEstimates[k,]$derv <- NA
+    } 
+    else {
+      
+    
+      #print(summary(model))
+      f <- data.frame(x=seq(0,30, len=200))
+      #t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
+      t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.05))
+      if("try-error" %in% class(t)) {
+        print("error")
+        next
+      } 
+      
+      r <- data.frame(x=X)
+      t <- try(tempRes <- predictNLS(model, newdata=r, interval="confidence", alpha=0.05))
+      if("try-error" %in% class(t)) {
+        print("error")
+      } 
+      residual <- Yper - tempRes$summary[,1] 
+      
+  
+      modelEstimates[k,]$p <- coef(model)["p"]
+      p <- as.numeric(modelEstimates[k,]$p)
+      modelEstimates[k,]$q <- coef(model)["q"]
+      q <- as.numeric(modelEstimates[k,]$q)
+      modelEstimates[k,]$m <- coef(model)["m"]
+      m <- as.numeric(modelEstimates[k,]$m)
+      modelEstimates[k,]$prediction <- list(tempRes$summary[,1])
+      modelEstimates[k,]$residual <- list(residual)
+      modelEstimates[k,]$interval <- list(f$x)
+      modelEstimates[k,]$model <- list(temp$summary[,1])
+      modelEstimates[k,]$upper <- list(temp$summary[,5])
+      modelEstimates[k,]$lower <- list(temp$summary[,6])
+      f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
+      modelEstimates[k,]$derv <- list(f$derv)
+    }
     
     k <- k + 1
   
@@ -87,8 +133,8 @@ estimate <- function(X,Y) {
   return (fit)
 }
 
-estimateBass <- function(X,Y) {
+estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)
-  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=0.03,q=0.3,m=10))
+  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=sP,q=sQ,m=sM))
   return (fit)
 }

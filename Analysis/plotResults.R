@@ -8,7 +8,9 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
   
   dfCluster <- data.frame(title=as.character(), interval=as.numeric(), model=as.numeric())
   for (i in (1:nrow(pData))) {
-    
+    if (is.na(pData[i,]$p)) {
+      next
+    }
     title <- pData[i,]$name 
     ages <- unlist(pData[i,]$ages)
     percentages <- unlist(pData[i,]$percentages)
