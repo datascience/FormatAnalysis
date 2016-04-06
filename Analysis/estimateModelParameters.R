@@ -34,10 +34,10 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     for (iP in pInterval) {
       for (iQ in qInterval) {
         for (iM in mInterval) {
-          
+          #print(paste(iP,iQ,iM, sep = " "))
           t <- try(mod <- estimateBass(X,Yavg, iP, iQ, iM))
           if("try-error" %in% class(t)) {
-            print("error")
+            print("error in estimating the model")
             next
           }
           
@@ -69,7 +69,7 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     modelEstimates[k,]$averages <- list(Yavg)
     
     if (is.na(model)) {
-    
+    print("Model is NA")
       modelEstimates[k,]$p <- NA
       modelEstimates[k,]$q <- NA
       modelEstimates[k,]$m <- NA
@@ -89,14 +89,25 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
       #t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
       t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.05))
       if("try-error" %in% class(t)) {
-        print("error")
+        print("error in predictNLS 1")
+        modelEstimates[k,]$p <- NA
+        modelEstimates[k,]$q <- NA
+        modelEstimates[k,]$m <- NA
+        modelEstimates[k,]$prediction <- NA
+        modelEstimates[k,]$residual <- NA
+        modelEstimates[k,]$interval <- NA
+        modelEstimates[k,]$model <- NA
+        modelEstimates[k,]$upper <- NA
+        modelEstimates[k,]$lower <- NA
+        modelEstimates[k,]$derv <- NA
+        k <- k + 1
         next
       } 
       
       r <- data.frame(x=X)
       t <- try(tempRes <- predictNLS(model, newdata=r, interval="confidence", alpha=0.05))
       if("try-error" %in% class(t)) {
-        print("error")
+        print("error in predictNLS 2")
       } 
       residual <- Yper - tempRes$summary[,1] 
       
@@ -121,7 +132,6 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
   
   }
   options( warn = 0 )
-  
   return (modelEstimates)
 }
 

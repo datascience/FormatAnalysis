@@ -8,8 +8,8 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-name <- "PDFS1"
-groupFile <- "Format markets - PDF versions.tsv"
+name <- "VIDEO"
+groupFile <- "Format markets - VIDEO.tsv"
 start <- 1994
 end <- 2010
 

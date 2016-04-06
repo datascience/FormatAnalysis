@@ -21,7 +21,7 @@ write.table(groupData, file=paste(path, "/market.tsv", sep=""), quote=FALSE, sep
 
 #make a list from multiple mime and other property values
 for (prop in propertyToTake) {
-  groupData[[prop]] <- strsplit(groupData[[prop]], split = " ")
+  groupData[[prop]] <- strsplit(groupData[[prop]], split = ",")
 }
 
 # load raw data, filter and reduce conflicts and save the resulting dataset to a file  
@@ -47,8 +47,9 @@ write.table(data2, file=paste(path, "/adoption.tsv", sep=""),
 # estimate the model and plot the curves
 source('estimateModelParameters.R')
 estimates <- estimateModelParameters(data2, propertyToTake, start, end)
-#write.table(estimates, file=paste("output data/", paste(name,"_estimates.csv", sep=""), sep=""), 
-#            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+estimatesPrint <- estimates[,names(estimates) %in% c("name", "p", "q", "m")]
+write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
+            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 source('plotResults.R')
 plotResults(estimates, includeRateOfChange, includeInterval, includePoints)
