@@ -52,4 +52,5 @@ write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""),
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 source('plotResults.R')
-plotResults(estimates, includeRateOfChange, includeInterval, includePoints)
+plotResults(estimates, c("bass","linear1","linear2","linear3"), includeRateOfChange, includeInterval, includePoints)
+

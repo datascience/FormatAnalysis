@@ -8,13 +8,13 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-name <- "VIDEO"
-groupFile <- "Format markets - VIDEO.tsv"
+name <- "PDFS"
+groupFile <- "Format markets - PDF versions.tsv"
 start <- 1994
 end <- 2010
 
 #plot settings
-includeInterval <- TRUE
+includeInterval <- FALSE
 includeRateOfChange <- FALSE
 includePoints <- TRUE
 includeResidual <- TRUE
