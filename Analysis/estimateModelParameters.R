@@ -1,7 +1,7 @@
 library(minpack.lm)
 library(propagate)
 
-estimateModelParameters <- function(pData, propertyToTake, start, end) {
+estimateModelParameters <- function(pData, propertyToTake, start, end, intervalType, alphaInterval, useMovingAverage) {
 
   options( warn = -1 )
   pData <- pData[pData$year >= start & pData$year<=end,]
@@ -22,7 +22,12 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     Yper <- data$percentage
     Yavg <- data$average
     year <- data$year
-    Y <- Yper
+    
+    if (useMovingAverage == TRUE) {
+      Y <- Yavg
+    } else {
+      Y <- Yper
+    }
     
     # save common data 
     modelEstimates[k,][["ID"]] <- data[1,"ID"]
@@ -35,13 +40,13 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
     modelEstimates[k,][["percentages"]] <- list(Yper)
     modelEstimates[k,][["averages"]] <- list(Yavg)
     
-    modelEstimates <- estimateLinear1Model(modelEstimates, X, Y, Yper, k)
+    modelEstimates <- estimateLinear1Model(modelEstimates, X, Y, Yper, k, intervalType, alphaInterval)
     
-    modelEstimates <- estimateLinear2Model(modelEstimates, X, Y, Yper, k)
+    modelEstimates <- estimateLinear2Model(modelEstimates, X, Y, Yper, k, intervalType, alphaInterval)
     
-    modelEstimates <- estimateLinear3Model(modelEstimates, X, Y, Yper, k)
+    modelEstimates <- estimateLinear3Model(modelEstimates, X, Y, Yper, k, intervalType, alphaInterval)
     
-    modelEstimates <- estimateBassModel(modelEstimates, X, Y, Yper, k)
+    modelEstimates <- estimateBassModel(modelEstimates, X, Y, Yper, k, intervalType, alphaInterval)
     
     
     
@@ -54,15 +59,15 @@ estimateModelParameters <- function(pData, propertyToTake, start, end) {
 }
 
 
-estimateLinear1Model <- function(modelEstimates, X, Y, Yreal, k) {
+estimateLinear1Model <- function(modelEstimates, X, Y, Yreal, k, intervalType, alphaInterval) {
   t <- try(model <- estimateLinear1(X,Y))
   if("try-error" %in% class(t)) {
     print("error in estimating the linear1 model")
   }
   f <- data.frame(x=seq(0,30, len=200))
-  temp <- predict(model, newdata=f, interval="confidence", alpha=0.05)
+  temp <- predict(model, newdata=f, interval=intervalType, alpha=alphaInterval)
   r <- data.frame(x=X)
-  tempRes <- predict(model, newdata=r, interval="confidence", alpha=0.05)
+  tempRes <- predict(model, newdata=r, interval=intervalType, alpha=alphaInterval)
   residual <- Yreal - tempRes[,1]
   modelEstimates[k,"a.linear1"] <- coef(model)["(Intercept)"]
   modelEstimates[k,"b.linear1"] <- coef(model)["I(x)"]
@@ -89,7 +94,7 @@ estimateLinear1Model <- function(modelEstimates, X, Y, Yreal, k) {
   
 }
 
-estimateLinear2Model <- function(modelEstimates, X, Y, Yreal, k) {
+estimateLinear2Model <- function(modelEstimates, X, Y, Yreal, k, intervalType, alphaInterval) {
   
   #Linear2 model estimation
   t <- try(model <- estimateLinear2(X,Y))
@@ -97,9 +102,9 @@ estimateLinear2Model <- function(modelEstimates, X, Y, Yreal, k) {
     print("error in estimating the linear2 model")
   }
   f <- data.frame(x=seq(0,30, len=200))
-  temp <- predict(model, newdata=f, interval="confidence", alpha=0.05)
+  temp <- predict(model, newdata=f, interval=intervalType, alpha=alphaInterval)
   r <- data.frame(x=X)
-  tempRes <- predict(model, newdata=r, interval="confidence", alpha=0.05)
+  tempRes <- predict(model, newdata=r, interval=intervalType, alpha=alphaInterval)
   residual <- Yreal - tempRes[,1]
   modelEstimates[k,"a.linear2"] <- coef(model)["(Intercept)"]
   a <- as.numeric(modelEstimates[k,"a.linear2"])
@@ -128,7 +133,7 @@ estimateLinear2Model <- function(modelEstimates, X, Y, Yreal, k) {
 }
 
 
-estimateLinear3Model <- function(modelEstimates, X, Y, Yreal, k) {
+estimateLinear3Model <- function(modelEstimates, X, Y, Yreal, k, intervalType, alphaInterval) {
   
   #Linear2 model estimation
   t <- try(model <- estimateLinear3(X,Y))
@@ -136,9 +141,9 @@ estimateLinear3Model <- function(modelEstimates, X, Y, Yreal, k) {
     print("error in estimating the linear3 model")
   }
   f <- data.frame(x=seq(0,30, len=200))
-  temp <- predict(model, newdata=f, interval="confidence", alpha=0.05)
+  temp <- predict(model, newdata=f, interval=intervalType, alpha=alphaInterval)
   r <- data.frame(x=X)
-  tempRes <- predict(model, newdata=r, interval="confidence", alpha=0.05)
+  tempRes <- predict(model, newdata=r, interval=intervalType, alpha=alphaInterval)
   residual <- Yreal - tempRes[,1]
   modelEstimates[k,"a.linear3"] <- coef(model)["(Intercept)"]
   a <- as.numeric(modelEstimates[k,"a.linear3"])
@@ -170,7 +175,7 @@ estimateLinear3Model <- function(modelEstimates, X, Y, Yreal, k) {
 
 
 
-estimateBassModel <- function(modelEstimates, X, Y, Yreal, k) {
+estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, intervalType, alphaInterval) {
   
   #Bass model estimation
   pInterval <- c(0.01, 0.03, 0.05, 0.07, 0.1, 0.2, 0.3)
@@ -222,7 +227,7 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k) {
     #print(summary(model))
     f <- data.frame(x=seq(0,30, len=200))
     #t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
-    t <- try(temp <- predictNLS(model, newdata=f, interval="confidence", alpha=0.05))
+    t <- try(temp <- predictNLS(model, newdata=f, interval=intervalType, alpha=alphaInterval))
     if("try-error" %in% class(t)) {
       print("error in predictNLS 1")
       modelEstimates[k,"p.bass"] <- NA
@@ -238,7 +243,7 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k) {
     } else {
       
       r <- data.frame(x=X)
-      t <- try(tempRes <- predictNLS(model, newdata=r, interval="confidence", alpha=0.05))
+      t <- try(tempRes <- predictNLS(model, newdata=r, interval=intervalType, alpha=alphaInterval))
       if("try-error" %in% class(t)) {
         print("error in predictNLS 2")
       } 

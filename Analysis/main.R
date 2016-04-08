@@ -46,7 +46,7 @@ write.table(data2, file=paste(path, "/adoption.tsv", sep=""),
 
 # estimate the model and plot the curves
 source('estimateModelParameters.R')
-estimates <- estimateModelParameters(data2, propertyToTake, start, end)
+estimates <- estimateModelParameters(data2, propertyToTake, start, end, intervalType, alphaInterval, useMovingAverage)
 estimatesPrint <- estimates[,names(estimates) %in% c("name", "p", "q", "m")]
 write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)

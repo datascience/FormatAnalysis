@@ -13,6 +13,14 @@ groupFile <- "Format markets - PDF versions.tsv"
 start <- 1994
 end <- 2010
 
+#type of interval calculated: "none", "confidence" or "prediction"
+intervalType <- "confidence"
+#alpha for the interval 
+alphaInterval <- 0.05
+
+#if a three year moving average should be used 
+useMovingAverage <- FALSE
+
 #plot settings
 includeInterval <- FALSE
 includeRateOfChange <- FALSE
