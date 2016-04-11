@@ -8,10 +8,10 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
-name <- "PDFS"
+name <- "PDF - formats predictions"
 groupFile <- "Format markets - PDF versions.tsv"
 start <- 1994
-end <- 2010
+end <- 2009
 
 #type of interval calculated: "none", "confidence" or "prediction"
 intervalType <- "prediction"
@@ -22,7 +22,7 @@ alphaInterval <- 0.05
 useMovingAverage <- FALSE
 
 #plot settings
-includeInterval <- FALSE
+includeInterval <- TRUE
 includeRateOfChange <- FALSE
 includePoints <- TRUE
 includeResidual <- TRUE

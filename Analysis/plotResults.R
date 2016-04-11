@@ -66,8 +66,8 @@ plotResults <- function(pData, modelTypes, includeRateOfChange, includeInterval,
       }
       
       if (includeResidual) {
-        dfResidual <- data.frame(percentages, residual)
-        residualPlot <- ggplot(dfResidual, aes(x=percentages, y=residual)) + geom_point() + labs(x="real value", y="residual")
+        dfResidual <- data.frame(prediction, residual)
+        residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + geom_point() + labs(x="fitted value", y="residual")
         png(filename=paste(pathGraph, title, "-", mType, "-residual.png", sep=""))
         print(residualPlot)
         dev.off()

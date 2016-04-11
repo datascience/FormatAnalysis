@@ -21,6 +21,7 @@ estimateModelParameters <- function(pData, propertyToTake, start, end, intervalT
     
     #take the data needed for doing the estimation
     X <- data[data$year >= start & data$year<=end,]$age
+    Xper <- data[!(data$year >= start & data$year<=end),]$age
     Yper <- data[data$year >= start & data$year<=end,]$percentage
     Yavg <- data[data$year >= start & data$year<=end,]$average
     year <- data[data$year >= start & data$year<=end,]$year
@@ -48,13 +49,13 @@ estimateModelParameters <- function(pData, propertyToTake, start, end, intervalT
       modelEstimates[k,"real-next"] <- data[data$year==end+1,]$percentage 
     }
     
-    modelEstimates <- estimateLinear1Model(modelEstimates, X, Y, Yper, k, end+1, intervalType, alphaInterval)
+    modelEstimates <- estimateLinear1Model(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
     
-    modelEstimates <- estimateLinear2Model(modelEstimates, X, Y, Yper, k, end+1, intervalType, alphaInterval)
+    modelEstimates <- estimateLinear2Model(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
     
-    modelEstimates <- estimateLinear3Model(modelEstimates, X, Y, Yper, k, end+1, intervalType, alphaInterval)
+    modelEstimates <- estimateLinear3Model(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
     
-    modelEstimates <- estimateBassModel(modelEstimates, X, Y, Yper, k, end+1, intervalType, alphaInterval)
+    modelEstimates <- estimateBassModel(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
     
     
     
@@ -100,9 +101,12 @@ estimateLinear1Model <- function(modelEstimates, X, Y, Yreal, k, predYear, inter
   f$derv <-rep(b,200)
   modelEstimates[k,"derv.linear1"] <- list(f$derv)
   modelEstimates[k,][["derv.linear1"]] <- list(f$derv)
-  modelEstimates[k,"prediction-next.linear1"] <- predRes[,1][1]
-  modelEstimates[k,"predictionLower-next.linear1"] <- predRes[,2][1]
-  modelEstimates[k,"predictionUpper-next.linear1"] <- predRes[,3][1]
+  modelEstimates[k,"prediction-next.linear1"] <- list(predRes[,1])
+  modelEstimates[k,][["prediction-next.linear1"]] <- list(predRes[,1])
+  modelEstimates[k,"predictionLower-next.linear1"] <- list(predRes[,2])
+  modelEstimates[k,][["predictionLower-next.linear1"]] <- list(predRes[,2])
+  modelEstimates[k,"predictionUpper-next.linear1"] <- list(predRes[,3])
+  modelEstimates[k,][["predictionUpper-next.linear1"]] <- list(predRes[,3])
   modelEstimates[k,"MSE.linear1"] <- calculateMSE(residual)
   modelEstimates[k,"R2.linear1"] <- calculateR2(residual, Yreal)
   return (modelEstimates)
@@ -145,9 +149,12 @@ estimateLinear2Model <- function(modelEstimates, X, Y, Yreal, k, predYear, inter
   f$derv <- b + c*f$x
   modelEstimates[k,"derv.linear2"] <- list(f$derv)
   modelEstimates[k,][["derv.linear2"]] <- list(f$derv)
-  modelEstimates[k,"prediction-next.linear2"] <- predRes[,1][1]
-  modelEstimates[k,"predictionLower-next.linear2"] <- predRes[,2][1]
-  modelEstimates[k,"predictionUpper-next.linear2"] <- predRes[,3][1]
+  modelEstimates[k,"prediction-next.linear2"] <- list(predRes[,1])
+  modelEstimates[k,][["prediction-next.linear2"]] <- list(predRes[,1])
+  modelEstimates[k,"predictionLower-next.linear2"] <- list(predRes[,2])
+  modelEstimates[k,][["predictionLower-next.linear2"]] <- list(predRes[,2])
+  modelEstimates[k,"predictionUpper-next.linear2"] <- list(predRes[,3])
+  modelEstimates[k,][["predictionUpper-next.linear2"]] <- list(predRes[,3])
   modelEstimates[k,"MSE.linear2"] <- calculateMSE(residual)
   modelEstimates[k,"R2.linear2"] <- calculateR2(residual, Yreal)
   return (modelEstimates)
@@ -193,9 +200,12 @@ estimateLinear3Model <- function(modelEstimates, X, Y, Yreal, k, predYear, inter
   f$derv <- b + c*f$x + d*(f$x)^2
   modelEstimates[k,"derv.linear3"] <- list(f$derv)
   modelEstimates[k,][["derv.linear3"]] <- list(f$derv)
-  modelEstimates[k,"prediction-next.linear3"] <- predRes[,1][1]
-  modelEstimates[k,"predictionLower-next.linear3"] <- predRes[,2][1]
-  modelEstimates[k,"predictionUpper-next.linear3"] <- predRes[,3][1]
+  modelEstimates[k,"prediction-next.linear3"] <- list(predRes[,1])
+  modelEstimates[k,][["prediction-next.linear3"]] <- list(predRes[,1])
+  modelEstimates[k,"predictionLower-next.linear3"] <- list(predRes[,2])
+  modelEstimates[k,][["predictionLower-next.linear3"]] <- list(predRes[,2])
+  modelEstimates[k,"predictionUpper-next.linear3"] <- list(predRes[,3])
+  modelEstimates[k,][["predictionUpper-next.linear3"]] <- list(predRes[,3])
   modelEstimates[k,"MSE.linear3"] <- calculateMSE(residual)
   modelEstimates[k,"R2.linear3"] <- calculateR2(residual, Yreal)
   return (modelEstimates)
@@ -316,9 +326,12 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, predYear, interval
       f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
       modelEstimates[k,"derv.bass"] <- list(f$derv)
       modelEstimates[k,][["derv.bass"]] <- list(f$derv)
-      modelEstimates[k,"prediction-next.bass"] <- predRes$summary[,1][1]
-      modelEstimates[k,"predictionLower-next.bass"] <- predRes$summary[,5][1]
-      modelEstimates[k,"predictionUpper-next.bass"] <- predRes$summary[,6][1]
+      modelEstimates[k,"prediction-next.bass"] <- list(predRes$summary[,1][1])
+      modelEstimates[k,][["prediction-next.bass"]] <- list(predRes$summary[,1][1])
+      modelEstimates[k,"predictionLower-next.bass"] <- list(predRes$summary[,5][1])
+      modelEstimates[k,][["predictionLower-next.bass"]] <- list(predRes$summary[,5][1])
+      modelEstimates[k,"predictionUpper-next.bass"] <- list(predRes$summary[,6][1])
+      modelEstimates[k,][["predictionUpper-next.bass"]] <- list(predRes$summary[,6][1])
       modelEstimates[k,"MSE.bass"] <- calculateMSE(residual)
       modelEstimates[k,"R2.bass"] <- calculateR2(residual, Yreal)
     }
