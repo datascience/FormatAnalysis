@@ -103,6 +103,8 @@ estimateLinear1Model <- function(modelEstimates, X, Y, Yreal, k, predYear, inter
   modelEstimates[k,"prediction-next.linear1"] <- predRes[,1][1]
   modelEstimates[k,"predictionLower-next.linear1"] <- predRes[,2][1]
   modelEstimates[k,"predictionUpper-next.linear1"] <- predRes[,3][1]
+  modelEstimates[k,"MSE.linear1"] <- calculateMSE(residual)
+  modelEstimates[k,"R2.linear1"] <- calculateR2(residual, Yreal)
   return (modelEstimates)
   
 }
@@ -146,6 +148,8 @@ estimateLinear2Model <- function(modelEstimates, X, Y, Yreal, k, predYear, inter
   modelEstimates[k,"prediction-next.linear2"] <- predRes[,1][1]
   modelEstimates[k,"predictionLower-next.linear2"] <- predRes[,2][1]
   modelEstimates[k,"predictionUpper-next.linear2"] <- predRes[,3][1]
+  modelEstimates[k,"MSE.linear2"] <- calculateMSE(residual)
+  modelEstimates[k,"R2.linear2"] <- calculateR2(residual, Yreal)
   return (modelEstimates)
   
 }
@@ -192,6 +196,8 @@ estimateLinear3Model <- function(modelEstimates, X, Y, Yreal, k, predYear, inter
   modelEstimates[k,"prediction-next.linear3"] <- predRes[,1][1]
   modelEstimates[k,"predictionLower-next.linear3"] <- predRes[,2][1]
   modelEstimates[k,"predictionUpper-next.linear3"] <- predRes[,3][1]
+  modelEstimates[k,"MSE.linear3"] <- calculateMSE(residual)
+  modelEstimates[k,"R2.linear3"] <- calculateR2(residual, Yreal)
   return (modelEstimates)
   
 }
@@ -247,6 +253,8 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, predYear, interval
     modelEstimates[k,"prediction-next.bass"] <- NA
     modelEstimates[k,"predictionLower-next.bass"] <- NA
     modelEstimates[k,"predictionUpper-next.bass"] <- NA
+    modelEstimates[k,"MSE.bass"] <- NA
+    modelEstimates[k,"R2.bass"] <- NA
   }  else {
     
     
@@ -269,6 +277,8 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, predYear, interval
       modelEstimates[k,"prediction-next.bass"] <- NA
       modelEstimates[k,"predictionLower-next.bass"] <- NA
       modelEstimates[k,"predictionUpper-next.bass"] <- NA
+      modelEstimates[k,"MSE.bass"] <- NA
+      modelEstimates[k,"R2.bass"] <- NA
     } else {
       
       r <- data.frame(x=X)
@@ -309,7 +319,8 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, predYear, interval
       modelEstimates[k,"prediction-next.bass"] <- predRes$summary[,1][1]
       modelEstimates[k,"predictionLower-next.bass"] <- predRes$summary[,5][1]
       modelEstimates[k,"predictionUpper-next.bass"] <- predRes$summary[,6][1]
-      
+      modelEstimates[k,"MSE.bass"] <- calculateMSE(residual)
+      modelEstimates[k,"R2.bass"] <- calculateR2(residual, Yreal)
     }
   }
     
@@ -343,4 +354,17 @@ estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)
   fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=sP,q=sQ,m=sM),lower = c(0,0,0))
   return (fit)
+}
+
+calculateMSE <- function(resid) {
+  mse <- sum(resid^2) / length(resid)
+  return (mse)
+}
+
+calculateR2 <- function(resid, Y) {
+  RSS <- sum(resid^2)
+  m <- mean(Y)
+  TSS <- sum((Y - m)^2)
+  r2 <- 1 - RSS/TSS
+  return (r2)
 }
