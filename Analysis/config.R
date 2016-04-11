@@ -14,7 +14,7 @@ start <- 1994
 end <- 2010
 
 #type of interval calculated: "none", "confidence" or "prediction"
-intervalType <- "confidence"
+intervalType <- "prediction"
 #alpha for the interval 
 alphaInterval <- 0.05
 

@@ -48,7 +48,16 @@ write.table(data2, file=paste(path, "/adoption.tsv", sep=""),
 source('estimateModelParameters.R')
 estimates <- estimateModelParameters(data2, propertyToTake, start, end, intervalType, alphaInterval, useMovingAverage)
 estimatesPrint <- estimates[,names(estimates) %in% c("name", "p", "q", "m")]
+predictionsPrint <- estimates[,names(estimates) %in% c("real-next", "prediction-next.linear1", "predictionLower-next.linear1", 
+                                                       "predictionUpper-next.linear1", "prediction-next.linear2", 
+                                                       "predictionLower-next.linear2", "predictionUpper-next.linear2",
+                                                       "prediction-next.linear3", "predictionLower-next.linear3", 
+                                                       "predictionUpper-next.linear3", 
+                                                       "prediction-next.bass", "predictionLower-next.bass", 
+                                                       "predictionUpper-next.bass")]
 write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
+            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+write.table(predictionsPrint, file=paste(path, "/predictions.csv", sep=""), 
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 source('plotResults.R')
