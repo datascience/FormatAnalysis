@@ -1,0 +1,8 @@
+ID	name	mime	release year	comments
+1	7z compressed archive file	application/x-7z-compressed	1999	https://en.wikipedia.org/wiki/7z  http://www.online-convert.com/file-format/7z
+2	BZzip2 compressed archive file	application/x-bzip,application/bzip2,application/x-bz2	2000	 https://en.wikipedia.org/wiki/Bzip2  http://www.online-convert.com/file-format/bz2
+3	Gnu Zipped Archive File	application/gzip,application/x-gzip	1992	https://en.wikipedia.org/wiki/Gzip  http://www.online-convert.com/file-format/gz
+4	WinRAR Compressed Archive	application/x-rar-compressed	1993	http://www.online-convert.com/file-format/rar https://en.wikipedia.org/wiki/RAR_%28file_format%29 
+5	Consolidated Unix File Archive (TAR)	application/x-tar	1988	https://en.wikipedia.org/wiki/Tar_%28computing%29#File_format  http://www.online-convert.com/file-format/tar
+6	Gzipped Tar File	application/x-gtar	1990	http://www.online-convert.com/file-format/tgz  
+7	ZIP compression	application/zip	1989	http://www.online-convert.com/file-format/zip  https://en.wikipedia.org/wiki/Zip_%28file_format%29

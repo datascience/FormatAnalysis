@@ -1,0 +1,23 @@
+ID	name	mime	release year	comments
+1	3rd Generation Partnership Project Multimedia File	video/3gpp2		https://en.wikipedia.org/wiki/3GP_and_3G2  http://www.online-convert.com/file-format/3g2
+2	Third Generation Partnership Project Media File	video/3gpp		https://en.wikipedia.org/wiki/3GP_and_3G2  http://www.online-convert.com/file-format/3g2 http://www.online-convert.com/file-format/3gpp
+3	Advanced Systems Format File	video/x-ms-asf,application/vnd.ms-asf		https://en.wikipedia.org/wiki/Advanced_Systems_Format http://www.online-convert.com/file-format/asf
+4	Microsoft Audio-Visual Interleaved	video/vnd.avi,video/avi,video/x-msvideo	1992	https://en.wikipedia.org/wiki/Audio_Video_Interleave  http://www.online-convert.com/file-format/avi
+6	Flash MP4 Video File	video/x-f4v		http://www.online-convert.com/file-format/f4v
+7	Flash video	video/x-flv	2002	http://www.online-convert.com/file-format/flv  https://en.wikipedia.org/wiki/Flash_Video
+9	MPEG-2 Transport Stream	video/MP2T		http://www.online-convert.com/file-format/m2ts  https://en.wikipedia.org/wiki/.m2ts
+10	iTunes Video File (m4v)	video/x-m4v		https://en.wikipedia.org/wiki/M4V  http://www.online-convert.com/file-format/m4v
+11	Matroska Video File	video/x-matroska	2002	http://www.online-convert.com/file-format/mkv
+12	Camcorder Recorded Video (Modul) File		1987	http://www.online-convert.com/file-format/mod  https://en.wikipedia.org/wiki/MOD_%28file_format%29
+13	QuickTime Movie	video/quicktime	1991	http://www.online-convert.com/file-format/mov
+14	MPEG-4 Video Stream	video/mp4	2001	https://en.wikipedia.org/wiki/MPEG-4_Part_14  http://www.online-convert.com/file-format/mp4
+15	Motion Picture Experts Group file interchange format	video/mpeg	1993	https://en.wikipedia.org/wiki/Moving_Picture_Experts_Group
+16	AVCHD Video File		2006	http://www.online-convert.com/file-format/mts  https://en.wikipedia.org/wiki/AVCHD
+17	Material Exchange Format File	application/mxf		https://en.wikipedia.org/wiki/Material_Exchange_Format
+18	Ogg Video File	video/ogg	1993	https://en.wikipedia.org/wiki/Ogg  http://www.online-convert.com/file-format/ogv
+19	Real Media File	application/vnd.rn-realmedia		http://www.online-convert.com/file-format/rm  https://en.wikipedia.org/wiki/RealMedia
+20	Shockwave Flash Movie	application/vnd.adobe.flash-movie	1996	https://en.wikipedia.org/wiki/SWF  http://www.online-convert.com/file-format/swf
+21	Video Transport Stream File	video/MP2T	1995	http://www.online-convert.com/file-format/ts  https://en.wikipedia.org/wiki/MPEG_transport_stream
+22	Video Object File	video/dvd,video/x-ms-vob		https://en.wikipedia.org/wiki/VOB  http://www.online-convert.com/file-format/vob
+23	Web Media File	video/webm	2010	http://www.online-convert.com/file-format/webm  https://en.wikipedia.org/wiki/WebM
+24	Windows Media Video	video/x-ms-wmv	1999	http://www.online-convert.com/file-format/wmv  https://en.wikipedia.org/wiki/Windows_Media_Video  https://en.wikipedia.org/wiki/Advanced_Systems_Format https://www.nationalarchives.gov.uk/PRONOM/Format/proFormatSearch.aspx?status=detailReport&id=693

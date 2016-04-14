@@ -5,12 +5,13 @@ source('loadData.R')
 path <- paste("output data/", name, sep="")
 dir.create(path)
 
+#load twice to see which columns it has 
 groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
 groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, 
                         colClasses=rep("character", each=ncol(groupData)), sep="\t", stringsAsFactors=FALSE)
 
 
-# calculate properties to take  
+# calculate properties to take TODO explain exclusion from the tsv file 
 nam <- names(groupData)
 propertyToTake <- nam[!(nam %in% c("ID", "name", "release.year", "comments"))]
 
@@ -46,23 +47,23 @@ write.table(data2, file=paste(path, "/adoption.tsv", sep=""),
 
 # estimate the model and plot the curves
 source('estimateModelParameters.R')
-estimates <- estimateModelParameters(data2, propertyToTake, start, end, intervalType, alphaInterval, useMovingAverage)
+estimates <- estimateModelParameters(data2, propertyToTake, start, end, predictionYears, intervalType, alphaInterval, useMovingAverage)
 estimatesPrint <- estimates[,names(estimates) %in% c("name", "a.linear1", "b.linear1", "MSE.linear1", "R2.linear1",
                                                      "a.linear2", "b.linear2", "c.linear2", "MSE.linear2", "R2.linear2",
                                                      "a.linear3", "b.linear3", "c.linear3", "d.linear3", "MSE.linear3", "R2.linear3",
                                                      "p.bass", "q.bass", "m.bass", "MSE.bass", "R2.bass")]
-predictionsPrint <- estimates[,names(estimates) %in% c("name", "real-next", "prediction-next.linear1", "predictionLower-next.linear1", 
-                                                       "predictionUpper-next.linear1", "prediction-next.linear2", 
-                                                       "predictionLower-next.linear2", "predictionUpper-next.linear2",
-                                                       "prediction-next.linear3", "predictionLower-next.linear3", 
-                                                       "predictionUpper-next.linear3", 
-                                                       "prediction-next.bass", "predictionLower-next.bass", 
-                                                       "predictionUpper-next.bass")]
+# predictionsPrint <- estimates[,names(estimates) %in% c("name", "real-next", "prediction-next.linear1", "predictionLower-next.linear1", 
+#                                                        "predictionUpper-next.linear1", "prediction-next.linear2", 
+#                                                        "predictionLower-next.linear2", "predictionUpper-next.linear2",
+#                                                        "prediction-next.linear3", "predictionLower-next.linear3", 
+#                                                        "predictionUpper-next.linear3", 
+#                                                        "prediction-next.bass", "predictionLower-next.bass", 
+#                                                        "predictionUpper-next.bass")]
 write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
-write.table(predictionsPrint, file=paste(path, "/predictions.csv", sep=""), 
-            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+# write.table(predictionsPrint, file=paste(path, "/predictions.csv", sep=""), 
+#             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 source('plotResults.R')
-plotResults(estimates, c("bass","linear1","linear2","linear3"), includeRateOfChange, includeInterval, includePoints)
+plotResults(estimates, c("bass"), includeRateOfChange, includeInterval, includePoints)
 
