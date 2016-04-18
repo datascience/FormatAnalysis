@@ -28,6 +28,7 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   #remove raw data from memory
   rm(rawData)
   
+  aggregatePerYear <- aggregate(amount ~ year, data=pData, FUN = sum)
   
   #filter according to selected properties
   for (prop in propertyToTake) {
@@ -98,7 +99,9 @@ loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts
   
   #calculate age
   pData$age <- pData$year - as.numeric(pData$release.year)
-  pData <- pData[pData$age>=0,]
+  # this is moved to calculatePercentages
+  #pData <- pData[pData$age>=0,]
+  
   options(warn=0)
   print("Data loading finished")
   return (pData)

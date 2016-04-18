@@ -9,12 +9,15 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 #market definition
-name <- "DISTILLER"
-groupFile <- "Format markets - DISTILLER.tsv"
+name <- "PDFSMarket-2"
+groupFile <- "Format markets - PDF versions.tsv"
 
 #years used to estimate the model
 start <- 1994
 end <- 2010
+
+#if total market per year should be used
+useTotal <- TRUE
 
 #type of interval calculated: "none", "confidence" or "prediction"
 intervalType <- "confidence"

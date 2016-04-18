@@ -1,42 +1,62 @@
 
 calculatePercentage <- function(pData, propertyToTake) {
   
+  aggregPerYear <- read.table("input data/UKWAPerYear.tsv", header=TRUE, sep="\t", stringsAsFactors=FALSE)
   
+  
+  # calculate percentages inside of the market
   aggreg <- aggregate(amount~year , FUN=sum, data=pData) 
   aggreg <- setNames(aggreg, c("year", "total"))
   
   pData <- merge(pData, aggreg, by="year")
-  pData$percentage <- pData$amount / pData$total
+  pData$percentage <- (pData$amount / pData$total)*1000
   pData <- pData[!(names(pData)=="total")]
   rm(aggreg)
   
+  
+  # calculate percentages over the whole harvest years
+  pData <- merge(pData, aggregPerYear, by="year")
+  pData$percentageYear <- (pData$amount / pData$amountYear)*1000
+  pData <- pData[!(names(pData)=="amountYear")]
 
-  aggreg <- aggregate(as.formula(paste("amount~", paste(propertyToTake, collapse="+"))) , FUN=sum, data=pData) 
-  aggreg <- setNames(aggreg, c(propertyToTake, "total"))
-  pData <- merge(pData, aggreg, by=propertyToTake)
-
-  pData$average <- c(1:nrow(pData))
+  #it seems that these three lines are irelevant 
+#   aggreg <- aggregate(as.formula(paste("amount~", paste(propertyToTake, collapse="+"))) , FUN=sum, data=pData) 
+#   aggreg <- setNames(aggreg, c(propertyToTake, "total"))
+#   pData <- merge(pData, aggreg, by=propertyToTake)
+# 
+   pData$average <- c(1:nrow(pData))
+   pData$averageYear <- c(1:nrow(pData))
   
   for (i in (1:nrow(pData))) {
-    age<- pData[i,]$age
-    data <- merge(pData, pData[i,][names(pData) %in% propertyToTake], by=propertyToTake)
-      
-    avrg <- average(age,data)
-    pData[i,]$average <- avrg
+    if (!is.na(pData[i,]$age)) {
+      age<- pData[i,]$age
+      data <- merge(pData, pData[i,][names(pData) %in% propertyToTake], by=propertyToTake)
+      avrg1 <- average(age,data, "percentage")
+      avrg2 <- average(age,data, "percentageYear")
+      pData[i,]$average <- avrg1
+      pData[i,]$averageYear <- avrg2  
+    } else {
+      pData[i,]$average <- NA
+      pData[i,]$averageYear <- NA
+    }
+    
   }
   
   pData <- pData[c("ID", "name", propertyToTake, "year", "amount", "release.year", "age", 
-                   "percentage", "average")]
+                   "percentage", "average", "percentageYear", "averageYear")]
 
+  #remove those where release year was not available
+  pData <- pData[pData$age>=0 & !is.na(pData$release.year) & !is.na(pData$age),]
+  
   return (pData)
 }
 
 
-average <- function(age, data) {
+average <- function(age, data, cn) {
   
-  perc1 <- data[data$age==age-1,]$percentage
-  perc2 <- data[data$age==age,]$percentage
-  perc3 <- data[data$age==age+1,]$percentage
+  perc1 <- data[data$age==age-1,cn]
+  perc2 <- data[data$age==age,cn]
+  perc3 <- data[data$age==age+1,cn]
 #   print(perc1)
 #   print(perc2)
 #   print(perc3)

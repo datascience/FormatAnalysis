@@ -47,11 +47,9 @@ write.table(data2, file=paste(path, "/adoption.tsv", sep=""),
 
 # estimate the model and plot the curves
 source('estimateModelParameters.R')
-estimates <- estimateModelParameters(data2, propertyToTake, start, end, predictionYears, intervalType, alphaInterval, useMovingAverage)
-estimatesPrint <- estimates[,names(estimates) %in% c("name", "a.linear1", "b.linear1", "MSE.linear1", "R2.linear1",
-                                                     "a.linear2", "b.linear2", "c.linear2", "MSE.linear2", "R2.linear2",
-                                                     "a.linear3", "b.linear3", "c.linear3", "d.linear3", "MSE.linear3", "R2.linear3",
-                                                     "p.bass", "q.bass", "m.bass", "MSE.bass", "R2.bass")]
+estimates <- estimateModelParameters(data2, propertyToTake, start, end, predictionYears, intervalType, alphaInterval, useMovingAverage, useTotal)
+estimatesPrint <- estimates[,names(estimates) %in% c("name", "p.bass", "pLow.bass", "pUpr.bass", "q.bass", "qLow.bass", "qUpr.bass", 
+                                                     "m.bass", "mLow.bass", "mUpr.bass", "qprat.bass", "MSE.bass", "R2.bass")]
 # predictionsPrint <- estimates[,names(estimates) %in% c("name", "real-next", "prediction-next.linear1", "predictionLower-next.linear1", 
 #                                                        "predictionUpper-next.linear1", "prediction-next.linear2", 
 #                                                        "predictionLower-next.linear2", "predictionUpper-next.linear2",

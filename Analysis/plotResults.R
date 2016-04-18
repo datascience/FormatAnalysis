@@ -16,16 +16,18 @@ plotResults <- function(pData, modelTypes, includeRateOfChange, includeInterval,
       
       
       title <- pData[i,"name"] 
+      releaseYear <- as.numeric(pData[i,"release.year"])
       ages <- unlist(pData[i,"ages"])
-      percentages <- unlist(pData[i,"percentages"])
-      averages <- unlist(pData[i,"averages"])
+      percentages <- unlist(pData[i,"percentages"])/10
+      averages <- unlist(pData[i,"averages"])/10
       interval <- unlist(pData[i,paste("interval.",mType, sep="")])
-      model <- unlist(pData[i,paste("model.",mType, sep="")])
-      upper <- unlist(pData[i,paste("upper.",mType, sep="")])
-      lower <- unlist(pData[i,paste("lower.",mType, sep="")])
+      model <- unlist(pData[i,paste("model.",mType, sep="")])/10
+      upper <- unlist(pData[i,paste("upper.",mType, sep="")])/10
+      lower <- unlist(pData[i,paste("lower.",mType, sep="")])/10
       derv <- unlist(pData[i,paste("derv.",mType, sep="")])
-      residual <- unlist(pData[i,paste("residual.",mType,sep="")])
-      prediction <- unlist(pData[i,paste("prediction.",mType,sep="")])
+      residual <- unlist(pData[i,paste("residual.",mType,sep="")])/10
+      prediction <- unlist(pData[i,paste("prediction.",mType,sep="")])/10
+      qpRat <- pData[i,"qprat.bass"]
       
       if (is.na(model)) {
         next
@@ -40,10 +42,11 @@ plotResults <- function(pData, modelTypes, includeRateOfChange, includeInterval,
       dfCluster <- rbind(dfCluster, dfClusterTemp)
       
       if (includeInterval) {
-        modelPlot <- modelPlot + geom_ribbon(data=dfModel, aes(x=interval, ymin=lower, ymax=upper), alpha=0.2) 
+        modelPlot <- modelPlot + geom_ribbon(data=dfModel, aes(x=interval, ymin=lower, ymax=upper), alpha=0.2) + coord_cartesian(ylim=c(0,max(dfModel$model)+0.05*max(dfModel$model)))
       }
       
-      modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model)) 
+      modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model)) + 
+        annotate(geom="text", x=20, y=max(dfModel$model)/2, label=qpRat, color="red") 
       
       if (includePoints) {
         modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
