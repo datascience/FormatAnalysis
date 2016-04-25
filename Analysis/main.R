@@ -46,22 +46,35 @@ write.table(data2, file=paste(path, "/adoption.tsv", sep=""),
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 # estimate the model and plot the curves
+pathMarketElements <- paste(path, "/market elements/", sep="")
+dir.create(pathMarketElements)
 source('estimateModelParameters.R')
-estimates <- estimateModelParameters(data2, propertyToTake, start, end, predictionYears, intervalType, alphaInterval, useMovingAverage, useTotal)
-estimatesPrint <- estimates[,names(estimates) %in% c("name", "p.bass", "pLow.bass", "pUpr.bass", "q.bass", "qLow.bass", "qUpr.bass", 
-                                                     "m.bass", "mLow.bass", "mUpr.bass", "qprat.bass", "MSE.bass", "R2.bass")]
-# predictionsPrint <- estimates[,names(estimates) %in% c("name", "real-next", "prediction-next.linear1", "predictionLower-next.linear1", 
-#                                                        "predictionUpper-next.linear1", "prediction-next.linear2", 
-#                                                        "predictionLower-next.linear2", "predictionUpper-next.linear2",
-#                                                        "prediction-next.linear3", "predictionLower-next.linear3", 
-#                                                        "predictionUpper-next.linear3", 
-#                                                        "prediction-next.bass", "predictionLower-next.bass", 
-#                                                        "predictionUpper-next.bass")]
-write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
-            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
-# write.table(predictionsPrint, file=paste(path, "/predictions.csv", sep=""), 
-#             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+
+estimates <- estimateModelParameters(data2, start, end, useMovingAverage, pathMarketElements)
+
+modelEStimates <- calculateBestModelValues(data2, estimates, pathMarketElements)
 
 source('plotResults.R')
-plotResults(estimates, c("bass"), includeRateOfChange, includeInterval, includePoints)
+graphAllModels(data2, modelEStimates, pathMarketElements)
+
+readline(prompt = "Enter when ready to proceed")
+
+estimatesFinal <- pickTheBestOnes(modelEStimates, pathMarketElements)
+
+plotResults(estimatesFinal, FALSE, TRUE, TRUE, path)
+
+predictions <- makePredictions(data2, c(2011), path)
+
+
+
+
+# estimatesPrint <- estimates[,names(estimates) %in% c("name", "p.bass", "pLow.bass", "pUpr.bass", "q.bass", "qLow.bass", "qUpr.bass", 
+#                                                      "m.bass", "mLow.bass", "mUpr.bass", "qprat.bass", "MSE.bass", "R2.bass")]
+# 
+# write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
+#             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+
+
+# source('plotResults.R')
+# plotResults(estimates, c("bass"), includeRateOfChange, includeInterval, includePoints)
 

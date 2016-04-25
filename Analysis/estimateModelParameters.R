@@ -1,217 +1,278 @@
 library(minpack.lm)
 library(propagate)
 require(MASS)
-estimateModelParameters <- function(pData, propertyToTake, start, end, predictionYears, intervalType, alphaInterval, useMovingAverage, useTotal) {
+
+
+estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
 
   options( warn = -1 )
-  #pData <- pData[pData$year >= start & pData$year<=end,]
   
   #extract unique values 
   unig <- unique(pData$ID)
-  
 
-  modelEstimates <- data.frame(matrix(vector(),0,7 + length(propertyToTake), 
-                                      dimnames = list(c(),c("ID", "name", propertyToTake, "release.year", 
-                                                            "ages", "percentages", "averages", "predictionAge"))))
-
+  estimates <- data.frame(ID=numeric(), modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
+                          p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
+    
   k <- 1
   for (i in unig) {
     data <- pData[pData$ID==i,]
     print(paste("Estimating and fitting the model to ", data[1,]$name))
     
+    name <- data[1,]$name
+    pathElement <- paste(path, name, "/", sep="")
+    dir.create(pathElement)
+    pathModel <- paste(pathElement, "models/", sep="")
+    dir.create(pathModel)
+    #delete if there is something in the folder
+    file.remove(file.path(pathModel, list.files(pathModel)))
+    
+    
     #take the data needed for doing the estimation
-    X <- data[data$year >= start & data$year<=end,]$age
-    Xper <- NA
-   
-#      if (!is.na(predictionYears)) {
-#       Xper <- predictionYears - data[1,]$release.year
-#       Xper[Xper < 0] <- 0 
-#     } 
-    Yper <- NA
-    Yavg <- NA
-    year <- NA
-    if (useTotal==TRUE) {
-      Yper <- data[data$year >= start & data$year<=end,]$percentageYear
-      Yavg <- data[data$year >= start & data$year<=end,]$averageYear
-      year <- data[data$year >= start & data$year<=end,]$year
-    }else {
-      Yper <- data[data$year >= start & data$year<=end,]$percentage
-      Yavg <- data[data$year >= start & data$year<=end,]$average
-      year <- data[data$year >= start & data$year<=end,]$year
-    }
+    X <- data[data$year>=start & data$year<=end,]$age
+
+    
+    Yper <- data[data$year >= start & data$year<=end,]$percentage
+    Yavg <- data[data$year >= start & data$year<=end,]$average
+    year <- data[data$year >= start & data$year<=end,]$year
     if (useMovingAverage == TRUE) {
       Y <- Yavg
     } else {
       Y <- Yper
     }
     
-    # save common data 
-    modelEstimates[k,][["ID"]] <- data[1,"ID"]
-    modelEstimates[k,][["name"]] <- data[1,"name"]
-    for (prop in propertyToTake) {
-      modelEstimates[k,][[prop]] <- data[1,][[prop]]
-    }
-    modelEstimates[k,][["release.year"]] <- data[1,][["release.year"]]
-    modelEstimates[k,][["ages"]] <- list(data$age)
-    modelEstimates[k,][["percentages"]] <- list(Yper)
-    modelEstimates[k,][["averages"]] <- list(Yavg)
+   
+    allEstimates <- estimateBassModel(X, Y, Yper, pathModel)
     
-#     if (is.na(Xper)) {
-#       modelEstimates[k,"predictionAge"] <- NA
-#       modelEstimates[k,"real-next"] <- NA
-#     } else {
-#       modelEstimates[k,][["predictionAge"]] <- list(Xper)
-#       RV <- c()
-#       for (j in 1:length(Xper)) {
-#         temp <- data[data$year=Xper[j],]$percentage
-#         if (length(temp)>0) {
-#           RV[j] <- temp
-#         } else {
-#           RV[j] <- NA
-#         }
-#       }
-#       modelEstimates[k,][["real-next"]] <- list(RV)
-#     }
+    write.table(allEstimates, file = paste(pathElement, "allEstimates.tsv", sep=""), quote=FALSE, 
+                sep="\t", col.names=TRUE, row.names=FALSE)
     
-   # modelEstimates <- estimateLinear1Model(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
+    #filtering to get the best models
+    allEstimates <- allEstimates[!is.na(allEstimates$p) & !is.na(allEstimates$q) & !is.na(allEstimates$m),]
+    allEstimates <- allEstimates[allEstimates$p>0 & allEstimates$q>0 & allEstimates$m>0 & allEstimates$p<=1,]
     
-  #  modelEstimates <- estimateLinear2Model(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
+    allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= 1000,]
     
-   # modelEstimates <- estimateLinear3Model(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
+    allEstimates <- allEstimates[order(allEstimates$MSE),]
+    allEstimates <- allEstimates[1:2,]
     
-    modelEstimates <- estimateBassModel(modelEstimates, X, Y, Yper, k, Xper, intervalType, alphaInterval)
+    write.table(allEstimates, file = paste(pathElement, "10best.tsv", sep=""), quote=FALSE, 
+                sep="\t", col.names=TRUE, row.names=FALSE)
     
-    
-    
+    allEstimates$ID <- i
     
     k <- k + 1
   
+    estimates <- rbind(estimates,allEstimates)
+    
   }
+  
   options( warn = 0 )
-  return (modelEstimates)
+  return (estimates)
 }
 
 
 
 
-estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, predYear, intervalType, alphaInterval) {
+
+estimateBassModel <- function(X, Y, Yreal, path) {
   
   #Bass model estimation
   #pInterval <- c(0.01, 0.03, 0.05, 0.07, 0.1, 0.2, 0.3)
-  pInterval <- seq(0.00, 0.5, 0.01)
+  pInterval <- seq(0.00, 0.5, 0.05)
   #qInterval <- c(0.01, 0.05, 0.1, 0.3, 0.5, 0.7, 1.0)
   qInterval <- seq(0.00, 1.0, 0.05)
   mInterval <- c(0.000, 0.01, 0.1, 1, 10, 100, 1000, 10000, 30000)
   #mInterval <- seq(0,10000,100)
+  
+  allEstimates <- data.frame(modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
+                             p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
   model <- NA
-  tempRes <- Inf
+  k <- 1
   for (iP in pInterval) {
     for (iQ in qInterval) {
       for (iM in mInterval) {
-        print(paste(iP,iQ,iM, sep = " "))
-        t <- try(mod <- estimateBass(X,Y, iP, iQ, iM))
+        #cat(paste(iP,iQ,iM, "\n", sep=" "))
+        allEstimates[k,"modelID"] <- k
+        allEstimates[k,"pStart"] <- iP
+        allEstimates[k,"qStart"] <- iQ
+        allEstimates[k,"mStart"] <- iM
+        
+        suppressMessages(t <- try(model <- estimateBass(X,Y, iP, iQ, iM)))
         if("try-error" %in% class(t)) {
-          print("error in estimating the model")
-          next
+          allEstimates[k,"p"] <- NA
+          allEstimates[k,"q"] <- NA
+          allEstimates[k,"m"] <- NA
+          allEstimates[k,"MSE"] <- NA
+        } else {
+          p <- as.numeric(coef(model)["p"])
+          q <- as.numeric(coef(model)["q"])
+          m <- as.numeric(coef(model)["m"])
+          allEstimates[k,"p"] <- p
+          allEstimates[k,"q"] <- q
+          allEstimates[k,"m"] <- m
+          
+#          # suppressMessages(t <- try (cInt <- confint(model, level = 0.95)))
+#         #  if ("try-error" %in% class(t)) {
+#             allEstimates[k,"pLow"] <- NA
+#             allEstimates[k,"pUpr"] <- NA
+#             allEstimates[k,"qLow"] <- NA
+#             allEstimates[k,"qUpr"] <- NA
+#             allEstimates[k,"mLow"] <- NA
+#             allEstimates[k,"mUpr"] <- NA
+#         #  }else {
+# #             allEstimates[k,"pLow"] <- cInt["p",1]
+# #             allEstimates[k,"pUpr"] <- cInt["p",2]
+# #             allEstimates[k,"qLow"] <- cInt["q",1]
+# #             allEstimates[k,"qUpr"] <- cInt["q",2]
+# #             allEstimates[k,"mLow"] <- cInt["m",1]
+# #             allEstimates[k,"mUpr"] <- cInt["m",2]
+# #           }
+          # WARNING These residuals will be in the end different from those calculated by 
+          # when real values are used. This is because the model is estimated on moving average. 
+          residual <- resid(model)
+          allEstimates[k,"MSE"] <- calculateMSE(residual)
+          #allEstimates[k,]$R2 <- calculateR2(residual, Yreal)
+          saveRDS(model, paste(path,k,".rds", sep=""))
         }
-        
-        p <- as.numeric(coef(mod)["p"])
-        q <- as.numeric(coef(mod)["q"])
-        m <- as.numeric(coef(mod)["m"])
-        if (p>1 | p<0 | q<0 | m<0) {
-          next
-        }
-        if ((m*(p+q)^2)/(4*q) <= 1000) {
-          sumRes <- sum(resid(mod)^2)
-          if (sumRes < tempRes) {
-            model <- mod
-            tempRes <- sumRes
-          }
-        }
-        
-        #if p is above 1 do not use the model
-        
-        
-#         sumRes <- sum(resid(mod)^2)
-#         if (sumRes < tempRes) {
-#           model <- mod
-#           tempRes <- sumRes
-#         }
-        
+      
+        k <- k + 1
       }
     }
   }
+  return (allEstimates)
+}
   
-  if (is.na(model)) {
-    print("Model is NA")
-    modelEstimates[k,"p.bass"] <- NA
-    modelEstimates[k,"q.bass"] <- NA
-    modelEstimates[k,"m.bass"] <- NA
-    modelEstimates[k,"qprat.bass"] <-NA
-    modelEstimates[k,"prediction.bass"] <- NA
-    modelEstimates[k,"residual.bass"] <- NA
-    modelEstimates[k,"interval.bass"] <- NA
-    modelEstimates[k,"model.bass"] <- NA
-    modelEstimates[k,"upper.bass"] <- NA
-    modelEstimates[k,"lower.bass"] <- NA
-    modelEstimates[k,"derv.bass"] <- NA
-#     modelEstimates[k,"prediction-next.bass"] <- NA
-#     modelEstimates[k,"predictionLower-next.bass"] <- NA
-#     modelEstimates[k,"predictionUpper-next.bass"] <- NA
-    modelEstimates[k,"MSE.bass"] <- NA
-    modelEstimates[k,"R2.bass"] <- NA
-    modelEstimates[k,"pLow.bass"] <- NA
-    modelEstimates[k,"pUpr.bass"] <- NA
-    modelEstimates[k,"qLow.bass"] <- NA
-    modelEstimates[k,"qUpr.bass"] <- NA
-    modelEstimates[k,"mLow.bass"] <- NA
-    modelEstimates[k,"mUpr.bass"] <- NA
-  }  else {
+
+calculateBestModelValues <- function(marketShare, bestModels, path) {
+  
+  modelEstimates <- data.frame(matrix(vector(),0,30, 
+                                      dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
+                                                            "ages", "percentages", "averages", 
+                                                            "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
+                                                            "m", "mLwr", "mUpr", "qprat", "prediction", 
+                                                            "residual", "interval", "model", "upper", "lower",
+                                                            "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
+                                                            "predictedLow", "predictedHigh"))))
+  
+  modelEsPerElement <- data.frame(matrix(vector(),0,30, 
+                                      dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
+                                                            "ages", "percentages", "averages", 
+                                                            "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
+                                                            "m", "mLwr", "mUpr", "qprat", "prediction", 
+                                                            "residual", "interval", "model", "upper", "lower",
+                                                            "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
+                                                            "predictedLow", "predictedHigh"))))
+  
+  pickFrame <- data.frame(ID=character(), name=character(), modelID=character())
+  
+  
+  uniq <- unique(marketShare$ID)
+  
+  for (i in uniq) {
+    data <- marketShare[marketShare$ID==i,]
+    name <- data[1,][["name"]]
+    pickFrame <- rbind(pickFrame, data.frame(ID=i, name=name, modelID=NA))
+    pathElement <- paste(path, name, "/", sep="")
+    pathElModels <- paste(pathElement, "models/", sep="")
+    models <- bestModels[bestModels$ID==i,]
+    modelEsPerElement <- modelEsPerElement[0,]
+    for (j in models$modelID) {
+      print(j)
+      mFile <- paste(getwd(),"/",pathElModels, j, ".rds", sep="")
+      model <- readRDS(mFile)
+      estimates <- calculateModelValues(data, model, j)
+      modelEsPerElement <- rbind(modelEsPerElement, estimates)
+    }
+    saveRDS(modelEsPerElement, file=paste(pathElement, "estimates.rds", sep=""))
+    
+    modelEstimates <- rbind(modelEstimates, modelEsPerElement)
+  }
+  
+  write.table(pickFrame, file = paste(path, "pick.tsv", sep=""), quote=FALSE, 
+              sep="\t", col.names=TRUE, row.names=FALSE)
+  
+  return (modelEstimates)
+  
+} 
+
+
+
+calculateModelValues <- function(marketShare, model, modelID, calculationType, predictionYears = NA) {
+  
+  if (length(unique(marketShare$ID))>1) {
+    
+    message("Expecting only one market element!")
+    return (NA)
+    
+  } else {
+    intervalType <- calculationType
+    modelEstimates <- data.frame(matrix(vector(),0,30, 
+                                        dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
+                                                              "ages", "percentages", "averages", 
+                                                              "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
+                                                              "m", "mLwr", "mUpr", "qprat", "prediction", 
+                                                              "residual", "interval", "model", "upper", "lower",
+                                                              "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
+                                                              "predictedLow", "predictedHigh"))))
+    
+    modelEstimates[1,][["ID"]] <- marketShare[1,]$ID
+    modelEstimates[1,][["name"]] <- marketShare[1,]$name
+    modelEstimates[1,][["release.year"]] <- marketShare[1,]$release.year
+    modelEstimates[1,][["modelID"]] <- modelID
+    
+    X <- marketShare$age
+    
+    Yper  <- marketShare$percentage
+    Yreal <- Yper
+    Yavg  <- marketShare$average
+    releaseYear  <- marketShare$release.year
+    
+    modelEstimates[1,][["ages"]] <- list(X)
+    modelEstimates[1,][["percentages"]] <- list(Yper)
+    modelEstimates[1,][["averages"]] <- list(Yavg)
     
     
-    #print(summary(model))
-    f <- data.frame(x=seq(0,30, len=200))
-    #t <- try(temp <- predictNLS(model, newdata=f, interval='none'))
-    t <- try(temp <- predictNLS(model, newdata=f, interval=intervalType, alpha=alphaInterval))
+    f <- data.frame(x=seq(0,30, len=100))
+    t <- try(temp <- predictNLS(model, newdata=f, interval=intervalType, alpha=0.05))
     if("try-error" %in% class(t)) {
       print("error in predictNLS 1")
-      modelEstimates[k,"p.bass"] <- NA
-      modelEstimates[k,"q.bass"] <- NA
-      modelEstimates[k,"m.bass"] <- NA
-      modelEstimates[k,"qprat.bass"] <-NA
-      modelEstimates[k,"prediction.bass"] <- NA
-      modelEstimates[k,"residual.bass"] <- NA
-      modelEstimates[k,"interval.bass"] <- NA
-      modelEstimates[k,"model.bass"] <- NA
-      modelEstimates[k,"upper.bass"] <- NA
-      modelEstimates[k,"lower.bass"] <- NA
-      modelEstimates[k,"derv.bass"] <- NA
-#       modelEstimates[k,"prediction-next.bass"] <- NA
-#       modelEstimates[k,"predictionLower-next.bass"] <- NA
-#       modelEstimates[k,"predictionUpper-next.bass"] <- NA
-      modelEstimates[k,"MSE.bass"] <- NA
-      modelEstimates[k,"R2.bass"] <- NA
-      modelEstimates[k,"pLow.bass"] <- NA
-      modelEstimates[k,"pUpr.bass"] <- NA
-      modelEstimates[k,"qLow.bass"] <- NA
-      modelEstimates[k,"qUpr.bass"] <- NA
-      modelEstimates[k,"mLow.bass"] <- NA
-      modelEstimates[k,"mUpr.bass"] <- NA
+      modelEstimates[1,][["p"]] <- NA
+      modelEstimates[1,][["pLwr"]] <- NA
+      modelEstimates[1,][["pUpr"]] <- NA
+      modelEstimates[1,][["q"]] <- NA
+      modelEstimates[1,][["qLwr"]] <- NA
+      modelEstimates[1,][["qUpr"]] <- NA
+      modelEstimates[1,][["m"]] <- NA
+      modelEstimates[1,][["mLwr"]] <- NA
+      modelEstimates[1,][["mUpr"]] <- NA
+      modelEstimates[1,][["qprat"]] <-NA
+      modelEstimates[1,][["prediction"]] <- NA
+      modelEstimates[1,][["residual"]] <- NA
+      modelEstimates[1,][["interval"]] <- NA
+      modelEstimates[1,][["model"]] <- NA
+      modelEstimates[1,][["upper"]] <- NA
+      modelEstimates[1,][["lower"]] <- NA
+      modelEstimates[1,][["derv"]] <- NA
+      modelEstimates[1,][["MSE"]] <- NA
+      modelEstimates[1,][["R2"]] <- NA
     } else {
-      
       r <- data.frame(x=X)
-      t <- try(tempRes <- predictNLS(model, newdata=r, interval=intervalType, alpha=alphaInterval))
+      t <- try(tempRes <- predictNLS(model, newdata=r, interval=intervalType, alpha=0.05))
       if("try-error" %in% class(t)) {
         print("error in predictNLS 2")
       } 
-      r <- data.frame(x=predYear)
-      t <- try(predRes <- predictNLS(model, newdata=r, interval="prediction", alpha=alphaInterval))
+      predictionAge <- predictionYears - releaseYear
+      r <- data.frame(x=predictionAge)
+      t <- try(tempPred <- predictNLS(model, newdata=r, interval=intervalType, alpha=0.05))
       if("try-error" %in% class(t)) {
-        print("error in predictNLS 2")
+        print("error in predictNLS 3")
       }
       
+      
+      #calculate residuals 
       residual <- Yreal - tempRes$summary[,1] 
       
+      #calculate confidence intervals for estimated parameters 
       t <- try (cInt <- confint(model, level = 0.95))
       if ("try-error" %in% class(t)) {
         print("error in predictNLS 2")
@@ -230,71 +291,108 @@ estimateBassModel <- function(modelEstimates, X, Y, Yreal, k, predYear, interval
         mU <- cInt["m",2]
         
       }
-        
-      modelEstimates[k,"p.bass"] <- coef(model)["p"]
-      p <- as.numeric(modelEstimates[k,"p.bass"])
-      modelEstimates[k,"pLow.bass"] <- pL
-      modelEstimates[k,"pUpr.bass"] <- pU
-      modelEstimates[k,"q.bass"] <- coef(model)["q"]
-      q <- as.numeric(modelEstimates[k,"q.bass"])
-      modelEstimates[k,"qLow.bass"] <- qL
-      modelEstimates[k,"qUpr.bass"] <- qU
-      modelEstimates[k,"m.bass"] <- coef(model)["m"]
-      m <- as.numeric(modelEstimates[k,"m.bass"])
-      modelEstimates[k,"mLow.bass"] <- mL
-      modelEstimates[k,"mUpr.bass"] <- mU
-      modelEstimates[k,"qprat.bass"] <-as.numeric(q/p)
-      modelEstimates[k,"prediction.bass"] <- list(tempRes$summary[,1])
-      modelEstimates[k,][["prediction.bass"]] <- list(tempRes$summary[,1])
-      modelEstimates[k,"residual.bass"] <- list(residual)
-      modelEstimates[k,][["residual.bass"]] <- list(residual)
-      modelEstimates[k,"interval.bass"] <- list(f$x)
-      modelEstimates[k,][["interval.bass"]] <- list(f$x)
-      modelEstimates[k,"model.bass"] <- list(temp$summary[,1])
-      modelEstimates[k,][["model.bass"]] <- list(temp$summary[,1])
-      modelEstimates[k,"upper.bass"] <- list(temp$summary[,6])
-      modelEstimates[k,][["upper.bass"]] <- list(temp$summary[,6])
-      modelEstimates[k,"lower.bass"] <- list(temp$summary[,5])
-      modelEstimates[k,][["lower.bass"]] <- list(temp$summary[,5])
+      
+      modelEstimates[1,][["p"]] <- coef(model)["p"]
+      p <- as.numeric(modelEstimates[1,][["p"]])
+      modelEstimates[1,][["pLwr"]] <- pL
+      modelEstimates[1,][["pUpr"]] <- pU
+      modelEstimates[1,][["q"]] <- coef(model)["q"]
+      q <- as.numeric(modelEstimates[1,][["q"]])
+      modelEstimates[1,][["qLwr"]] <- qL
+      modelEstimates[1,][["qUpr"]] <- qU
+      modelEstimates[1,][["m"]] <- coef(model)["m"]
+      m <- as.numeric(modelEstimates[1,][["m"]])
+      modelEstimates[1,][["mLwr"]] <- mL
+      modelEstimates[1,][["mUpr"]] <- mU
+      modelEstimates[1,][["qprat"]] <-as.numeric(q/p)
+      modelEstimates[1,][["prediction"]] <- list(tempRes$summary[,1])
+      modelEstimates[1,][["residual"]] <- list(residual)
+      modelEstimates[1,][["interval"]] <- list(f$x)
+      modelEstimates[1,][["model"]] <- list(temp$summary[,1])
+      modelEstimates[1,][["lower"]] <- list(temp$summary[,5])
+      modelEstimates[1,][["upper"]] <- list(temp$summary[,6])
       f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
-      modelEstimates[k,"derv.bass"] <- list(f$derv)
-      modelEstimates[k,][["derv.bass"]] <- list(f$derv)
-#       modelEstimates[k,"prediction-next.bass"] <- list(predRes$summary[,1][1])
-#       modelEstimates[k,][["prediction-next.bass"]] <- list(predRes$summary[,1][1])
-#       modelEstimates[k,"predictionLower-next.bass"] <- list(predRes$summary[,5][1])
-#       modelEstimates[k,][["predictionLower-next.bass"]] <- list(predRes$summary[,5][1])
-#       modelEstimates[k,"predictionUpper-next.bass"] <- list(predRes$summary[,6][1])
-#       modelEstimates[k,][["predictionUpper-next.bass"]] <- list(predRes$summary[,6][1])
-      modelEstimates[k,"MSE.bass"] <- calculateMSE(residual)
-      modelEstimates[k,"R2.bass"] <- calculateR2(residual, Yreal)
+      modelEstimates[1,][["derv"]] <- list(f$derv)
+      modelEstimates[1,][["MSE"]] <- calculateMSE(residual)
+      modelEstimates[1,][["R2"]] <- calculateR2(residual, Yreal)
+      if (calculationType=="prediction") {
+        modelEstimates[1,][["yearsToPredict"]] <- list(predictionYears)
+        modelEstimates[1,][["predictedValues"]] <- list(tempPred$summary[,1])
+        modelEstimates[1,][["predictedLow"]] <- list(tempPred$summary[,5])
+        modelEstimates[1,][["predictedHigh"]] <- list(tempPred$summary[,6])
+      } else {
+        modelEstimates[1,][["yearsToPredict"]] <- NA
+        modelEstimates[1,][["predictedValues"]] <- NA
+        modelEstimates[1,][["predictedLow"]] <- NA
+        modelEstimates[1,][["predictedHigh"]] <- NA
+      }
+
     }
-  }
     
+    
+  }
+  
   return (modelEstimates)
   
 }
 
 
-
-
-
-estimateLinear1 <- function(X,Y) {
-  f <- data.frame(x=X, y=Y)
-  fit <- lm(y ~ I(x), data=f)
-  return (fit)
+pickTheBestOnes <- function(allModelsCalculated, path) {
+  
+  chosen <- read.table(paste(path, "pick.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+  final <- merge(allModelsCalculated,chosen, by=c("ID", "modelID", "name"))
+  
+  return (final)
+  
 }
+      
 
-estimateLinear2 <- function(X,Y) {
-  f <- data.frame(x=X, y=Y)
-  fit <- lm(y ~ 1 + I(x) + I(x^2), data=f)
-  return (fit)
-}
 
-estimateLinear3 <- function(X,Y) {
-  f <- data.frame(x=X, y=Y)
-  fit <- lm(y ~ 1 + I(x) + I(x^2) + 1/I(x^3), data=f)
-  return (fit)
+makePredictions <- function(marketShare, years, path) {
+  
+
+  chosen <- read.table(paste(path, "/market elements/pick.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+  print(chosen)
+  pathPrediction <- paste(path,"/prediction",sep="")  
+  dir.create(pathPrediction)
+  file.remove(file.path(pathPrediction, list.files(pathPrediction)))
+  
+  allEstimates <- data.frame(matrix(vector(),0,30, 
+                                    dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
+                                                          "ages", "percentages", "averages", 
+                                                          "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
+                                                          "m", "mLwr", "mUpr", "qprat", "prediction", 
+                                                          "residual", "interval", "model", "upper", "lower",
+                                                          "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
+                                                          "predictedLow", "predictedHigh" ))))
+  
+  for (i in chosen$ID) {
+    print(i)
+    data <- marketShare[marketShare$ID==i,]
+    name <- data[1,][["name"]]
+    
+    pathModel <- paste(path, "/market elements/", name, "/models/", chosen[chosen$ID==i,]$modelID, ".rds", sep="")
+    print(pathModel)
+    model <- readRDS(pathModel)
+    estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, years)
+    predictionYears <- unlist(estimates[1,][["yearsToPredict"]])
+    predicted <- unlist(estimates[1,][["predictedValues"]])
+    predictedLow <- unlist(estimates[1,][["predictedLow"]])
+    prediectedHigh <- unlist(estimates[1,][["predictedHigh"]])
+    
+    dataPred <- data.frame(ID=i, name=name, prediction.year=predictionYears, 
+                           prediction.value=predicted, prediction.low=predictedLow, prediction.high=prediectedHigh)
+    
+    write.table(dataPred, file = paste(pathPrediction, name, "-predictions.tsv", sep=""), quote=FALSE, 
+                sep="\t", col.names=TRUE, row.names=FALSE)
+    allEstimates <- rbind(allEstimates, estimates)
+    
+  }
+  return (allEstimates)
+  
 }
+  
+
 
 estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)

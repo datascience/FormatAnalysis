@@ -9,7 +9,7 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 #market definition
-name <- "PDFSMarket-2"
+name <- "PDFSMarket-TestNew"
 groupFile <- "Format markets - PDF versions.tsv"
 
 #years used to estimate the model
