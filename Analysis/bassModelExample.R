@@ -1,12 +1,18 @@
-
 library(ggplot2)
 library(grid)
+library(gridExtra)
+
 path <- paste("output data/")
 
-png(filename=paste(path, "bass1.png", sep=""))
-layout(matrix(c(1, 2, 3,4), 2, 2, byrow = TRUE), heights = c(1.5, 1.5, 1.5, 1.5))
-par(mar=c(0.3,0.3,0.3,0.3), font=2)
 
+
+#output four main patterns of the Bass model
+png(filename=paste(path, "bass1.png", sep=""))
+#layout(matrix(c(1, 2, 3,4), 2, 2, byrow = TRUE), heights = c(1.5, 1.5, 1.5, 1.5))
+#par(mar=c(0.3,0.3,0.3,0.3), font=2)
+
+
+# First model 
 p <- 0.004
 q <- 0.2
 m <- 10
@@ -15,13 +21,29 @@ y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
 yq <- y - yp
-plot(NULL, main ="Bass", xlim=c(0,50), ylim=c(0,max(y)+0.1*max(y)), 
-     xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
-lines(x,y,lwd=3)
-polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
-lines(x,yp,lwd=3)
-text(40,0.4, labels=expression(paste(frac(q,p),"=50")), cex=2)
+# plot(NULL, main ="Bass", xlim=c(0,50), ylim=c(0,max(y)+0.1*max(y)), 
+#      xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
+# lines(x,y,lwd=3)
+# polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
+# lines(x,yp,lwd=3)
+# text(40,0.4, labels=expression(paste(frac(q,p),"=50")), cex=2)
 #lines(x,yq)
+
+df <- data.frame(x, y, yp, yq)
+bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
+  geom_line(aes(y=y), size=1) + 
+  geom_line(aes(y=yp), size=1) + 
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
+
+
+
+#expression(paste(frac(q,p),as.character(q/p)))
+
+
+
 
 
 p <- 0.1
@@ -32,13 +54,21 @@ y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
 yq <- y - yp
-plot(NULL, main ="Bass", xlim=c(0,10), ylim=c(0,max(y)+0.1*max(y)),
-     xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
-lines(x,y,lwd=3)
-polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
-lines(x,yp,lwd=3)
-text(8,2.1, labels=expression(paste(frac(q,p),"=9")), cex=2)
-#lines(x,yq)
+# plot(NULL, main ="Bass", xlim=c(0,10), ylim=c(0,max(y)+0.1*max(y)),
+#      xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
+# lines(x,y,lwd=3)
+# polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
+# lines(x,yp,lwd=3)
+# text(8,2.1, labels=expression(paste(frac(q,p),"=9")), cex=2)
+# #lines(x,yq)
+df <- data.frame(x, y, yp, yq)
+bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
+  geom_line(aes(y=y), size=1) + 
+  geom_line(aes(y=yp), size=1) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 p <- 0.0001
 q <- 0.06
@@ -48,13 +78,21 @@ y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
 yq <- y - yp
-plot(NULL, main ="Bass", xlim=c(0,200), ylim=c(0,max(y)+0.1*max(y)),
-     xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
-lines(x,y,lwd=3)
-polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
-lines(x,yp,lwd=3)
-text(175,0.1, labels=expression(paste(frac(q,p),"=600")), cex=2)
-#lines(x,yq)
+# plot(NULL, main ="Bass", xlim=c(0,200), ylim=c(0,max(y)+0.1*max(y)),
+#      xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
+# lines(x,y,lwd=3)
+# polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
+# lines(x,yp,lwd=3)
+# text(175,0.1, labels=expression(paste(frac(q,p),"=600")), cex=2)
+# #lines(x,yq)
+df <- data.frame(x, y, yp, yq)
+bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
+  geom_line(aes(y=y), size=1) + 
+  geom_line(aes(y=yp), size=1) + 
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 p <- 0.2
 q <- 0.3
@@ -64,18 +102,34 @@ y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
 yq <- y - yp
-plot(NULL, main ="Bass", xlim=c(0,15), ylim=c(0,max(y)+0.1*max(y)),
-     xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
-lines(x,y,lwd=3)
-polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
-lines(x,yp,lwd=3)
-text(12,1.3, labels=expression(paste(frac(q,p),"=1.5")), cex=2)
-#lines(x,yq)
+# plot(NULL, main ="Bass", xlim=c(0,15), ylim=c(0,max(y)+0.1*max(y)),
+#      xaxt='n', yaxt='n', ann=FALSE, xaxs="i", yaxs="i")
+# lines(x,y,lwd=3)
+# polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
+# lines(x,yp,lwd=3)
+# text(12,1.3, labels=expression(paste(frac(q,p),"=1.5")), cex=2)
+# #lines(x,yq)
+df <- data.frame(x, y, yp, yq)
+bassGraph4<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
+  geom_line(aes(y=y), size=1) + 
+  geom_line(aes(y=yp), size=1) + 
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
+
+print(grid.arrange(bassGraph4, bassGraph2, bassGraph1, bassGraph3, ncol = 2, nrow = 2))
+
+
 dev.off()
 
-#only one figure 
 
-#png(filename=paste(path, "bass2.png", sep=""))
+
+
+
+
+
+#only one figure 
 p <- 0.1
 q <- 0.9
 m <- 10
