@@ -65,7 +65,7 @@ plotResults(estimatesFinal, FALSE, TRUE, TRUE, path)
 
 predictions <- makePredictions(data2, c(2011), path)
 
-
+plotResults(predictions, FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
 
 
 # estimatesPrint <- estimates[,names(estimates) %in% c("name", "p.bass", "pLow.bass", "pUpr.bass", "q.bass", "qLow.bass", "qUpr.bass", 

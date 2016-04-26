@@ -3,6 +3,14 @@ library(propagate)
 require(MASS)
 
 
+dimensionNames <<- list(c(),c("ID", "name", "modelID", "release.year", 
+                              "ages", "percentages", "averages", 
+                              "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
+                              "m", "mLwr", "mUpr", "qprat", "prediction", 
+                              "residual", "interval", "model", "upper", "lower",
+                              "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
+                              "predictedLow", "predictedHigh"))
+
 estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
 
   options( warn = -1 )
@@ -146,22 +154,10 @@ estimateBassModel <- function(X, Y, Yreal, path) {
 calculateBestModelValues <- function(marketShare, bestModels, path) {
   
   modelEstimates <- data.frame(matrix(vector(),0,30, 
-                                      dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
-                                                            "ages", "percentages", "averages", 
-                                                            "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
-                                                            "m", "mLwr", "mUpr", "qprat", "prediction", 
-                                                            "residual", "interval", "model", "upper", "lower",
-                                                            "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
-                                                            "predictedLow", "predictedHigh"))))
+                                      dimnames = dimensionNames))
   
   modelEsPerElement <- data.frame(matrix(vector(),0,30, 
-                                      dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
-                                                            "ages", "percentages", "averages", 
-                                                            "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
-                                                            "m", "mLwr", "mUpr", "qprat", "prediction", 
-                                                            "residual", "interval", "model", "upper", "lower",
-                                                            "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
-                                                            "predictedLow", "predictedHigh"))))
+                                      dimnames = dimensionNames))
   
   pickFrame <- data.frame(ID=character(), name=character(), modelID=character())
   
@@ -197,7 +193,7 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
 
 
 
-calculateModelValues <- function(marketShare, model, modelID, calculationType, predictionYears = NA) {
+calculateModelValues <- function(marketShare, model, modelID, calculationType ="confidence", predictionYears = NA) {
   
   if (length(unique(marketShare$ID))>1) {
     
@@ -207,13 +203,7 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType, p
   } else {
     intervalType <- calculationType
     modelEstimates <- data.frame(matrix(vector(),0,30, 
-                                        dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
-                                                              "ages", "percentages", "averages", 
-                                                              "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
-                                                              "m", "mLwr", "mUpr", "qprat", "prediction", 
-                                                              "residual", "interval", "model", "upper", "lower",
-                                                              "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
-                                                              "predictedLow", "predictedHigh"))))
+                                        dimnames = dimensionNames))
     
     modelEstimates[1,][["ID"]] <- marketShare[1,]$ID
     modelEstimates[1,][["name"]] <- marketShare[1,]$name
@@ -233,6 +223,7 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType, p
     
     
     f <- data.frame(x=seq(0,30, len=100))
+    print(intervalType)
     t <- try(temp <- predictNLS(model, newdata=f, interval=intervalType, alpha=0.05))
     if("try-error" %in% class(t)) {
       print("error in predictNLS 1")
@@ -261,12 +252,6 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType, p
       if("try-error" %in% class(t)) {
         print("error in predictNLS 2")
       } 
-      predictionAge <- predictionYears - releaseYear
-      r <- data.frame(x=predictionAge)
-      t <- try(tempPred <- predictNLS(model, newdata=r, interval=intervalType, alpha=0.05))
-      if("try-error" %in% class(t)) {
-        print("error in predictNLS 3")
-      }
       
       
       #calculate residuals 
@@ -316,10 +301,18 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType, p
       modelEstimates[1,][["MSE"]] <- calculateMSE(residual)
       modelEstimates[1,][["R2"]] <- calculateR2(residual, Yreal)
       if (calculationType=="prediction") {
-        modelEstimates[1,][["yearsToPredict"]] <- list(predictionYears)
-        modelEstimates[1,][["predictedValues"]] <- list(tempPred$summary[,1])
-        modelEstimates[1,][["predictedLow"]] <- list(tempPred$summary[,5])
-        modelEstimates[1,][["predictedHigh"]] <- list(tempPred$summary[,6])
+        
+        predictionAge <- predictionYears - as.numeric(releaseYear)
+        r <- data.frame(x=predictionAge)
+        t <- try(tempPred <- predictNLS(model, newdata=r, interval=intervalType, alpha=0.05))
+        if("try-error" %in% class(t)) {
+          print("error in predictNLS 3")
+        } else {
+          modelEstimates[1,][["yearsToPredict"]] <- list(predictionYears)
+          modelEstimates[1,][["predictedValues"]] <- list(tempPred$summary[,1])
+          modelEstimates[1,][["predictedLow"]] <- list(tempPred$summary[,5])
+          modelEstimates[1,][["predictedHigh"]] <- list(tempPred$summary[,6])
+        }
       } else {
         modelEstimates[1,][["yearsToPredict"]] <- NA
         modelEstimates[1,][["predictedValues"]] <- NA
@@ -353,18 +346,12 @@ makePredictions <- function(marketShare, years, path) {
 
   chosen <- read.table(paste(path, "/market elements/pick.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
   print(chosen)
-  pathPrediction <- paste(path,"/prediction",sep="")  
+  pathPrediction <- paste(path,"/prediction/",sep="")  
   dir.create(pathPrediction)
   file.remove(file.path(pathPrediction, list.files(pathPrediction)))
   
   allEstimates <- data.frame(matrix(vector(),0,30, 
-                                    dimnames = list(c(),c("ID", "name", "modelID", "release.year", 
-                                                          "ages", "percentages", "averages", 
-                                                          "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
-                                                          "m", "mLwr", "mUpr", "qprat", "prediction", 
-                                                          "residual", "interval", "model", "upper", "lower",
-                                                          "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
-                                                          "predictedLow", "predictedHigh" ))))
+                                    dimnames = dimensionNames))
   
   for (i in chosen$ID) {
     print(i)
@@ -374,7 +361,7 @@ makePredictions <- function(marketShare, years, path) {
     pathModel <- paste(path, "/market elements/", name, "/models/", chosen[chosen$ID==i,]$modelID, ".rds", sep="")
     print(pathModel)
     model <- readRDS(pathModel)
-    estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, years)
+    estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, "prediction", years)
     predictionYears <- unlist(estimates[1,][["yearsToPredict"]])
     predicted <- unlist(estimates[1,][["predictedValues"]])
     predictedLow <- unlist(estimates[1,][["predictedLow"]])
