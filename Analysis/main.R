@@ -35,9 +35,6 @@ write.table(data, file=paste(path,"/cleaned_data.tsv",sep=""), quote=FALSE,
 #   groupData[[prop]] <- sapply(groupData[[prop]], "[",1)
 # }
 
-# # calculate age 
-# source('calculateAge.R')
-# data2 <- calculateAge(data, groupData, propertyToTake)
 
 # calculate percentage and moving average of each value
 source('calculatePercentage.R')
@@ -67,14 +64,4 @@ predictions <- makePredictions(data2, c(2011), path)
 
 plotResults(predictions, FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
 
-
-# estimatesPrint <- estimates[,names(estimates) %in% c("name", "p.bass", "pLow.bass", "pUpr.bass", "q.bass", "qLow.bass", "qUpr.bass", 
-#                                                      "m.bass", "mLow.bass", "mUpr.bass", "qprat.bass", "MSE.bass", "R2.bass")]
-# 
-# write.table(estimatesPrint, file=paste(path, "/estimates.csv", sep=""), 
-#             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
-
-
-# source('plotResults.R')
-# plotResults(estimates, c("bass"), includeRateOfChange, includeInterval, includePoints)
 
