@@ -76,7 +76,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
     }
-    modelPlot <- modelPlot + labs(x="age", y="% of the market share")
+    modelPlot <- modelPlot + labs(x="age", y="number of adoptions")
     
     dfChange <- data.frame(interval, derv)
     changePlot <- ggplot(dfChange, aes(x=interval, y=derv)) +
@@ -106,7 +106,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
   clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title)) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
-          legend.key=element_blank()) + labs(x="age", y="% of the market share")
+          legend.key=element_blank()) + labs(x="age", y="number of adoptions")
   print(clusterPlot)
   dev.off()
   
@@ -114,7 +114,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
   clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title)) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
-          legend.key=element_blank()) + labs(x="harvest year", y="% of the market share")
+          legend.key=element_blank()) + labs(x="harvest year", y="number of adoptions")
   print(clusterPlot)
   dev.off()
 

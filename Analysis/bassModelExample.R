@@ -95,12 +95,12 @@ bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_y_continuous(expand = c(0,0), limits=c(0,3)) + 
   scale_x_continuous(expand = c(0,0)) +
   scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="blue"),
-                     labels=c("Total new adopters","Internal influence\n(q=0.9)",
-                              "External influence\n(p=0.1)")) + 
+                     labels=c("New adoptions","External influence\n(p=0.1)",
+                              "Internal influence\n(q=0.9)")) + 
   scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
-                        labels=c("Total new adopters","Internal influence\n(q=0.9)",
-                                 "External influence\n(p=0.1)")) +
-  labs(x="Time", y="Adopters") +
+                        labels=c("New adoptions","External influence\n(p=0.1)",
+                                 "Internal influence\n(q=0.9)")) +
+  labs(x="Time", y="Number of adoptions") +
   theme(axis.ticks=element_blank(), axis.text=element_blank(),
         axis.title=element_text(face="italic",size=16),
         legend.position=c(0.7,0.6), legend.background=element_blank(),
