@@ -31,7 +31,8 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
   file.remove(file.path(pathGraph, list.files(pathGraph)))
   
   
-  dfCluster <- data.frame(title=as.character(), interval=as.numeric(), model=as.numeric())
+  dfClusterAge <- data.frame(title=as.character(), interval=as.numeric(), model=as.numeric())
+  dfClusterYear <- data.frame(title=as.character(), interval=as.numeric(), model=as.numeric())
   
   for (i in (1:nrow(pData))) {
     
@@ -61,7 +62,9 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     modelPlot <- ggplot() 
     
     dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval, model=model)
-    dfCluster <- rbind(dfCluster, dfClusterTemp)
+    dfClusterAge <- rbind(dfClusterAge, dfClusterTemp)
+    dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval+releaseYear, model=model)
+    dfClusterYear <- rbind(dfClusterYear, dfClusterTemp)
     
     if (includeInterval) {
       modelPlot <- modelPlot + geom_ribbon(data=dfModel, aes(x=interval, ymin=lower, ymax=upper), alpha=0.2) + coord_cartesian(ylim=c(0,max(dfModel$model)+0.05*max(dfModel$model)))
@@ -99,14 +102,21 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     }
   }
   
-  png(filename=paste(pathGraph, "cluster.png", sep=""))
-  clusterPlot <- ggplot(dfCluster, aes(x=interval, y=model, colour=title)) + geom_line() +
+  png(filename=paste(pathGraph, "cluster-ages.png", sep=""))
+  clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title)) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="age", y="% of the market share")
   print(clusterPlot)
   dev.off()
   
+  png(filename=paste(pathGraph, "cluster-years.png", sep=""))
+  clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title)) + geom_line() +
+    theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
+          legend.text=element_text(size=10), legend.title=element_blank(),
+          legend.key=element_blank()) + labs(x="harvest year", y="% of the market share")
+  print(clusterPlot)
+  dev.off()
 
 }
 

@@ -28,7 +28,7 @@ alphaInterval <- 0.05
 predictionYears <- c(2011)
 
 #if a three year moving average should be used 
-useMovingAverage <- FALSE
+useMovingAverage <- TRUE
 
 #plot settings
 includeInterval <- TRUE
