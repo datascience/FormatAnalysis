@@ -25,7 +25,7 @@ calculatePercentage <- function(pData, propertyToTake) {
   }
   
   pData <- pData[c("ID", "name", propertyToTake, "year", "amount", "release.year", "age", 
-                   "percentage", "average", "percentageYear")]
+                   "percentage", "average")]
 
   #remove those where release year was not available
   pData <- pData[pData$age>=0 & !is.na(pData$release.year) & !is.na(pData$age),]

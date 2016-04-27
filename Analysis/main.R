@@ -2,66 +2,105 @@ source('config.R')
 source('loadData.R')
 
 
-path <- paste("output data/", name, sep="")
-dir.create(path)
 
-#load twice to see which columns it has 
-groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-groupData <- read.table(paste("input data/", groupFile, sep=""), header=TRUE, 
-                        colClasses=rep("character", each=ncol(groupData)), sep="\t", stringsAsFactors=FALSE)
+if (length(experiments)==length(marketFiles)) {
+  dir.create("output data")
+  for (i in 1:length(experiments)) {
+    experimentName <- experiments[i]
+    path <- paste("output data/", experimentName, "/", sep="")
+    #if the folder already exists delete all the content 
+    if (file.exists(path)) {
+      unlink(path, recursive = TRUE)
+    }
+    # create expeirment folder 
+    dir.create(path)
 
+    # load market data 
+    # load it twice to see which columns it has
+    marketFile <- marketFiles[i]
+    marketData <- read.table(paste("input data/", marketFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    marketData <- read.table(paste("input data/", marketFile, sep=""), header=TRUE, 
+                            colClasses=rep("character", each=ncol(marketData)), sep="\t", stringsAsFactors=FALSE)
+    
 
-# calculate properties to take TODO explain exclusion from the tsv file 
-nam <- names(groupData)
-propertyToTake <- nam[!(nam %in% c("ID", "name", "release.year", "comments"))]
+    # calculate properties to take TODO explain exclusion from the tsv file 
+    nam <- names(marketData)
+    propertyToTake <- nam[!(nam %in% c("ID", "name", "release.year", "comments"))]  
+    
+    # discard those elements from the market where properties, according to which filtering will 
+    # be done, are missing
+    source('discardNotComplete.R')
+    marketData <- discardNotComplete(marketData, propertyToTake)
+    write.table(marketData, file=paste(path, "market.tsv", sep=""), quote=FALSE, sep="\t", 
+                col.names=TRUE, row.names=FALSE)
+    
+    # make a list from multiple mime and other property values
+    for (prop in propertyToTake) {
+      marketData[[prop]] <- strsplit(marketData[[prop]], split = ",")
+    }
+    
+    # load raw data, filter according to properties, reduce conflicts calculate age and save the resulting dataset to a file  
+    dataCleaned <- loadData(fileName, colNames, marketData, propertyToTake, resolveConflicts, 
+                     afterConflictsResolution, conflictCategory)
+    write.table(dataCleaned, file=paste(path,"cleanedData.tsv",sep=""), quote=FALSE, 
+                sep="\t", col.names=TRUE, row.names=FALSE)
+    
+    # calculate percentage and moving average of each value
+    source('calculatePercentage.R')
+    dataShares <- calculatePercentage(dataCleaned,propertyToTake)
+    write.table(dataShares, file=paste(path, "marketShares.tsv", sep=""), 
+                quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
+    
+    
+    # estimating models, plotting results and making predictions 
+    source('estimateModelParameters.R')
+    source('plotResults.R')
+    
+    # create folder where all models will be saved 
+    pathMarketElements <- paste(path, "market elements/", sep="")
+    dir.create(pathMarketElements)
+    
+    # for each element estimate models 
+    allModelEstimates <- estimateModelParameters(dataShares, start, end, useMovingAverage, pathMarketElements)
+    saveRDS(allModelEstimates, file=paste(pathMarketElements, "allModelEstimates.rds", sep=""))
+    bestModelEstimates <- calculateBestModelValues(dataShares, allModelEstimates, pathMarketElements)
+    saveRDS(bestModelEstimates, file=paste(pathMarketElements, "bestModelEstimates.rds", sep="")) 
+    # plot bets models
+    graphAllModels(dataShares, bestModelEstimates, pathMarketElements)
+  }
+  
+  #Ask user to select wanted models manually 
+  readline(prompt = "Please for each experiment and each market element in that experiment select one model. 
+           This is easily done by filling out selectedModels.tsv file. Press Enter when ready to proceed")
+  
+  for (i in 1:length(experiments)) {
+    experimentName <- experiments[i]
+    path <- paste("output data/", experimentName, "/", sep="")
+    
+    # load needed data 
+    pathMarketElements <- paste(path, "market elements/", sep="")
+    bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
+    dataShares <- read.table(paste(path, "marketShares.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    
+    # pick estimated values for selected models and plot them 
+    chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+    plotResults(estimatesFinal, FALSE, TRUE, TRUE, path)    
 
-source('discardNotComplete.R')
-groupData <- discardNotComplete(groupData, propertyToTake)
-write.table(groupData, file=paste(path, "/market.tsv", sep=""), quote=FALSE, sep="\t", 
-            col.names=TRUE, row.names=FALSE)
-
-#make a list from multiple mime and other property values
-for (prop in propertyToTake) {
-  groupData[[prop]] <- strsplit(groupData[[prop]], split = ",")
+    # make predictions and plot prediction results 
+    predictions <- makePredictions(dataShares, chosenModels, c(2011), path, pathMarketElements)
+    plotResults(predictions, FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
+    
+  }
+  
+} else {
+  message("The number of experiments and market files does not match! Check experiments and marketFiles variables in the config.R.")
 }
 
-# load raw data, filter and reduce conflicts and save the resulting dataset to a file  
-data <- loadData(fileName, colNames, groupData, propertyToTake, resolveConflicts, 
-                 afterConflictsResolution, conflictCategory)
-write.table(data, file=paste(path,"/cleaned_data.tsv",sep=""), quote=FALSE, 
-            sep="\t", col.names=TRUE, row.names=FALSE)
-
-# for (prop in propertyToTake) {
-#   groupData[[prop]] <- sapply(groupData[[prop]], "[",1)
-# }
 
 
-# calculate percentage and moving average of each value
-source('calculatePercentage.R')
-data2 <- calculatePercentage(data,propertyToTake)
-write.table(data2, file=paste(path, "/adoption.tsv", sep=""), 
-            quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
-# estimate the model and plot the curves
-pathMarketElements <- paste(path, "/market elements/", sep="")
-dir.create(pathMarketElements)
-source('estimateModelParameters.R')
 
-estimates <- estimateModelParameters(data2, start, end, useMovingAverage, pathMarketElements)
 
-modelEStimates <- calculateBestModelValues(data2, estimates, pathMarketElements)
-
-source('plotResults.R')
-graphAllModels(data2, modelEStimates, pathMarketElements)
-
-readline(prompt = "Enter when ready to proceed")
-
-estimatesFinal <- pickTheBestOnes(modelEStimates, pathMarketElements)
-
-plotResults(estimatesFinal, FALSE, TRUE, TRUE, path)
-
-predictions <- makePredictions(data2, c(2011), path)
-
-plotResults(predictions, FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
 
 

@@ -184,7 +184,7 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
     modelEstimates <- rbind(modelEstimates, modelEsPerElement)
   }
   
-  write.table(pickFrame, file = paste(path, "pick.tsv", sep=""), quote=FALSE, 
+  write.table(pickFrame, file = paste(path, "selectedModels.tsv", sep=""), quote=FALSE, 
               sep="\t", col.names=TRUE, row.names=FALSE)
   
   return (modelEstimates)
@@ -223,7 +223,6 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType ="
     
     
     f <- data.frame(x=seq(0,30, len=100))
-    print(intervalType)
     t <- try(temp <- predictNLS(model, newdata=f, interval=intervalType, alpha=0.05))
     if("try-error" %in% class(t)) {
       print("error in predictNLS 1")
@@ -329,23 +328,9 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType ="
   
 }
 
-
-pickTheBestOnes <- function(allModelsCalculated, path) {
-  
-  chosen <- read.table(paste(path, "pick.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-  final <- merge(allModelsCalculated,chosen, by=c("ID", "modelID", "name"))
-  
-  return (final)
-  
-}
-      
-
-
-makePredictions <- function(marketShare, years, path) {
+makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
   
 
-  chosen <- read.table(paste(path, "/market elements/pick.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-  print(chosen)
   pathPrediction <- paste(path,"/prediction/",sep="")  
   dir.create(pathPrediction)
   file.remove(file.path(pathPrediction, list.files(pathPrediction)))
@@ -354,12 +339,10 @@ makePredictions <- function(marketShare, years, path) {
                                     dimnames = dimensionNames))
   
   for (i in chosen$ID) {
-    print(i)
     data <- marketShare[marketShare$ID==i,]
     name <- data[1,][["name"]]
     
-    pathModel <- paste(path, "/market elements/", name, "/models/", chosen[chosen$ID==i,]$modelID, ".rds", sep="")
-    print(pathModel)
+    pathModel <- paste(pathMarket, name, "/models/", chosen[chosen$ID==i,]$modelID, ".rds", sep="")
     model <- readRDS(pathModel)
     estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, "prediction", years)
     predictionYears <- unlist(estimates[1,][["yearsToPredict"]])

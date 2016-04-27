@@ -71,7 +71,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     }
     
     modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model)) + 
-      annotate(geom="text", x=20, y=max(dfModel$model)/2, label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) 
+      annotate(geom="text", x=20, y=max(dfModel$model)/2, label=paste("frac(q,p)==", qpRat, sep=""), color="red", parse=TRUE) 
     
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
