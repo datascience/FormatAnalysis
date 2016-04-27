@@ -1,5 +1,5 @@
 
-calculatePercentage <- function(pData, propertyToTake) {
+normalizeMarket <- function(pData, propertyToTake) {
   
   # calculate percentages inside of the market
   aggreg <- aggregate(amount~year , FUN=sum, data=pData) 
@@ -38,9 +38,6 @@ average <- function(age, data) {
   perc1 <- data[data$age==age-1,]$percentage
   perc2 <- data[data$age==age,]$percentage
   perc3 <- data[data$age==age+1,]$percentage
-  print(perc1)
-  print(perc2)
-  print(perc3)
   if (length(perc1)==0 & length(perc3)==0) {
     return (perc2)
   }

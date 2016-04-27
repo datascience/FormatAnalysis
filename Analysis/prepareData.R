@@ -4,7 +4,7 @@ source('utils.R')
 library(plyr)
 library(ggplot2)
 
-loadData <- function(file, colNames, groupData, propertyToTake, resolveConflicts, afterResolution, conflictCategory) {
+prepareData <- function(file, colNames, groupData, propertyToTake, resolveConflicts, afterResolution, conflictCategory) {
 
   options( warn = -1 )
   

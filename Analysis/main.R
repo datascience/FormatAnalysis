@@ -1,5 +1,5 @@
 source('config.R')
-source('loadData.R')
+source('prepareData.R')
 
 
 
@@ -40,14 +40,14 @@ if (length(experiments)==length(marketFiles)) {
     }
     
     # load raw data, filter according to properties, reduce conflicts calculate age and save the resulting dataset to a file  
-    dataCleaned <- loadData(fileName, colNames, marketData, propertyToTake, resolveConflicts, 
+    dataCleaned <- prepareData(fileName, colNames, marketData, propertyToTake, resolveConflicts, 
                      afterConflictsResolution, conflictCategory)
     write.table(dataCleaned, file=paste(path,"cleanedData.tsv",sep=""), quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE)
     
     # calculate percentage and moving average of each value
-    source('calculatePercentage.R')
-    dataShares <- calculatePercentage(dataCleaned,propertyToTake)
+    source('normalizeMarket.R')
+    dataShares <- normalizeMarket(dataCleaned,propertyToTake)
     write.table(dataShares, file=paste(path, "marketShares.tsv", sep=""), 
                 quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
     
