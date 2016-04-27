@@ -85,11 +85,11 @@ if (length(experiments)==length(marketFiles)) {
     # pick estimated values for selected models and plot them 
     chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-    plotResults(estimatesFinal, FALSE, TRUE, TRUE, path)    
+    plotResults(estimatesFinal, "separated", FALSE, TRUE, TRUE, path)    
 
     # make predictions and plot prediction results 
-    predictions <- makePredictions(dataShares, chosenModels, c(2011), path, pathMarketElements)
-    plotResults(predictions, FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
+    predictions <- makePredictions(dataShares, chosenModels, predictionYears, path, pathMarketElements)
+    plotResults(predictions, "separated", FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
     
   }
   

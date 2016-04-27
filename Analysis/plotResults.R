@@ -15,14 +15,14 @@ graphAllModels <- function(marketShare, modelValues, path) {
     
     pathEl <- paste(path, name, sep="")
     
-    plotResults(data, FALSE, TRUE, TRUE, pathEl)
+    plotResults(data, "combined", FALSE, TRUE, TRUE, pathEl)
     
   }
 }
 
 # TODO a function which takes a data frame with all the values for every element and plots specific 
 # the function also takes a path where all the models should be plotted 
-plotResults <- function(pData, includeRateOfChange, includeInterval, includePoints, path) {
+plotResults <- function(pData,  plotType="separated", includeRateOfChange, includeInterval, includePoints, path) {
   
   options( warn = -1 )
   pathGraph <- paste(path, "/graphs/", sep="")
@@ -50,56 +50,87 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     derv <- unlist(pData[i,"derv"])
     residual <- unlist(pData[i,"residual"])
     prediction <- unlist(pData[i,"prediction"])
-    qpRat <- round(pData[i,"qprat"], 2)
+    
+    p <- round(pData[i,"p"], 5)
+    pLwr <- round(pData[i,"pLwr"], 5)
+    pUpr <- round(pData[i,"pUpr"], 5)
+    q <- round(pData[i,"q"], 5)
+    qLwr <- round(pData[i,"qLwr"], 5)
+    qUpr <- round(pData[i,"qUpr"], 5)
+    m <- round(pData[i,"m"], 5)
+    mLwr <- round(pData[i,"mLwr"], 5)
+    mUpr <- round(pData[i,"mUpr"], 5)
+    qpRat <- round(pData[i,"qprat"], 5)
+    
+    
+    yUpperLimit <- max(1.1*max(model), 1.1*max(percentages))
     
     if (is.na(model)) {
       next
     }
     
+    variables <- c("p", "pLwr","pUpr", "q", "qLwr", "qUpr", "m", "mLwr", "mUpr", "p-q ratio")
+    values <- c(p, pLwr, pUpr, q, qLwr, qUpr, m, mLwr, mUpr, qpRat)
+    info <- data.frame(variable=variables, value=values)
+    
+    
     dfModel <- data.frame(interval, model, upper, lower)
     dfPoints <- data.frame(ages,percentages)
     
-    modelPlot <- ggplot() 
+    
+    # table with all the info
+    tbl <- tableGrob(info)
     
     dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval, model=model)
     dfClusterAge <- rbind(dfClusterAge, dfClusterTemp)
     dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval+releaseYear, model=model)
     dfClusterYear <- rbind(dfClusterYear, dfClusterTemp)
     
+    #adding elements to the main plot
+    modelPlot <- ggplot() 
     if (includeInterval) {
-      modelPlot <- modelPlot + geom_ribbon(data=dfModel, aes(x=interval, ymin=lower, ymax=upper), alpha=0.2) + coord_cartesian(ylim=c(0,max(dfModel$model)+0.05*max(dfModel$model)))
+      modelPlot <- modelPlot + geom_ribbon(data=dfModel, aes(x=interval, ymin=lower, ymax=upper), 
+                                           alpha=0.2) + coord_cartesian(ylim=c(0,yUpperLimit))
     }
-    
-    modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model)) + 
-      annotate(geom="text", x=20, y=max(dfModel$model)/2, label=paste("frac(q,p)==", qpRat, sep=""), color="red", parse=TRUE) 
-    
+    modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model))
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
     }
     modelPlot <- modelPlot + labs(x="age", y="number of adoptions")
     
+    # change plot 
     dfChange <- data.frame(interval, derv)
     changePlot <- ggplot(dfChange, aes(x=interval, y=derv)) +
       geom_area(fill="gray", alpha=0.3) +
       geom_line() + labs(x="age", y="change rate")
     
-    if (includeRateOfChange) {
-      png(filename=paste(pathGraph, title, ".png", sep=""))
-      print(grid.arrange(modelPlot, changePlot))
-      dev.off()
-    }else {
-      png(filename=paste(pathGraph, title, ".png", sep=""))
-      print(modelPlot)
-      dev.off()
-    }
+    # residual plot 
+    dfResidual <- data.frame(prediction, residual)
+    residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + geom_point() + labs(x="fitted value", y="residual")
     
-    if (includeResidual) {
-      dfResidual <- data.frame(prediction, residual)
-      residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + geom_point() + labs(x="fitted value", y="residual")
+    if (plotType=="combined") {
+      
+      lay <- rbind(c(1,3), c(2,3))
+      png(filename=paste(pathGraph, title, ".png", sep=""))
+      print(grid.arrange(modelPlot, residualPlot, tbl, layout_matrix=lay))
+      dev.off()
+      
+    }else {
+      if (includeRateOfChange) {
+        png(filename=paste(pathGraph, title, ".png", sep=""))
+        print(grid.arrange(modelPlot, changePlot))
+        dev.off()
+      }else {
+        png(filename=paste(pathGraph, title, ".png", sep=""))
+        print(modelPlot)
+        dev.off()
+      }
+      
       png(filename=paste(pathGraph, title, "-residual.png", sep=""))
       print(residualPlot)
       dev.off()
     }
+    
   }
   
   png(filename=paste(pathGraph, "cluster-ages.png", sep=""))

@@ -20,7 +20,8 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
 
   estimates <- data.frame(ID=numeric(), modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
                           p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
-    
+ 
+  
   k <- 1
   for (i in unig) {
     data <- pData[pData$ID==i,]
@@ -48,7 +49,6 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
       Y <- Yper
     }
     
-   
     allEstimates <- estimateBassModel(X, Y, Yper, pathModel)
     
     write.table(allEstimates, file = paste(pathElement, "allEstimates.tsv", sep=""), quote=FALSE, 
@@ -61,16 +61,29 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
     allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= 1000,]
     
     allEstimates <- allEstimates[order(allEstimates$MSE),]
-    allEstimates <- allEstimates[1:2,]
     
-    write.table(allEstimates, file = paste(pathElement, "10best.tsv", sep=""), quote=FALSE, 
+    bestEstimates <- data.frame(ID=numeric(), modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
+                                p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
+    
+    # more advanced way to pick good models
+    # a lot of the models are actually equal so we need to avoid proposing 10 equal models
+    for (cnt in 1:2) {
+      tmpMSE <- allEstimates[1,]$MSE
+      bestEstimates <- rbind(bestEstimates, allEstimates[1,])
+      allEstimates <- allEstimates[2:nrow(allEstimates),]
+      allEstimates <- allEstimates[allEstimates$MSE>1.1*tmpMSE,]
+      if (nrow(allEstimates)==0) break
+      
+    }
+    
+    write.table(bestEstimates, file = paste(pathElement, "best.tsv", sep=""), quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE)
     
-    allEstimates$ID <- i
+    bestEstimates$ID <- i
     
     k <- k + 1
   
-    estimates <- rbind(estimates,allEstimates)
+    estimates <- rbind(estimates,bestEstimates)
     
   }
   
@@ -301,7 +314,7 @@ calculateModelValues <- function(marketShare, model, modelID, calculationType ="
       modelEstimates[1,][["R2"]] <- calculateR2(residual, Yreal)
       if (calculationType=="prediction") {
         
-        predictionAge <- predictionYears - as.numeric(releaseYear)
+        predictionAge <- predictionYears - as.numeric(releaseYear[1])
         r <- data.frame(x=predictionAge)
         t <- try(tempPred <- predictNLS(model, newdata=r, interval=intervalType, alpha=0.05))
         if("try-error" %in% class(t)) {
@@ -341,7 +354,7 @@ makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
   for (i in chosen$ID) {
     data <- marketShare[marketShare$ID==i,]
     name <- data[1,][["name"]]
-    
+    print(paste("Predicting for " , name))
     pathModel <- paste(pathMarket, name, "/models/", chosen[chosen$ID==i,]$modelID, ".rds", sep="")
     model <- readRDS(pathModel)
     estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, "prediction", years)
@@ -350,11 +363,18 @@ makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
     predictedLow <- unlist(estimates[1,][["predictedLow"]])
     prediectedHigh <- unlist(estimates[1,][["predictedHigh"]])
     
-    dataPred <- data.frame(ID=i, name=name, prediction.year=predictionYears, 
+    dataPred <- data.frame(ID=i, name=name, year=predictionYears, 
                            prediction.value=predicted, prediction.low=predictedLow, prediction.high=prediectedHigh)
     
+    data <- data[data$year %in% years,]
+    dataPred <- merge(x=data, y=dataPred, by=c("ID", "name", "year"), all.y = TRUE)
+    dataPred <- dataPred[, names(dataPred) %in% c("ID", "name", "year", "percentage", 
+                                                  "prediction.value", "prediction.low", "prediction.high")]
+    names(dataPred)[names(dataPred)=="percentage"] <- "actual.value"
     write.table(dataPred, file = paste(pathPrediction, name, "-predictions.tsv", sep=""), quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE)
+    
+    
     allEstimates <- rbind(allEstimates, estimates)
     
   }

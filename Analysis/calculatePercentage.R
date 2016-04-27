@@ -16,7 +16,7 @@ calculatePercentage <- function(pData, propertyToTake) {
     if (!is.na(pData[i,]$age)) {
       age<- pData[i,]$age
       data <- merge(pData, pData[i,][names(pData) %in% propertyToTake], by=propertyToTake)
-      avrg1 <- average(age,data, "percentage")
+      avrg1 <- average(age,data)
       pData[i,]$average <- avrg1
     } else {
       pData[i,]$average <- NA
@@ -34,12 +34,13 @@ calculatePercentage <- function(pData, propertyToTake) {
 }
 
 
-average <- function(age, data, cn) {
-  
-  perc1 <- data[data$age==age-1,cn]
-  perc2 <- data[data$age==age,cn]
-  perc3 <- data[data$age==age+1,cn]
-
+average <- function(age, data) {
+  perc1 <- data[data$age==age-1,]$percentage
+  perc2 <- data[data$age==age,]$percentage
+  perc3 <- data[data$age==age+1,]$percentage
+  print(perc1)
+  print(perc2)
+  print(perc3)
   if (length(perc1)==0 & length(perc3)==0) {
     return (perc2)
   }

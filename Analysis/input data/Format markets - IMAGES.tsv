@@ -38,7 +38,6 @@ ID	name	mime	release year	comments
 37	Microsoft Document Imaging Format	image/vnd.ms-modi		
 38	OpenDocument Image	application/vnd.oasis.opendocument.image		
 39	OpenGL Textures (KTX)	image/ktx		
-40	Photoshop Document	image/vnd.adobe.photoshop		
 41	Portable Anymap Image	image/x-portable-anymap		
 42	Portable Bitmap Format	image/x-portable-bitmap		
 43	Portable Graymap Format	image/x-portable-graymap		
