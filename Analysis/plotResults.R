@@ -50,7 +50,7 @@ plotResults <- function(pData, includeRateOfChange, includeInterval, includePoin
     derv <- unlist(pData[i,"derv"])
     residual <- unlist(pData[i,"residual"])
     prediction <- unlist(pData[i,"prediction"])
-    qpRat <- pData[i,"qprat"]
+    qpRat <- round(pData[i,"qprat"], 2)
     
     if (is.na(model)) {
       next
