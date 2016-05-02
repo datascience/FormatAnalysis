@@ -2,6 +2,7 @@
 normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
   
   # calculate percentages inside of the market
+  # and multiply the values with the multiplication factor 
   aggreg <- aggregate(amount~year , FUN=sum, data=pData) 
   aggreg <- setNames(aggreg, c("year", "total"))
   
@@ -10,6 +11,7 @@ normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
   pData <- pData[!(names(pData)=="total")]
   rm(aggreg)
 
+  # calculate average values 
   pData$average <- c(1:nrow(pData))
   
   for (i in (1:nrow(pData))) {
@@ -24,10 +26,11 @@ normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
     
   }
   
+  # take the needed columns from the data frame 
   pData <- pData[c("ID", "name", propertyToTake, "year", "amount", "release.year", "age", 
                    "percentage", "average")]
 
-  # remove those where release year was not available
+  # remove those where release year was not available as for those the model can not be estimated
   pData <- pData[pData$age>=0 & !is.na(pData$release.year) & !is.na(pData$age),]
   
   return (pData)
