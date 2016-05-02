@@ -15,6 +15,13 @@ if (length(experiments)==length(marketFiles)) {
     # create expeirment folder 
     dir.create(path)
 
+    # save the config parameters from the experiment 
+    cpdf <- data.frame(parameter=c("experiment name", "file", "start year", "end year", "moving average used", "prediction years", "multiplication factor"), 
+                       value=c(experimentName, marketFile, start, end, useMovingAverage, paste(predictionYears, sep=","), multiplicationFactor))
+    write.table(marketData, file=paste(path, "experimentConfig.tsv", sep=""), quote=FALSE, sep="\t", 
+                col.names=FALSE, row.names=FALSE)
+    
+    
     # load market data 
     # load it twice to see which columns it has
     marketFile <- marketFiles[i]
@@ -27,7 +34,7 @@ if (length(experiments)==length(marketFiles)) {
     nam <- names(marketData)
     propertyToTake <- nam[!(nam %in% c("ID", "name", "release.year", "comments"))]  
     
-    # discard those elements from the market where properties, according to which filtering will 
+    # discard those elements from the market where properties, according to which filtering should
     # be done, are missing
     source('discardNotComplete.R')
     marketData <- discardNotComplete(marketData, propertyToTake)
@@ -47,7 +54,7 @@ if (length(experiments)==length(marketFiles)) {
     
     # calculate percentage and moving average of each value
     source('normalizeMarket.R')
-    dataShares <- normalizeMarket(dataCleaned,propertyToTake)
+    dataShares <- normalizeMarket(dataCleaned,propertyToTake, multiplicationFactor)
     write.table(dataShares, file=paste(path, "marketShares.tsv", sep=""), 
                 quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
     
@@ -94,7 +101,7 @@ if (length(experiments)==length(marketFiles)) {
   }
   
 } else {
-  message("The number of experiments and market files does not match! Check experiments and marketFiles variables in the config.R.")
+  message("The number of experiments and market files does not match! Check experiments and marketFiles variables in the config.R file")
 }
 
 

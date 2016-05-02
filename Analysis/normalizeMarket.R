@@ -1,12 +1,12 @@
 
-normalizeMarket <- function(pData, propertyToTake) {
+normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
   
   # calculate percentages inside of the market
   aggreg <- aggregate(amount~year , FUN=sum, data=pData) 
   aggreg <- setNames(aggreg, c("year", "total"))
   
   pData <- merge(pData, aggreg, by="year")
-  pData$percentage <- (pData$amount / pData$total)*1000
+  pData$percentage <- (pData$amount / pData$total)*multiplicationFactor
   pData <- pData[!(names(pData)=="total")]
   rm(aggreg)
 
@@ -27,7 +27,7 @@ normalizeMarket <- function(pData, propertyToTake) {
   pData <- pData[c("ID", "name", propertyToTake, "year", "amount", "release.year", "age", 
                    "percentage", "average")]
 
-  #remove those where release year was not available
+  # remove those where release year was not available
   pData <- pData[pData$age>=0 & !is.na(pData$release.year) & !is.na(pData$age),]
   
   return (pData)

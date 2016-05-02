@@ -52,12 +52,15 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     prediction <- unlist(pData[i,"prediction"])
     
     p <- round(pData[i,"p"], 5)
+    pStart <- round(pData[i,"pStart"], 5)
     pLwr <- round(pData[i,"pLwr"], 5)
     pUpr <- round(pData[i,"pUpr"], 5)
     q <- round(pData[i,"q"], 5)
+    qStart <- round(pData[i,"qStart"], 5)
     qLwr <- round(pData[i,"qLwr"], 5)
     qUpr <- round(pData[i,"qUpr"], 5)
     m <- round(pData[i,"m"], 5)
+    mStart <- round(pData[i,"mStart"], 5)
     mLwr <- round(pData[i,"mLwr"], 5)
     mUpr <- round(pData[i,"mUpr"], 5)
     qpRat <- round(pData[i,"qprat"], 5)
@@ -69,8 +72,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       next
     }
     
-    variables <- c("p", "pLwr","pUpr", "q", "qLwr", "qUpr", "m", "mLwr", "mUpr", "p-q ratio")
-    values <- c(p, pLwr, pUpr, q, qLwr, qUpr, m, mLwr, mUpr, qpRat)
+    variables <- c("pStart", "p", "pLwr","pUpr", "qStart", "q", "qLwr", "qUpr", "mStart", "m", "mLwr", "mUpr", "p-q ratio")
+    values <- c(pStart, p, pLwr, pUpr, qStart, q, qLwr, qUpr, mStart, m, mLwr, mUpr, qpRat)
     info <- data.frame(variable=variables, value=values)
     
     
@@ -135,7 +138,7 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
   
   png(filename=paste(pathGraph, "cluster-ages.png", sep=""))
   clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title)) + geom_line() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
+    theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="age", y="number of adoptions")
   print(clusterPlot)
@@ -143,7 +146,7 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
   
   png(filename=paste(pathGraph, "cluster-years.png", sep=""))
   clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title)) + geom_line() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1),legend.background=element_rect(fill="white"),
+    theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="harvest year", y="number of adoptions")
   print(clusterPlot)

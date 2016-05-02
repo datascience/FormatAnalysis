@@ -23,6 +23,10 @@ predictionYears <- c(2009, 2010, 2011)
 #if a three year moving average should be used 
 useMovingAverage <- TRUE
 
+# multiplication factor for normalizing markets sizes
+multiplicationFactor <- 1000 
+
+
 #plot settings
 includeInterval <- TRUE
 includeRateOfChange <- FALSE
