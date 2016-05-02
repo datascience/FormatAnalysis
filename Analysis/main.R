@@ -17,8 +17,8 @@ if (length(experiments)==length(marketFiles)) {
 
     # save the config parameters from the experiment 
     cpdf <- data.frame(parameter=c("experiment name", "file", "start year", "end year", "moving average used", "prediction years", "multiplication factor"), 
-                       value=c(experimentName, marketFile, start, end, useMovingAverage, paste(predictionYears, sep=","), multiplicationFactor))
-    write.table(marketData, file=paste(path, "experimentConfig.tsv", sep=""), quote=FALSE, sep="\t", 
+                       value=c(experimentName, marketFile, start, end, useMovingAverage, paste(predictionYears, collapse=","), multiplicationFactor))
+    write.table(cpdf, file=paste(path, "experimentConfig.tsv", sep=""), quote=FALSE, sep="\t", 
                 col.names=FALSE, row.names=FALSE)
     
     

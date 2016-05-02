@@ -9,8 +9,8 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 # market definition
-experiments <- c("PDFs-New")
-marketFiles <- c("Format markets - PDF versions.tsv")
+experiments <- c("ARCHIVE-New")
+marketFiles <- c("Format markets - ARCHIVE.tsv")
 
 #years used to estimate the model
 start <- 1994

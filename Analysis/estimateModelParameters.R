@@ -11,7 +11,7 @@ frameNames <<- c("ID", "name", "modelID", "pStart", "qStart", "mStart", "release
                "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
                "predictedLow", "predictedHigh")
 dimensionNames <<- list(c(), frameNames)
-frameDimensions <<- length(dimNames)
+frameDimensions <<- length(frameNames)
 
 estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
 
