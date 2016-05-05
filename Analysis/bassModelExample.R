@@ -166,7 +166,7 @@ png(filename=paste(path, "bass3.png", sep=""))
 print(bassGraph)
 dev.off()
   
-  
+
 # #layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
 # par(fig=c(0,1,0,1), oma=c(0,0,0,0), mar=c(5.5,2.5,2.0,2.0), font=2, mgp=c(0.8,1,0))
 # plot(NULL, xlim=c(0,10), ylim=c(0,max(y)+0.1*max(y)),

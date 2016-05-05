@@ -1,5 +1,6 @@
 library(ggplot2)
 library(gridExtra)
+library(grid)
 
 
 
@@ -34,6 +35,10 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
   dfClusterAge <- data.frame(title=as.character(), interval=as.numeric(), model=as.numeric())
   dfClusterYear <- data.frame(title=as.character(), interval=as.numeric(), model=as.numeric())
   
+  dfClusterParameters <- data.frame(title=as.character(), p=as.numeric(), plwr=as.numeric(), pupr=as.numeric(),
+                                    q=as.numeric(), qlwr=as.numeric(), qupr=as.numeric(),
+                                    m=as.numeric(), mlwr=as.numeric(), mupr=as.numeric())
+  
   for (i in (1:nrow(pData))) {
     
     
@@ -50,6 +55,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     derv <- unlist(pData[i,"derv"])
     residual <- unlist(pData[i,"residual"])
     prediction <- unlist(pData[i,"prediction"])
+    pValue <- unlist(pData[i,"pValue"])
+    qValue <- unlist(pData[i,"qValue"])
     
     p <- round(pData[i,"p"], 5)
     pStart <- round(pData[i,"pStart"], 5)
@@ -64,6 +71,12 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     mLwr <- round(pData[i,"mLwr"], 5)
     mUpr <- round(pData[i,"mUpr"], 5)
     qpRat <- round(pData[i,"qprat"], 5)
+    mse <- round(pData[i,"MSE"], 5)
+    msereal <- round(pData[i,"MSEreal"], 5)
+    
+    pBound <- (pUpr-p)/p
+    qBound <- (pUpr-p)/q
+    mBound <- (pUpr-p)/m
     
     
     yUpperLimit <- max(1.1*max(model), 1.1*max(percentages))
@@ -72,14 +85,16 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       next
     }
     
-    variables <- c("pStart", "p", "pLwr","pUpr", "qStart", "q", "qLwr", "qUpr", "mStart", "m", "mLwr", "mUpr", "p-q ratio")
-    values <- c(pStart, p, pLwr, pUpr, qStart, q, qLwr, qUpr, mStart, m, mLwr, mUpr, qpRat)
+    variables <- c("pStart", "p", "pLwr","pUpr", "pBound", "qStart", "q", "qLwr", "qUpr", "qBound", "mStart", "m", 
+                   "mLwr", "mUpr", "mBound", "q-p ratio", "mse", "mse-real")
+    values <- c(pStart, p, pLwr, pUpr, pBound, qStart, q, qLwr, qUpr, qBound, mStart, m, mLwr, mUpr, mBound, qpRat, mse, msereal)
     info <- data.frame(variable=variables, value=values)
     
     
     dfModel <- data.frame(interval, model, upper, lower)
     dfPoints <- data.frame(ages,percentages)
     
+    dfComponentsPlot <- data.frame(interval,model,pValue, qValue)
     
     # table with all the info
     tbl <- tableGrob(info)
@@ -88,6 +103,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     dfClusterAge <- rbind(dfClusterAge, dfClusterTemp)
     dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval+releaseYear, model=model)
     dfClusterYear <- rbind(dfClusterYear, dfClusterTemp)
+    
+    
     
     #adding elements to the main plot
     modelPlot <- ggplot() 
@@ -107,6 +124,27 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       geom_area(fill="gray", alpha=0.3) +
       geom_line() + labs(x="age", y="change rate")
     
+    # components plot 
+    componentsPlot<- ggplot(dfComponentsPlot, aes(x = interval)) + geom_area(aes(y=pValue), fill="gray75") + 
+      geom_line(aes(y=model, colour="col1", linetype="col1"), size=1) + 
+      geom_line(aes(y=pValue, colour="col2", linetype="col2"), size=1) + 
+      geom_line(aes(y=qValue, color="col3", linetype="col3"), size=1) +
+      scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(model))) + 
+      scale_x_continuous(expand = c(0,0)) +
+      scale_color_manual(name="", values=c("col1"="black", "col2"="red", "col3"="blue"),
+                         labels=c("New adoptions", paste("External influence\n(p=", p, ")", sep=""),
+                                  paste("Internal influence\n(q=",q,")", sep=""))) + 
+      scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
+                            labels=c("New adoptions", paste("External influence\n(p=",p,")", sep=""),
+                                     paste("Internal influence\n(q=",q,")", sep=""))) +
+      labs(x="Time", y="Number of adoptions") +
+      theme(axis.ticks=element_blank(), axis.text=element_blank(),
+            axis.title=element_text(face="italic",size=16),
+            legend.position=c(0.7,0.6), legend.background=element_blank(),
+            legend.text=element_text(face="bold", size=16), 
+            legend.key=element_blank(), legend.key.width=unit(3.5,"line"), 
+            legend.key.height=unit(3,"line"))
+    
     # residual plot 
     dfResidual <- data.frame(prediction, residual)
     residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + geom_point() + labs(x="fitted value", y="residual")
@@ -116,6 +154,10 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       lay <- rbind(c(1,3), c(2,3))
       png(filename=paste(pathGraph, title, ".png", sep=""))
       print(grid.arrange(modelPlot, residualPlot, tbl, layout_matrix=lay))
+      dev.off()
+      
+      png(filename=paste(pathGraph, title, "components.png", sep=""))
+      print(componentsPlot)
       dev.off()
       
     }else {
@@ -132,6 +174,9 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       png(filename=paste(pathGraph, title, "-residual.png", sep=""))
       print(residualPlot)
       dev.off()
+      
+
+      
     }
     
   }

@@ -14,6 +14,8 @@ if (length(experiments)==length(marketFiles)) {
     }
     # create expeirment folder 
     dir.create(path)
+    
+    marketFile <- marketFiles[i]
 
     # save the config parameters from the experiment 
     cpdf <- data.frame(parameter=c("experiment name", "file", "start year", "end year", "moving average used", "prediction years", "multiplication factor"), 
@@ -24,7 +26,6 @@ if (length(experiments)==length(marketFiles)) {
     
     # load market data 
     # load it twice to see which columns it has
-    marketFile <- marketFiles[i]
     marketData <- read.table(paste("input data/", marketFile, sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     marketData <- read.table(paste("input data/", marketFile, sep=""), header=TRUE, 
                             colClasses=rep("character", each=ncol(marketData)), sep="\t", stringsAsFactors=FALSE)
@@ -68,7 +69,7 @@ if (length(experiments)==length(marketFiles)) {
     dir.create(pathMarketElements)
     
     # for each element estimate models 
-    allModelEstimates <- estimateModelParameters(dataShares, start, end, useMovingAverage, pathMarketElements)
+    allModelEstimates <- estimateModelParameters(dataShares, start, end, useMovingAverage, multiplicationFactor, pathMarketElements)
     saveRDS(allModelEstimates, file=paste(pathMarketElements, "allModelEstimates.rds", sep=""))
     bestModelEstimates <- calculateBestModelValues(dataShares, allModelEstimates, pathMarketElements)
     saveRDS(bestModelEstimates, file=paste(pathMarketElements, "bestModelEstimates.rds", sep="")) 

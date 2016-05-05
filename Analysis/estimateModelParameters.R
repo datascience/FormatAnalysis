@@ -8,12 +8,12 @@ frameNames <<- c("ID", "name", "modelID", "pStart", "qStart", "mStart", "release
                "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
                "m", "mLwr", "mUpr", "qprat", "prediction", 
                "residual", "interval", "model", "upper", "lower",
-               "derv", "MSE", "R2", "yearsToPredict", "predictedValues", 
-               "predictedLow", "predictedHigh")
+               "derv", "MSE", "MSEreal", "R2", "yearsToPredict", "predictedValues", 
+               "predictedLow", "predictedHigh", "pValue", "qValue")
 dimensionNames <<- list(c(), frameNames)
 frameDimensions <<- length(frameNames)
 
-estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
+estimateModelParameters <- function(pData, start, end, useMovingAverage, multiplicationFactor, path) {
 
   options( warn = -1 )
   
@@ -60,7 +60,8 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
     allEstimates <- allEstimates[!is.na(allEstimates$p) & !is.na(allEstimates$q) & !is.na(allEstimates$m),]
     allEstimates <- allEstimates[allEstimates$p>0 & allEstimates$q>0 & allEstimates$m>0 & allEstimates$p<=1,]
     
-    allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= 1000,]
+    #check the peak 
+    allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor,]
     
     allEstimates <- allEstimates[order(allEstimates$MSE),]
     
@@ -68,8 +69,8 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
                                 p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
     
     # more advanced way to pick good models
-    # a lot of the models are actually equal so we need to avoid proposing 10 equal models
-    for (cnt in 1:2) {
+    # lots of the models are actually equal so we need to avoid proposing equal models
+    for (cnt in 1:5) {
       tmpMSE <- allEstimates[1,]$MSE
       bestEstimates <- rbind(bestEstimates, allEstimates[1,])
       allEstimates <- allEstimates[2:nrow(allEstimates),]
@@ -77,7 +78,7 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, path) {
       if (nrow(allEstimates)==0) break
       
     }
-    
+    bestEstimates <- bestEstimates[!is.na(bestEstimates$modelID),]
     write.table(bestEstimates, file = paste(pathElement, "best.tsv", sep=""), quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE)
     
@@ -101,10 +102,10 @@ estimateBassModel <- function(X, Y, Yreal, path) {
   
   #Bass model estimation
   #pInterval <- c(0.01, 0.03, 0.05, 0.07, 0.1, 0.2, 0.3)
-  pInterval <- seq(0.00, 0.5, 0.05)
+  pInterval <- seq(0.05, 1.0, 0.05)
   #qInterval <- c(0.01, 0.05, 0.1, 0.3, 0.5, 0.7, 1.0)
-  qInterval <- seq(0.00, 1.0, 0.05)
-  mInterval <- c(0.000, 0.01, 0.1, 1, 10, 100, 1000, 10000, 30000)
+  qInterval <- seq(0.05, 1.0, 0.05)
+  mInterval <- c(0.01, 0.1, 1, 10, 100, 1000, 10000, 30000)
   #mInterval <- seq(0,10000,100)
   
   allEstimates <- data.frame(modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
@@ -188,11 +189,14 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
     models <- bestModels[bestModels$ID==i,]
     modelEsPerElement <- modelEsPerElement[0,]
     for (j in models$modelID) {
-      print(j)
       mFile <- paste(getwd(),"/",pathElModels, j, ".rds", sep="")
+      print(mFile)
       model <- readRDS(mFile)
-      estimates <- calculateModelValues(data, model, j, models[models$modelID==j,]$pStart,
-                                        models[models$modelID==j,]$qStart, models[models$modelID==j,]$mStart)
+      pStart <- models[models$modelID==j,]$pStart
+      qStart <- models[models$modelID==j,]$qStart
+      mStart <- models[models$modelID==j,]$mStart
+      print (paste("hello", pStart, qStart, mStart))
+      estimates <- calculateModelValues(data, model, j, pStart, qStart, mStart)
       modelEsPerElement <- rbind(modelEsPerElement, estimates)
     }
     saveRDS(modelEsPerElement, file=paste(pathElement, "estimates.rds", sep=""))
@@ -211,6 +215,7 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
 
 calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mStart, calculationType ="confidence", predictionYears = NA) {
   
+  print("Calculating model values")
   if (length(unique(marketShare$ID))>1) {
     
     message("Expecting only one market element!")
@@ -225,9 +230,11 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
     modelEstimates[1,][["name"]] <- marketShare[1,]$name
     modelEstimates[1,][["release.year"]] <- marketShare[1,]$release.year
     modelEstimates[1,][["modelID"]] <- modelID
-    modelEStimates[1,][["pStart"]] <- pStart
-    modelEStimates[1,][["qStart"]] <- qStart
-    modelEStimates[1,][["mStart"]] <- mStart
+    modelEstimates[1,"pStart"] <- pStart[1]
+    modelEstimates[1,"qStart"] <- qStart[1]
+    modelEstimates[1,"mStart"] <- mStart[1]
+    #print (pStart)
+    #print (paste("hello here", modelEStimates[1,][["pStart"]], modelEStimates[1,][["qStart"]], modelEStimates[1,][["mStart"]]))
     
     X <- marketShare$age
     
@@ -263,7 +270,10 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
       modelEstimates[1,][["lower"]] <- NA
       modelEstimates[1,][["derv"]] <- NA
       modelEstimates[1,][["MSE"]] <- NA
+      modelEstimates[1,][["MSEreal"]] <- NA
       modelEstimates[1,][["R2"]] <- NA
+      modelEstimates[1,][["pValue"]] <- NA
+      modelEstimates[1,][["qValue"]] <- NA
     } else {
       r <- data.frame(x=X)
       t <- try(tempRes <- predictNLS(model, newdata=r, interval=intervalType, alpha=0.05))
@@ -276,9 +286,10 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
       residual <- Yreal - tempRes$summary[,1] 
       
       #calculate confidence intervals for estimated parameters 
-      t <- try (cInt <- confint(model, level = 0.95))
+     # t <- try (cInt <- confint(model, level = 0.95))
+      t <- try (cInt <- calculateConfidence(model, level = 0.95))
       if ("try-error" %in% class(t)) {
-        print("error in predictNLS 2")
+        print("error in calculating confidence intervals")
         pL <- NA
         pU <- NA
         qL <- NA
@@ -294,7 +305,6 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
         mU <- cInt["m",2]
         
       }
-      
       modelEstimates[1,][["p"]] <- coef(model)["p"]
       p <- as.numeric(modelEstimates[1,][["p"]])
       modelEstimates[1,][["pLwr"]] <- pL
@@ -316,8 +326,16 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
       modelEstimates[1,][["upper"]] <- list(temp$summary[,6])
       f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
       modelEstimates[1,][["derv"]] <- list(f$derv)
-      modelEstimates[1,][["MSE"]] <- calculateMSE(residual)
+      modelEstimates[1,][["MSE"]] <- calculateMSE(resid(model))
+      modelEstimates[1,][["MSEreal"]] <- calculateMSE(residual)
       modelEstimates[1,][["R2"]] <- calculateR2(residual, Yreal)
+      
+      f$pValue <- p*m*(1-(1-exp(-(p+q)*f$x))/((q/p)*exp(-(p+q)*f$x)+1))
+      f$qValue <- temp$summary[,1] - f$pValue
+      modelEstimates[1,][["pValue"]] <- list(f$pValue)
+      modelEstimates[1,][["qValue"]] <- list(f$qValue)
+      
+      
       if (calculationType=="prediction") {
         
         predictionAge <- predictionYears - as.numeric(releaseYear[1])
@@ -354,7 +372,7 @@ makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
   dir.create(pathPrediction)
   file.remove(file.path(pathPrediction, list.files(pathPrediction)))
   
-  allEstimates <- data.frame(matrix(vector(),0,30, 
+  allEstimates <- data.frame(matrix(vector(),0,frameDimensions, 
                                     dimnames = dimensionNames))
   
   for (i in chosen$ID) {
@@ -393,7 +411,9 @@ makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
 
 estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)
-  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=sP,q=sQ,m=sM))
+  #fit <- nls(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, algorithm="port", start=list(p=sP,q=sQ,m=sM), lower = c(0,0,0)) 
+  fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=sP,q=sQ,m=sM),
+             control = list(maxiter=1000)) 
   return (fit)
 }
 
@@ -408,4 +428,22 @@ calculateR2 <- function(resid, Y) {
   TSS <- sum((Y - m)^2)
   r2 <- 1 - RSS/TSS
   return (r2)
+}
+
+
+calculateConfidence <- function(model, level=0.95) {
+  
+  a <- (1 - level)/2
+  a <- c(a, 1-a)
+  df <- df.residual(model)
+  t <- qt(a,df)
+  params <- coef(model)
+  serr <- sqrt(diag(vcov(model)))
+  inter <- array(NA, dim = c(length(names(params)), 2L),
+                 dimnames = list(names(params), 
+                                 paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),"%")))
+  inter[] <- params + serr %o% t
+  return (inter)
+  
+  
 }
