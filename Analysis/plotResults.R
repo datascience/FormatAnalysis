@@ -137,9 +137,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
                             labels=c("New adoptions", paste("External influence\n(p=",p,")", sep=""),
                                      paste("Internal influence\n(q=",q,")", sep=""))) +
-      labs(x="Time", y="Number of adoptions") +
-      theme(axis.ticks=element_blank(), axis.text=element_blank(),
-            axis.title=element_text(face="italic",size=16),
+      labs(x="Age", y="Number of adoptions") +
+      theme(axis.title=element_text(face="italic",size=16),
             legend.position=c(0.7,0.6), legend.background=element_blank(),
             legend.text=element_text(face="bold", size=16), 
             legend.key=element_blank(), legend.key.width=unit(3.5,"line"), 
