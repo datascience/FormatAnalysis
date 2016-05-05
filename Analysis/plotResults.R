@@ -58,25 +58,25 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     pValue <- unlist(pData[i,"pValue"])
     qValue <- unlist(pData[i,"qValue"])
     
-    p <- round(pData[i,"p"], 5)
-    pStart <- round(pData[i,"pStart"], 5)
-    pLwr <- round(pData[i,"pLwr"], 5)
-    pUpr <- round(pData[i,"pUpr"], 5)
-    q <- round(pData[i,"q"], 5)
-    qStart <- round(pData[i,"qStart"], 5)
-    qLwr <- round(pData[i,"qLwr"], 5)
-    qUpr <- round(pData[i,"qUpr"], 5)
-    m <- round(pData[i,"m"], 5)
-    mStart <- round(pData[i,"mStart"], 5)
-    mLwr <- round(pData[i,"mLwr"], 5)
-    mUpr <- round(pData[i,"mUpr"], 5)
-    qpRat <- round(pData[i,"qprat"], 5)
-    mse <- round(pData[i,"MSE"], 5)
-    msereal <- round(pData[i,"MSEreal"], 5)
+    p <- signif(pData[i,"p"], 4)
+    pStart <- signif(pData[i,"pStart"], 3)
+    pLwr <- signif(pData[i,"pLwr"], 4)
+    pUpr <- signif(pData[i,"pUpr"], 4)
+    q <- signif(pData[i,"q"], 4)
+    qStart <- signif(pData[i,"qStart"], 3)
+    qLwr <- signif(pData[i,"qLwr"], 4)
+    qUpr <- signif(pData[i,"qUpr"], 4)
+    m <- signif(pData[i,"m"], 4)
+    mStart <- signif(pData[i,"mStart"], 3)
+    mLwr <- signif(pData[i,"mLwr"], 4)
+    mUpr <- signif(pData[i,"mUpr"], 4)
+    qpRat <- round(pData[i,"qprat"], 2)
+    mse <- signif(pData[i,"MSE"], 4)
+    msereal <- signif(pData[i,"MSEreal"], 4)
     
-    pBound <- (pUpr-p)/p
-    qBound <- (pUpr-p)/q
-    mBound <- (pUpr-p)/m
+    pBound <- signif(100*(pUpr-p)/p,3)
+    qBound <- signif(100*(pUpr-p)/q,3)
+    mBound <- signif(100*(pUpr-p)/m,3)
     
     
     yUpperLimit <- max(1.1*max(model), 1.1*max(percentages))

@@ -365,7 +365,7 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
   
 }
 
-makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
+makePredictions <- function(marketShare, modelEstimates, chosen, years, path, pathMarket) {
   
 
   pathPrediction <- paste(path,"/prediction/",sep="")  
@@ -381,8 +381,9 @@ makePredictions <- function(marketShare, chosen, years, path, pathMarket) {
     print(paste("Predicting for " , name))
     pathModel <- paste(pathMarket, name, "/models/", chosen[chosen$ID==i,]$modelID, ".rds", sep="")
     model <- readRDS(pathModel)
-    estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, chosen[chosen$ID==i,]$pStart, 
-                                      chosen[chosen$ID==i,]$qStart, chosen[chosen$ID==i,]$mStart, "prediction", years)
+    estimates <- calculateModelValues(data, model, chosen[chosen$ID==i,]$modelID, modelEstimates[modelEstimates$ID==i,]$pStart, 
+                                      modelEstimates[modelEstimates$ID==i,]$qStart, modelEstimates[modelEstimates$ID==i,]$mStart,
+                                      "prediction", years)
     predictionYears <- unlist(estimates[1,][["yearsToPredict"]])
     predicted <- unlist(estimates[1,][["predictedValues"]])
     predictedLow <- unlist(estimates[1,][["predictedLow"]])

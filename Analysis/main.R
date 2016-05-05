@@ -96,7 +96,7 @@ if (length(experiments)==length(marketFiles)) {
     plotResults(estimatesFinal, "separated", FALSE, TRUE, TRUE, path)    
 
     # make predictions and plot prediction results 
-    predictions <- makePredictions(dataShares, chosenModels, predictionYears, path, pathMarketElements)
+    predictions <- makePredictions(dataShares, estimatesFinal, chosenModels, predictionYears, path, pathMarketElements)
     plotResults(predictions, "separated", FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
     
   }
