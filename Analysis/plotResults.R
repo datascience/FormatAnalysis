@@ -54,6 +54,7 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     lower <- unlist(pData[i,"lower"])
     derv <- unlist(pData[i,"derv"])
     residual <- unlist(pData[i,"residual"])
+    residualAverage <- unlist(pData[i,"residualAverage"])
     prediction <- unlist(pData[i,"prediction"])
     pValue <- unlist(pData[i,"pValue"])
     qValue <- unlist(pData[i,"qValue"])
@@ -71,8 +72,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     mLwr <- signif(pData[i,"mLwr"], 4)
     mUpr <- signif(pData[i,"mUpr"], 4)
     qpRat <- round(pData[i,"qprat"], 2)
-    mse <- signif(pData[i,"MSE"], 4)
-    msereal <- signif(pData[i,"MSEreal"], 4)
+    rmse <- signif(pData[i,"RMSE"], 4)
+    rmsereal <- signif(pData[i,"RMSEreal"], 4)
     
     pBound <- signif(100*(pUpr-p)/p,3)
     qBound <- signif(100*(pUpr-p)/q,3)
@@ -86,8 +87,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     }
     
     variables <- c("pStart", "p", "pLwr","pUpr", "pBound", "qStart", "q", "qLwr", "qUpr", "qBound", "mStart", "m", 
-                   "mLwr", "mUpr", "mBound", "q-p ratio", "mse", "mse-real")
-    values <- c(pStart, p, pLwr, pUpr, pBound, qStart, q, qLwr, qUpr, qBound, mStart, m, mLwr, mUpr, mBound, qpRat, mse, msereal)
+                   "mLwr", "mUpr", "mBound", "q-p ratio", "rmse", "rmse-real")
+    values <- c(pStart, p, pLwr, pUpr, pBound, qStart, q, qLwr, qUpr, qBound, mStart, m, mLwr, mUpr, mBound, qpRat, rmse, rmsereal)
     info <- data.frame(variable=variables, value=values)
     
     
@@ -148,11 +149,16 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     dfResidual <- data.frame(prediction, residual)
     residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + geom_point() + labs(x="fitted value", y="residual")
     
+    # average residual plot 
+    dfResidual <- data.frame(prediction, residualAverage)
+    residualAveragePlot <- ggplot(dfResidual, aes(x=prediction, y=residualAverage)) + geom_point() + labs(x="fitted value", y="residual(average)")
+    
+    
     if (plotType=="combined") {
       
-      lay <- rbind(c(1,3), c(2,3))
+      lay <- rbind(c(1,1,4), c(2,3,4))
       png(filename=paste(pathGraph, title, ".png", sep=""))
-      print(grid.arrange(modelPlot, residualPlot, tbl, layout_matrix=lay))
+      print(grid.arrange(modelPlot, residualPlot, residualAveragePlot, tbl, layout_matrix=lay))
       dev.off()
       
       png(filename=paste(pathGraph, title, "components.png", sep=""))
@@ -174,25 +180,29 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       print(residualPlot)
       dev.off()
       
+      png(filename=paste(pathGraph, title, "-averageResidual.png", sep=""))
+      print(residualAveragePlot)
+      dev.off()
+      
 
       
     }
     
   }
   
-  png(filename=paste(pathGraph, "cluster-ages.png", sep=""))
+  png(filename=paste(pathGraph, "allModels-ages.png", sep=""))
   clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title)) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
-          legend.key=element_blank()) + labs(x="age", y="number of adoptions")
+          legend.key=element_blank()) + labs(x="age", y="rate of adoptions")
   print(clusterPlot)
   dev.off()
   
-  png(filename=paste(pathGraph, "cluster-years.png", sep=""))
+  png(filename=paste(pathGraph, "allModels-years.png", sep=""))
   clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title)) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
-          legend.key=element_blank()) + labs(x="harvest year", y="number of adoptions")
+          legend.key=element_blank()) + labs(x="harvest year", y="rate of adoptions")
   print(clusterPlot)
   dev.off()
 

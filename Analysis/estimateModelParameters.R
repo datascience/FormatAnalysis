@@ -7,8 +7,8 @@ frameNames <<- c("ID", "name", "modelID", "pStart", "qStart", "mStart", "release
                "ages", "percentages", "averages", 
                "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
                "m", "mLwr", "mUpr", "qprat", "prediction", 
-               "residual", "interval", "model", "upper", "lower",
-               "derv", "MSE", "MSEreal", "R2", "yearsToPredict", "predictedValues", 
+               "residual", "residualAverage", "interval", "model", "upper", "lower",
+               "derv", "RMSE", "RMSEreal", "R2", "yearsToPredict", "predictedValues", 
                "predictedLow", "predictedHigh", "pValue", "qValue")
 dimensionNames <<- list(c(), frameNames)
 frameDimensions <<- length(frameNames)
@@ -21,7 +21,7 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
   unig <- unique(pData$ID)
 
   estimates <- data.frame(ID=numeric(), modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
-                          p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
+                          p=numeric(), q=numeric(), m=numeric(), RMSE=numeric())
  
   
   k <- 1
@@ -58,26 +58,29 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
     
     #filtering to get the best models
     allEstimates <- allEstimates[!is.na(allEstimates$p) & !is.na(allEstimates$q) & !is.na(allEstimates$m),]
-    allEstimates <- allEstimates[allEstimates$p>0 & allEstimates$q>0 & allEstimates$m>0 & allEstimates$p<=1,]
+    allEstimates <- allEstimates[allEstimates$p<=1,]
     
     #check the peak 
     allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor,]
     
-    allEstimates <- allEstimates[order(allEstimates$MSE),]
+    allEstimates <- allEstimates[order(allEstimates$RMSE),]
     
     bestEstimates <- data.frame(ID=numeric(), modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
-                                p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
+                                p=numeric(), q=numeric(), m=numeric(), RMSE=numeric())
     
     # more advanced way to pick good models
     # lots of the models are actually equal so we need to avoid proposing equal models
+    epsilon <- 10^-6
     for (cnt in 1:5) {
-      tmpMSE <- allEstimates[1,]$MSE
-      bestEstimates <- rbind(bestEstimates, allEstimates[1,])
-      allEstimates <- allEstimates[2:nrow(allEstimates),]
-      allEstimates <- allEstimates[allEstimates$MSE>1.1*tmpMSE,]
-      if (nrow(allEstimates)==0) break
+      tP <- allEstimates[1,]$p
+      tQ <- allEstimates[1,]$q
+      tM <- allEstimates[1,]$m
       
+      bestEstimates <- rbind(bestEstimates, allEstimates[1,])
+      allEstimates <- allEstimates[abs(allEstimates$p-tP)>epsilon | abs(allEstimates$q-tQ)>epsilon |  abs(allEstimates$m-tM),]
+      if (nrow(allEstimates)==0) break
     }
+    
     bestEstimates <- bestEstimates[!is.na(bestEstimates$modelID),]
     write.table(bestEstimates, file = paste(pathElement, "best.tsv", sep=""), quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE)
@@ -109,7 +112,7 @@ estimateBassModel <- function(X, Y, Yreal, path) {
   #mInterval <- seq(0,10000,100)
   
   allEstimates <- data.frame(modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
-                             p=numeric(), q=numeric(), m=numeric(), MSE=numeric())
+                             p=numeric(), q=numeric(), m=numeric(), RMSE=numeric())
   model <- NA
   k <- 1
   for (iP in pInterval) {
@@ -126,7 +129,7 @@ estimateBassModel <- function(X, Y, Yreal, path) {
           allEstimates[k,"p"] <- NA
           allEstimates[k,"q"] <- NA
           allEstimates[k,"m"] <- NA
-          allEstimates[k,"MSE"] <- NA
+          allEstimates[k,"RMSE"] <- NA
         } else {
           p <- as.numeric(coef(model)["p"])
           q <- as.numeric(coef(model)["q"])
@@ -154,7 +157,7 @@ estimateBassModel <- function(X, Y, Yreal, path) {
           # WARNING These residuals will be in the end different from those calculated by 
           # when real values are used. This is because the model is estimated on moving average. 
           residual <- resid(model)
-          allEstimates[k,"MSE"] <- calculateMSE(residual)
+          allEstimates[k,"RMSE"] <- calculateMSE(residual)
           #allEstimates[k,]$R2 <- calculateR2(residual, Yreal)
           saveRDS(model, paste(path,k,".rds", sep=""))
         }
@@ -264,12 +267,13 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
       modelEstimates[1,][["qprat"]] <-NA
       modelEstimates[1,][["prediction"]] <- NA
       modelEstimates[1,][["residual"]] <- NA
+      modelEstimates[1,][["residualAverage"]] <- NA
       modelEstimates[1,][["interval"]] <- NA
       modelEstimates[1,][["model"]] <- NA
       modelEstimates[1,][["upper"]] <- NA
       modelEstimates[1,][["lower"]] <- NA
       modelEstimates[1,][["derv"]] <- NA
-      modelEstimates[1,][["MSE"]] <- NA
+      modelEstimates[1,][["RMSE"]] <- NA
       modelEstimates[1,][["MSEreal"]] <- NA
       modelEstimates[1,][["R2"]] <- NA
       modelEstimates[1,][["pValue"]] <- NA
@@ -284,6 +288,7 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
       
       #calculate residuals 
       residual <- Yreal - tempRes$summary[,1] 
+      residualAverage <- Yavg - tempRes$summary[,1]
       
       #calculate confidence intervals for estimated parameters 
      # t <- try (cInt <- confint(model, level = 0.95))
@@ -320,14 +325,15 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
       modelEstimates[1,][["qprat"]] <-as.numeric(q/p)
       modelEstimates[1,][["prediction"]] <- list(tempRes$summary[,1])
       modelEstimates[1,][["residual"]] <- list(residual)
+      modelEstimates[1,][["residualAverage"]] <- list(residualAverage)
       modelEstimates[1,][["interval"]] <- list(f$x)
       modelEstimates[1,][["model"]] <- list(temp$summary[,1])
       modelEstimates[1,][["lower"]] <- list(temp$summary[,5])
       modelEstimates[1,][["upper"]] <- list(temp$summary[,6])
       f$derv <- ((m/p)*(p+q)^3*exp(-(p+q)*f$x)*((q/p)*exp(-(p+q)*f$x)-1))/(((q/p)*exp(-(p+q)*f$x)+1)^3)
       modelEstimates[1,][["derv"]] <- list(f$derv)
-      modelEstimates[1,][["MSE"]] <- calculateMSE(resid(model))
-      modelEstimates[1,][["MSEreal"]] <- calculateMSE(residual)
+      modelEstimates[1,][["RMSE"]] <- calculateRMSE(resid(model))
+      modelEstimates[1,][["RMSEreal"]] <- calculateRMSE(residual)
       modelEstimates[1,][["R2"]] <- calculateR2(residual, Yreal)
       
       f$pValue <- p*m*(1-(1-exp(-(p+q)*f$x))/((q/p)*exp(-(p+q)*f$x)+1))
@@ -418,9 +424,9 @@ estimateBass <- function(X,Y, sP, sQ, sM) {
   return (fit)
 }
 
-calculateMSE <- function(resid) {
-  mse <- sum(resid^2) / length(resid)
-  return (mse)
+calculateRMSE <- function(resid) {
+  rmse <- sqrt(sum(resid^2) / length(resid))
+  return (rmse)
 }
 
 calculateR2 <- function(resid, Y) {

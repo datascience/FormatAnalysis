@@ -9,7 +9,7 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 # market definition
-experiments <- c("IMAGES-New-3")
+experiments <- c("IMAGES-New-4")
 marketFiles <- c("Format markets - IMAGES.tsv")
 
 #years used to estimate the model

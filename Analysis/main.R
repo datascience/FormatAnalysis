@@ -56,7 +56,7 @@ if (length(experiments)==length(marketFiles)) {
     # calculate percentage and moving average of each value
     source('normalizeMarket.R')
     dataShares <- normalizeMarket(dataCleaned,propertyToTake, multiplicationFactor)
-    write.table(dataShares, file=paste(path, "marketShares.tsv", sep=""), 
+    write.table(dataShares, file=paste(path, "adoptionRates.tsv", sep=""), 
                 quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
     
     
@@ -88,7 +88,7 @@ if (length(experiments)==length(marketFiles)) {
     # load needed data 
     pathMarketElements <- paste(path, "market elements/", sep="")
     bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
-    dataShares <- read.table(paste(path, "marketShares.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     
     # pick estimated values for selected models and plot them 
     chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
