@@ -107,15 +107,21 @@ if (length(experiments)==length(marketFiles)) {
     path <- paste("output data/", experimentName, "/", sep="")
     print(path)
     dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-    path <- paste("output data/", experimentName, "/market elements", sep="")
+    pathElements <- paste("output data/", experimentName, "/market elements", sep="")
     
     for (name in unique(dataShares$name) ) {
-      pathFrom <- paste(path, "/", name, "/graphs", sep="")
+      pathFrom <- paste(pathElements, "/", name, "/graphs", sep="")
       print(pathFrom)
       file.copy(from=list.files(pathFrom, full.names = TRUE) , to=syncFolder, 
                 overwrite = TRUE, recursive = TRUE, 
                 copy.mode = TRUE)
     }
+    
+    pathAllGraphs <- paste(path, "graphs", sep="")
+    print(pathAllGraphs)
+    file.copy(from=list.files(pathAllGraphs, full.names = TRUE) , to=syncFolder, 
+              overwrite = TRUE, recursive = TRUE, 
+              copy.mode = TRUE)
     
   }
   
