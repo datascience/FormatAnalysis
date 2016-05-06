@@ -157,7 +157,7 @@ estimateBassModel <- function(X, Y, Yreal, path) {
           # WARNING These residuals will be in the end different from those calculated by 
           # when real values are used. This is because the model is estimated on moving average. 
           residual <- resid(model)
-          allEstimates[k,"RMSE"] <- calculateMSE(residual)
+          allEstimates[k,"RMSE"] <- calculateRMSE(residual)
           #allEstimates[k,]$R2 <- calculateR2(residual, Yreal)
           saveRDS(model, paste(path,k,".rds", sep=""))
         }

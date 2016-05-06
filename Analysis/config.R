@@ -9,8 +9,8 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 # market definition
-experiments <- c("IMAGES-New-4")
-marketFiles <- c("Format markets - IMAGES.tsv")
+experiments <- c("PDF-New-5-noMA")
+marketFiles <- c("Format markets - PDF versions.tsv")
 
 #years used to estimate the model
 start <- 1994
@@ -21,7 +21,7 @@ end <- 2010
 predictionYears <- c(2009, 2010, 2011)
 
 #if a three year moving average should be used 
-useMovingAverage <- TRUE
+useMovingAverage <- FALSE
 
 # multiplication factor for normalizing markets sizes
 multiplicationFactor <- 1000 
