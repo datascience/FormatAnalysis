@@ -93,13 +93,32 @@ if (length(experiments)==length(marketFiles)) {
     # pick estimated values for selected models and plot them 
     chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-    plotResults(estimatesFinal, "separated", FALSE, TRUE, TRUE, path)    
+    plotResults(estimatesFinal, "separated", FALSE, TRUE, TRUE, path, experimentName)    
 
     # make predictions and plot prediction results 
     predictions <- makePredictions(dataShares, estimatesFinal, chosenModels, predictionYears, path, pathMarketElements)
-    plotResults(predictions, "separated", FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""))
+    plotResults(predictions, "separated", FALSE, TRUE, TRUE, paste(path,"/prediction",sep="", experimentName))
     
   }
+  
+  syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/20160506-1200/model figures/"
+  for (i in 1:length(experiments)) {
+    experimentName <- experiments[i]
+    path <- paste("output data/", experimentName, "/", sep="")
+    print(path)
+    dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    path <- paste("output data/", experimentName, "/market elements", sep="")
+    
+    for (name in unique(dataShares$name) ) {
+      pathFrom <- paste(path, "/", name, "/graphs", sep="")
+      print(pathFrom)
+      file.copy(from=list.files(pathFrom, full.names = TRUE) , to=syncFolder, 
+                overwrite = TRUE, recursive = TRUE, 
+                copy.mode = TRUE)
+    }
+    
+  }
+  
   
 } else {
   message("The number of experiments and market files does not match! Check experiments and marketFiles variables in the config.R file")

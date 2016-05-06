@@ -32,10 +32,11 @@ yq <- y - yp
 df <- data.frame(x, y, yp, yq)
 bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
   geom_line(aes(y=y), size=1) + 
-  geom_line(aes(y=yp), size=1) + 
+  geom_line(aes(y=yp), size=1, linetype=2, color="red") + 
+  geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="black", parse=TRUE) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 
@@ -64,10 +65,12 @@ yq <- y - yp
 df <- data.frame(x, y, yp, yq)
 bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
   geom_line(aes(y=y), size=1) + 
-  geom_line(aes(y=yp), size=1) +
+  geom_line(aes(y=yp), size=1, linetype=2, color="red") + 
+  geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p,sep=""), color="black",
+           parse=TRUE) + 
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 p <- 0.0001
@@ -88,10 +91,11 @@ yq <- y - yp
 df <- data.frame(x, y, yp, yq)
 bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
   geom_line(aes(y=y), size=1) + 
-  geom_line(aes(y=yp), size=1) + 
+  geom_line(aes(y=yp), size=1, linetype=2, color="red") + 
+  geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="black", parse=TRUE) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 p <- 0.2
@@ -112,10 +116,11 @@ yq <- y - yp
 df <- data.frame(x, y, yp, yq)
 bassGraph4<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
   geom_line(aes(y=y), size=1) + 
-  geom_line(aes(y=yp), size=1) + 
+  geom_line(aes(y=yp), size=1, linetype=2, color="red") + 
+  geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="red", parse=TRUE) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="black", parse=TRUE) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 print(grid.arrange(bassGraph4, bassGraph2, bassGraph1, bassGraph3, ncol = 2, nrow = 2))
@@ -148,7 +153,7 @@ bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq, color="col3", linetype="col3"), size=1) +
   scale_y_continuous(expand = c(0,0), limits=c(0,3)) + 
   scale_x_continuous(expand = c(0,0)) +
-  scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="blue"),
+  scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="green"),
                      labels=c("New adoptions","External influence\n(p=0.1)",
                               "Internal influence\n(q=0.9)")) + 
   scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),

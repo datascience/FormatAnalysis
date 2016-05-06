@@ -12,21 +12,25 @@ graphAllModels <- function(marketShare, modelValues, path) {
   for (i in uniq) {
     data <- modelValues[modelValues$ID==i,]
     name <- data[1,]$name
-    data$name <- paste(data$name, data$modelID, sep = "-")
+    #data$name <- paste(data$name, data$modelID, sep = "-")
     
     pathEl <- paste(path, name, sep="")
     
-    plotResults(data, "combined", FALSE, TRUE, TRUE, pathEl)
+    plotResults(data, "combined", FALSE, TRUE, TRUE, pathEl, name)
     
   }
 }
 
 # TODO a function which takes a data frame with all the values for every element and plots specific 
 # the function also takes a path where all the models should be plotted 
-plotResults <- function(pData,  plotType="separated", includeRateOfChange, includeInterval, includePoints, path) {
+plotResults <- function(pData,  plotType="separated", includeRateOfChange, includeInterval, includePoints, path, marketTitle) {
   
   options( warn = -1 )
+  
   pathGraph <- paste(path, "/graphs/", sep="")
+  
+  timeStamp <- format(Sys.time(), "%y%m%d%H%M")
+  
   print(pathGraph)
   dir.create(pathGraph)
   file.remove(file.path(pathGraph, list.files(pathGraph)))
@@ -44,6 +48,7 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     
     
     title <- pData[i,"name"] 
+    modelID <- pData[i,"modelID"]
     releaseYear <- as.numeric(pData[i,"release.year"])
     ages <- unlist(pData[i,"ages"])
     percentages <- unlist(pData[i,"percentages"])
@@ -100,9 +105,9 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     # table with all the info
     tbl <- tableGrob(info)
     
-    dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval, model=model)
+    dfClusterTemp <- data.frame(title=rep(title,length(interval)), modelID=rep(modelID,length(interval)), interval=interval, model=model)
     dfClusterAge <- rbind(dfClusterAge, dfClusterTemp)
-    dfClusterTemp <- data.frame(title=rep(title,length(interval)), interval=interval+releaseYear, model=model)
+    dfClusterTemp <- data.frame(title=rep(title,length(interval)), modelID=rep(modelID,length(interval)), interval=interval+releaseYear, model=model)
     dfClusterYear <- rbind(dfClusterYear, dfClusterTemp)
     
     
@@ -113,7 +118,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       modelPlot <- modelPlot + geom_ribbon(data=dfModel, aes(x=interval, ymin=lower, ymax=upper), 
                                            alpha=0.2) + coord_cartesian(ylim=c(0,yUpperLimit))
     }
-    modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model))
+    modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model)) +
+      scale_x_continuous(expand = c(0,0))
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
     }
@@ -152,59 +158,66 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     # average residual plot 
     dfResidual <- data.frame(prediction, residualAverage)
     residualAveragePlot <- ggplot(dfResidual, aes(x=prediction, y=residualAverage)) + geom_point() + labs(x="fitted value", y="residual(average)")
+
     
     
     if (plotType=="combined") {
       
       lay <- rbind(c(1,1,4), c(2,3,4))
-      png(filename=paste(pathGraph, title, ".png", sep=""))
+      png(filename=paste(pathGraph, timeStamp, "-", title,"-", modelID, ".png", sep=""), width = 720, height = 480)
       print(grid.arrange(modelPlot, residualPlot, residualAveragePlot, tbl, layout_matrix=lay))
       dev.off()
       
-      png(filename=paste(pathGraph, title, "components.png", sep=""))
+      png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-components.png", sep=""))
       print(componentsPlot)
       dev.off()
       
     }else {
       if (includeRateOfChange) {
-        png(filename=paste(pathGraph, title, ".png", sep=""))
+        png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, ".png", sep=""))
         print(grid.arrange(modelPlot, changePlot))
         dev.off()
       }else {
-        png(filename=paste(pathGraph, title, ".png", sep=""))
+        png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, ".png", sep=""))
         print(modelPlot)
         dev.off()
       }
       
-      png(filename=paste(pathGraph, title, "-residual.png", sep=""))
+      png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-residual.png", sep=""))
       print(residualPlot)
       dev.off()
       
-      png(filename=paste(pathGraph, title, "-averageResidual.png", sep=""))
+      png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-averageResidual.png", sep=""))
       print(residualAveragePlot)
       dev.off()
       
-
+      
+      
       
     }
     
   }
   
-  png(filename=paste(pathGraph, "allModels-ages.png", sep=""))
-  clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title)) + geom_line() +
+  if (nrow(dfClusterAge)>0) {
+    
+  png(filename=paste(pathGraph, timeStamp, "-", marketTitle, "_allmodels-ages.png", sep=""))
+  clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""))) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="age", y="rate of adoptions")
   print(clusterPlot)
   dev.off()
   
-  png(filename=paste(pathGraph, "allModels-years.png", sep=""))
-  clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title)) + geom_line() +
+  png(filename=paste(pathGraph, timeStamp, "-", marketTitle,  "_allmodels-years.png", sep=""))
+  clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""))) + geom_line() +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="harvest year", y="rate of adoptions")
   print(clusterPlot)
   dev.off()
+    
+  }
+  
 
 }
 
