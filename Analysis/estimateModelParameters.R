@@ -70,7 +70,7 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
     
     # more advanced way to pick good models
     # lots of the models are actually equal so we need to avoid proposing equal models
-    epsilon <- 0.05
+    epsilon <- 0.1
     for (cnt in 1:5) {
       tP <- allEstimates[1,]$p
       tQ <- allEstimates[1,]$q
