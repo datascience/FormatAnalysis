@@ -21,8 +21,6 @@ extractProperty <- function(x, property) {
   return (c)
 }
 
-
-
 loadDataFromFile <- function(x, names) {
   txt <- readLines(x)
   splitTxt <- strsplit(txt, split="\t")
@@ -49,7 +47,6 @@ processLine <- function(x) {
   out
 }
 
-
 mySum <- function(x,y) {
   return (sum(y[x]))
 }
@@ -69,7 +66,6 @@ estimateS <- function(p,q,m,num) {
   return (c)
 }
 
-
 unifyValues <- function(el, groupProps) {
   bo <- el
   if (!is.na(el) & el!=" "){
@@ -82,7 +78,6 @@ unifyValues <- function(el, groupProps) {
   }
   return (bo)
 }
-
 
 recordConflicts <-function(data, properties, x) {
   for (prop in properties) {
@@ -110,3 +105,5 @@ recordConflicts <-function(data, properties, x) {
               quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   }
 }
+
+

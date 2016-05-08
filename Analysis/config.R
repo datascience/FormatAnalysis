@@ -6,6 +6,9 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
+#sync folder for gathering all plots 
+syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/20160506-1200/model figures/"
+
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 # market definition
