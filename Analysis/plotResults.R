@@ -30,7 +30,7 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
   
   timeStamp <- format(Sys.time(), "%y%m%d%H%M")
   
-  graphFileName <- paste(pathGraph, timeStamp, "_", experimentName, "_", plotType, sep="")
+  graphFileName <- paste(pathGraph, experimentName, "_", timeStamp, "_", plotType, sep="")
   
   print(pathGraph)
   dir.create(pathGraph)
