@@ -7,19 +7,19 @@ normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
   aggreg <- setNames(aggreg, c("year", "total"))
   
   pData <- merge(pData, aggreg, by="year")
-  pData$percentage <- (pData$amount / pData$total)*multiplicationFactor
+  pData$adoptionRate <- (pData$amount / pData$total)*multiplicationFactor
   pData <- pData[!(names(pData)=="total")]
   rm(aggreg)
 
   # calculate average values 
-  pData$average <- c(1:nrow(pData))
+  pData$smoothedAdoptionRate <- c(1:nrow(pData))
   
   for (i in (1:nrow(pData))) {
     if (!is.na(pData[i,]$age)) {
       age<- pData[i,]$age
       data <- merge(pData, pData[i,][names(pData) %in% propertyToTake], by=propertyToTake)
       avrg1 <- average(age,data)
-      pData[i,]$average <- avrg1
+      pData[i,]$smoothedAdoptionRate <- avrg1
     } else {
       pData[i,]$average <- NA
     }
@@ -28,7 +28,7 @@ normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
   
   # take the needed columns from the data frame 
   pData <- pData[c("ID", "name", propertyToTake, "year", "amount", "release.year", "age", 
-                   "percentage", "average")]
+                   "adoptionRate", "smoothedAdoptionRate")]
 
   # remove those where release year was not available as for those the model can not be estimated
   pData <- pData[pData$age>=0 & !is.na(pData$release.year) & !is.na(pData$age),]
@@ -38,9 +38,9 @@ normalizeMarket <- function(pData, propertyToTake, multiplicationFactor) {
 
 
 average <- function(age, data) {
-  perc1 <- data[data$age==age-1,]$percentage
-  perc2 <- data[data$age==age,]$percentage
-  perc3 <- data[data$age==age+1,]$percentage
+  perc1 <- data[data$age==age-1,]$adoptionRate
+  perc2 <- data[data$age==age,]$adoptionRate
+  perc3 <- data[data$age==age+1,]$adoptionRate
   if (length(perc1)==0 & length(perc3)==0) {
     return (perc2)
   }

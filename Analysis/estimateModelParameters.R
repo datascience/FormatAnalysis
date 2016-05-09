@@ -4,7 +4,7 @@ require(MASS)
 
 
 frameNames <<- c("ID", "name", "modelID", "pStart", "qStart", "mStart", "release.year", 
-               "ages", "percentages", "averages", 
+               "ages", "adoptionRate", "smoothedAdoptionRate", 
                "p", "pLwr", "pUpr", "q", "qLwr", "qUpr", 
                "m", "mLwr", "mUpr", "qprat", "prediction", 
                "residual", "residualAverage", "interval", "model", "upper", "lower",
@@ -42,8 +42,8 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
     X <- data[data$year>=start & data$year<=end,]$age
 
     
-    Yper <- data[data$year >= start & data$year<=end,]$percentage
-    Yavg <- data[data$year >= start & data$year<=end,]$average
+    Yper <- data[data$year >= start & data$year<=end,]$adoptionRate
+    Yavg <- data[data$year >= start & data$year<=end,]$smoothedAdoptionRate
     year <- data[data$year >= start & data$year<=end,]$year
     if (useMovingAverage == TRUE) {
       Y <- Yavg
@@ -242,14 +242,14 @@ calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mS
     
     X <- marketShare$age
     
-    Yper  <- marketShare$percentage
+    Yper  <- marketShare$adoptionRate
     Yreal <- Yper
-    Yavg  <- marketShare$average
+    Yavg  <- marketShare$smoothedAdoptionRate
     releaseYear  <- marketShare$release.year
     
     modelEstimates[1,][["ages"]] <- list(X)
-    modelEstimates[1,][["percentages"]] <- list(Yper)
-    modelEstimates[1,][["averages"]] <- list(Yavg)
+    modelEstimates[1,][["adoptionRate"]] <- list(Yper)
+    modelEstimates[1,][["smoothedAdoptionRate"]] <- list(Yavg)
     
     
     f <- data.frame(x=seq(0,30, len=100))
@@ -401,9 +401,9 @@ makePredictions <- function(marketShare, modelEstimates, chosen, years, path, pa
     
     data <- data[data$year %in% years,]
     dataPred <- merge(x=data, y=dataPred, by=c("ID", "name", "year"), all.y = TRUE)
-    dataPred <- dataPred[, names(dataPred) %in% c("ID", "name", "year", "percentage", 
+    dataPred <- dataPred[, names(dataPred) %in% c("ID", "name", "year", "adoptionRate", 
                                                   "prediction.value", "prediction.low", "prediction.high")]
-    names(dataPred)[names(dataPred)=="percentage"] <- "actual.value"
+    names(dataPred)[names(dataPred)=="adoptionRate"] <- "actual.value"
     write.table(dataPred, file = paste(pathPrediction, name, "-predictions.tsv", sep=""), quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE)
     

@@ -69,6 +69,10 @@ estimateS <- function(p,q,m,num) {
 unifyValues <- function(el, groupProps) {
   bo <- el
   if (!is.na(el) & el!=" "){
+#     if (bo=="image/x-ms-bmp") {
+#       print(bo)
+#       print(groupProps)
+#     }
     tmp <- unlist(lapply(groupProps, function(x) el %in% unlist(x)))
     poz <- min(which(tmp==TRUE))
     if (is.finite(poz)) {

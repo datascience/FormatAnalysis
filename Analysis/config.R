@@ -7,12 +7,12 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/20160506-1200/model figures/"
+syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605090800/models/"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 # market definition
-experiments <- c("IMAGES-New-5-noMA")
+experiments <- c("IMAGES")
 marketFiles <- c("Format markets - IMAGES.tsv")
 
 #years used to estimate the model
@@ -24,7 +24,7 @@ end <- 2010
 predictionYears <- c(2009, 2010, 2011)
 
 #if a three year moving average should be used 
-useMovingAverage <- FALSE
+useMovingAverage <- TRUE
 
 # multiplication factor for normalizing markets sizes
 multiplicationFactor <- 1000 

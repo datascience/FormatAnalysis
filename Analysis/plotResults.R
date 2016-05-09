@@ -6,7 +6,7 @@ library(grid)
 
 
 # TODO a function which takes all the best values and produces graphs for them
-graphAllModels <- function(marketShare, modelValues, path) {
+graphAllModels <- function(marketShare, modelValues, path, experimentName) {
   uniq <- unique(marketShare$ID)
   
   for (i in uniq) {
@@ -16,20 +16,21 @@ graphAllModels <- function(marketShare, modelValues, path) {
     
     pathEl <- paste(path, name, sep="")
     
-    plotResults(data, "combined", FALSE, TRUE, TRUE, pathEl, name)
+    plotResults(data, "toSelect", FALSE, TRUE, TRUE, pathEl, experimentName)
     
   }
 }
 
-# TODO a function which takes a data frame with all the values for every element and plots specific 
-# the function also takes a path where all the models should be plotted 
-plotResults <- function(pData,  plotType="separated", includeRateOfChange, includeInterval, includePoints, path, marketTitle) {
+
+plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includeInterval, includePoints, path, experimentName) {
   
   options( warn = -1 )
   
   pathGraph <- paste(path, "/graphs/", sep="")
   
   timeStamp <- format(Sys.time(), "%y%m%d%H%M")
+  
+  graphFileName <- paste(pathGraph, timeStamp, "_", experimentName, "_", plotType, sep="")
   
   print(pathGraph)
   dir.create(pathGraph)
@@ -51,8 +52,8 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     modelID <- pData[i,"modelID"]
     releaseYear <- as.numeric(pData[i,"release.year"])
     ages <- unlist(pData[i,"ages"])
-    percentages <- unlist(pData[i,"percentages"])
-    averages <- unlist(pData[i,"averages"])
+    percentages <- unlist(pData[i,"adoptionRate"])
+    averages <- unlist(pData[i,"smoothedAdoptionRate"])
     interval <- unlist(pData[i,"interval"])
     model <- unlist(pData[i,"model"])
     upper <- unlist(pData[i,"upper"])
@@ -123,7 +124,7 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
     }
-    modelPlot <- modelPlot + labs(x="age", y="number of adoptions")
+    modelPlot <- modelPlot + labs(x="age", y="rate of adoptions")
     
     # change plot 
     dfChange <- data.frame(interval, derv)
@@ -138,13 +139,13 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
       geom_line(aes(y=qValue, color="col3", linetype="col3"), size=1) +
       scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(model))) + 
       scale_x_continuous(expand = c(0,0)) +
-      scale_color_manual(name="", values=c("col1"="black", "col2"="red", "col3"="blue"),
+      scale_color_manual(name="", values=c("col1"="black", "col2"="red", "col3"="green"),
                          labels=c("New adoptions", paste("External influence\n(p=", p, ")", sep=""),
                                   paste("Internal influence\n(q=",q,")", sep=""))) + 
       scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
                             labels=c("New adoptions", paste("External influence\n(p=",p,")", sep=""),
                                      paste("Internal influence\n(q=",q,")", sep=""))) +
-      labs(x="Age", y="Number of adoptions") +
+      labs(x="Age", y="Rate of adoptions") +
       theme(axis.title=element_text(face="italic",size=16),
             legend.position=c(0.7,0.6), legend.background=element_blank(),
             legend.text=element_text(face="bold", size=16), 
@@ -161,33 +162,33 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
 
     
     
-    if (plotType=="combined") {
+    if (plotType=="toSelect") {
       
       lay <- rbind(c(1,1,4), c(2,3,4))
-      png(filename=paste(pathGraph, timeStamp, "-", title,"-", modelID, ".png", sep=""), width = 720, height = 480)
+      png(filename=paste(graphFileName, "_", title,"-", modelID, ".png", sep=""), width = 720, height = 480)
       print(grid.arrange(modelPlot, residualPlot, residualAveragePlot, tbl, layout_matrix=lay))
       dev.off()
       
-      png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-components.png", sep=""))
-      print(componentsPlot)
-      dev.off()
+#       png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-components.png", sep=""))
+#       print(componentsPlot)
+#       dev.off()
       
     }else {
       if (includeRateOfChange) {
-        png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, ".png", sep=""))
+        png(filename=paste(graphFileName, "_", title, ".png", sep=""))
         print(grid.arrange(modelPlot, changePlot))
         dev.off()
       }else {
-        png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, ".png", sep=""))
+        png(filename=paste(graphFileName, "_", title, ".png", sep=""))
         print(modelPlot)
         dev.off()
       }
       
-      png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-residual.png", sep=""))
+      png(filename=paste(graphFileName, "_", title, "_residual.png", sep=""))
       print(residualPlot)
       dev.off()
       
-      png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-averageResidual.png", sep=""))
+      png(filename=paste(graphFileName, "_", title, "_averageResidual.png", sep=""))
       print(residualAveragePlot)
       dev.off()
       
@@ -199,17 +200,25 @@ plotResults <- function(pData,  plotType="separated", includeRateOfChange, inclu
   }
   
   if (nrow(dfClusterAge)>0) {
+    allModelsName <- NA
+    if (plotType=="toSelect") {
+      allModelsName <- paste(graphFileName, "_", title, sep="")
+    } else {
+      allModelsName <- graphFileName
+    }
     
-  png(filename=paste(pathGraph, timeStamp, "-", marketTitle, "_allmodels-ages.png", sep=""))
+  png(filename=paste(allModelsName, "_allmodels-ages.png", sep=""))
   clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""))) + geom_line() +
+    scale_fill_brewer(palette="Dark2") +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="age", y="rate of adoptions")
   print(clusterPlot)
   dev.off()
   
-  png(filename=paste(pathGraph, timeStamp, "-", marketTitle,  "_allmodels-years.png", sep=""))
+  png(filename=paste(allModelsName,  "_allmodels-years.png", sep=""))
   clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""))) + geom_line() +
+    scale_fill_brewer(palette="Dark2") +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=10), legend.title=element_blank(),
           legend.key=element_blank()) + labs(x="harvest year", y="rate of adoptions")

@@ -15,6 +15,7 @@ if (length(experiments)==length(marketFiles)) {
     if (!file.exists(path)){
       dir.create(path)
     }
+    print(experimentName)
     
     # check for the experiment configuration 
     pathConfig <- paste(path, "experimentConfig.tsv", sep="")
@@ -37,6 +38,11 @@ if (length(experiments)==length(marketFiles)) {
     } else {
       # if experimentConfig.tsv does not exsist delete everything else
       unlink(path, recursive = TRUE)
+      dir.create(path)
+      cpdf <- data.frame(parameter=c("experiment name", "file", "start year", "end year", "moving average used", "prediction years", "multiplication factor"), 
+                         value=c(experimentName, marketFile, start, end, useMovingAverage, paste(predictionYears, collapse=","), multiplicationFactor))
+      write.table(cpdf, file=pathConfig, quote=FALSE, sep="\t", 
+                  col.names=TRUE, row.names=FALSE)
     }
     rm(pathConfig)
     
@@ -67,6 +73,7 @@ if (length(experiments)==length(marketFiles)) {
       
       # make a list from multiple mime and other property values
       for (prop in propertyToTake) {
+        marketData[[prop]] <- trimws(marketData[[prop]])
         marketData[[prop]] <- strsplit(marketData[[prop]], split = ",")
       }
       
@@ -122,7 +129,7 @@ if (length(experiments)==length(marketFiles)) {
     }
     
     # plot best models
-    graphAllModels(dataShares, bestModelEstimates, pathMarketElements)
+    graphAllModels(dataShares, bestModelEstimates, pathMarketElements, experimentName)
     
     # sync graphs to the selected folder 
     for (name in unique(dataShares$name) ) {
@@ -151,11 +158,11 @@ if (length(experiments)==length(marketFiles)) {
     # pick estimated values for selected models and plot them 
     chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-    plotResults(estimatesFinal, "separated", FALSE, TRUE, TRUE, path, experimentName)    
+    plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName)    
 
     # make predictions and plot prediction results 
     predictions <- makePredictions(dataShares, estimatesFinal, chosenModels, predictionYears, path, pathMarketElements)
-    plotResults(predictions, "separated", FALSE, TRUE, TRUE, paste(path,"/prediction",sep="", experimentName))
+    plotResults(predictions, "predicted", FALSE, TRUE, TRUE, paste(path,"/prediction",sep="", experimentName))
     
   }
   
