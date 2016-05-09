@@ -148,10 +148,10 @@ if (length(experiments)==length(marketFiles)) {
   
   for (i in 1:length(experiments)) {
     experimentName <- experiments[i]
-    path <- paste("output data/", experimentName, "/", sep="")
+    path <- paste("output data/", experimentName, sep="")
     
     # load needed data 
-    pathMarketElements <- paste(path, "market elements/", sep="")
+    pathMarketElements <- paste(path, "/market elements/", sep="")
     bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
     dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     
