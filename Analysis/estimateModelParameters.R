@@ -417,6 +417,67 @@ makePredictions <- function(marketShare, modelEstimates, chosen, years, path, pa
   
 
 
+crossValidate <- function(marketShare, modelEstimates, path) {
+  
+  pathCrossValidation <- paste(path,"cross-validation/",sep="")  
+  dir.create(pathCrossValidation)
+  for (id in unique(modelEstimates$ID)) {
+    name <- modelEstimates[modelEstimates$ID==id,]$name
+    crossValidationResults <- data.frame(pStart=as.numeric(), qStart=as.numeric(), mStart=as.numeric(), p=as.numeric(),
+                                         q=as.numeric(),m=as.numeric(), year=as.numeric(), real.value=as.numeric(), 
+                                         predicted.value=as.numeric(), lower=as.numeric(), upper=as.numeric(), 
+                                         inBounds=as.numeric())
+    data <- marketShare[marketShare$ID==id,]
+    if (nrow(data)<4) next
+    k <- 1
+    for (ag in data$age) {
+      
+        X <- data[data$age != ag,]$age
+        Y <- data[data$age != ag,]$smoothedAdoptionRate
+        Xl <- data[data$age == ag,]$age
+        Yl <- data[data$age == ag,]$smoothedAdoptionRate
+        pStart <- modelEstimates[modelEstimates$ID == id, ]$pStart
+        qStart <- modelEstimates[modelEstimates$ID == id, ]$qStart
+        mStart <- modelEstimates[modelEstimates$ID == id, ]$mStart
+        realValue <- Xl[1]
+        crossValidationResults[k, "pStart"] <- pStart
+        crossValidationResults[k, "qStart"] <- qStart
+        crossValidationResults[k, "mStart"] <- mStart
+        crossValidationResults[k, "year"] <- ag
+        crossValidationResults[k, "real.value"] <- realValue
+        suppressMessages(t <- try(model <- estimateBass(X,Y, pStart, qStart, mStart)))
+        if("try-error" %in% class(t)) {
+          crossValidationResults[k, "predicted.value"] <- NA
+          crossValidationResults[k, "lower"] <- NA
+          crossValidationResults[k, "upper"] <- NA
+        } else {
+          estimates <- calculateModelValues(data, model, modelEstimates[modelEstimates$ID == id, ]$modelID, pStart, 
+                                            qStart, mStart,"prediction", c(ag))
+          predictedValue <- unlist(estimates[1,"predictedValues"])[1]
+          low <- unlist(estimates[1,"predictedLow"])[1]
+          high <- unlist(estimates[1,"predictedHigh"])[1]
+          crossValidationResults[k, "predicted.value"] <- predictedValue
+          crossValidationResults[k, "lower"] <- low
+          crossValidationResults[k, "upper"] <- high
+          if (realValue > low & realValue < high) {
+            crossValidationResults[k, "inBounds"] <- TRUE
+          } else {
+            crossValidationResults[k, "inBounds"] <- FALSE
+          }
+        }
+        k <- k + 1
+    
+    }
+    pathCVFile <- paste(pathCrossValidation, name, ".tsv", sep="")
+    write.table(crossValidationResults, file =pathCVFile, quote=FALSE, 
+                sep="\t", col.names=TRUE, row.names=FALSE )
+  
+  }
+
+}
+
+
+
 estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)
   #fit <- nls(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, algorithm="port", start=list(p=sP,q=sQ,m=sM), lower = c(0,0,0)) 

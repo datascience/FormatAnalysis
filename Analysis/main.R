@@ -166,6 +166,24 @@ if (length(experiments)==length(marketFiles)) {
     
   }
   
+  # do the cross validation on selected models 
+  for (i in 1:length(experiments)) {
+    experimentName <- experiments[i]
+    path <- paste("output data/", experimentName, "/", sep="")
+    
+    # load needed data 
+    pathMarketElements <- paste(path, "market elements/", sep="")
+    bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
+    dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    
+    # pick estimated values for selected models and plot them 
+    chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+    
+    crossValidate(dataShares, estimatesFinal, path)        
+    
+  }
+  
 #   syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/20160506-1200/model figures/"
 #   for (i in 1:length(experiments)) {
 #     experimentName <- experiments[i]
