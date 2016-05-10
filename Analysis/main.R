@@ -128,23 +128,23 @@ if (length(experiments)==length(marketFiles)) {
       saveRDS(bestModelEstimates, file=paste(pathMarketElements, "bestModelEstimates.rds", sep="")) 
     }
     
+    fileGraphsDone <- paste(pathMarketElements, "graphsDone.txt", sep="")
     # plot best models
-    graphAllModels(dataShares, bestModelEstimates, pathMarketElements, experimentName)
-    
-    # sync graphs to the selected folder 
-    for (name in unique(dataShares$name) ) {
-      pathFrom <- paste(pathMarketElements, name, "/graphs", sep="")
-      print(pathFrom)
-      file.copy(from=list.files(pathFrom, full.names = TRUE) , to=syncFolder, 
-                overwrite = TRUE, recursive = TRUE, 
-                copy.mode = TRUE)
+    if (!file.exists(fileGraphsDone)) {
+      graphAllModels(dataShares, bestModelEstimates, pathMarketElements, experimentName)
+      file.create(fileGraphsDone)
+        # sync graphs to the selected folder 
+        for (name in unique(dataShares$name) ) {
+          pathFrom <- paste(pathMarketElements, name, "/graphs", sep="")
+          print(pathFrom)
+          file.copy(from=list.files(pathFrom, full.names = TRUE) , to=syncFolder, 
+                    overwrite = TRUE, recursive = TRUE, 
+                    copy.mode = TRUE)
+        }
     }
     
   }
   
-  #Ask user to select wanted models manually 
-  readline(prompt = "Please for each experiment and each market element in that experiment select one model. 
-           This is easily done by filling out selectedModels.tsv file. Press Enter when ready to proceed")
   
   for (i in 1:length(experiments)) {
     experimentName <- experiments[i]
@@ -153,35 +153,45 @@ if (length(experiments)==length(marketFiles)) {
     # load needed data 
     pathMarketElements <- paste(path, "/market elements/", sep="")
     bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
-    dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    dataShares <- read.table(paste(path, "/adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
     
     # pick estimated values for selected models and plot them 
     chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-    estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-    plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName)    
-
-    # make predictions and plot prediction results 
-    predictions <- makePredictions(dataShares, estimatesFinal, chosenModels, predictionYears, path, pathMarketElements)
-    plotResults(predictions, "predicted", FALSE, TRUE, TRUE, paste(path,"/prediction",sep="", experimentName))
-    
+    if (TRUE %in% is.na(chosenModels$modelID)) {
+      message(paste("Please select models for ", experimentName, " experiment!\n", sep=""))
+    } else {
+      if (!dir.exists(paste(path, "/graphs"))) {
+        estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+        plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName)    
+      }
+      if (!dir.exists(paste(path, "/prediction", sep=""))) {
+        # make predictions and plot prediction results 
+        predictions <- makePredictions(dataShares, estimatesFinal, chosenModels, predictionYears, path, pathMarketElements)
+        plotResults(predictions, "predicted", FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""), experimentName)
+      }
+    }
   }
   
-  # do the cross validation on selected models 
+  source("estimateModelParameters.R")
+  # do the cross validation on selected models
   for (i in 1:length(experiments)) {
     experimentName <- experiments[i]
     path <- paste("output data/", experimentName, "/", sep="")
-    
-    # load needed data 
-    pathMarketElements <- paste(path, "market elements/", sep="")
-    bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
-    dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-    
-    # pick estimated values for selected models and plot them 
-    chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-    estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-    
-    crossValidate(dataShares, estimatesFinal, path)        
-    
+    print(path)
+    if (!dir.exists(paste(path,"cross-validation", sep=""))) {
+      
+      # load needed data 
+      pathMarketElements <- paste(path, "market elements/", sep="")
+      bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
+      dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+      
+      # pick estimated values for selected models and plot them 
+      chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+      estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+      
+      crossValidate(dataShares, estimatesFinal, path)        
+      
+    }
   }
   
 #   syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/20160506-1200/model figures/"
