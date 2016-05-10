@@ -187,8 +187,8 @@ if (length(experiments)==length(marketFiles)) {
       dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
       
       # pick estimated values for selected models and plot them
-      if (file.exists(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""))) {
-        chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+      if (file.exists(paste(pathMarketElements, "selectedModels.tsv", sep=""))) {
+        chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
         print(chosenModels)
       }
