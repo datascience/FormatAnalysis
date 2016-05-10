@@ -12,6 +12,7 @@ ID	name	mime	release year	comments
 13	Microsoft Publisher Document File	application/x-mspublisher	1991	http://www.online-convert.com/file-format/pub  https://en.wikipedia.org/wiki/Microsoft_Publisher
 14	Rich Text Format	application/rtf	1987	http://www.online-convert.com/file-format/rtf
 15	StarOffice Writer Document	application/vnd.sun.xml.writer	1985	http://www.online-convert.com/file-format/sxw
+16	Raw text file 	text/plain		https://en.wikipedia.org/wiki/Text_file  http://www.online-convert.com/file-format/txt
 17	WordPerfect Document File	application/wordperfect5.1,application/wordperfect,application/x-wpwin	1979	http://www.online-convert.com/file-format/wpd  https://en.wikipedia.org/wiki/WordPerfect
 18	Microsoft Works file format	application/vnd.ms-works	1988	https://en.wikipedia.org/wiki/Microsoft_Works  http://www.online-convert.com/file-format/wps
 20	Microsoft XML Paper Specification (XPS)			

@@ -40,3 +40,9 @@ ID	property	server	tika	droid	resolveTo
 39	mime	text/html	application/xhtml+xml	text/html	text/html
 40	mime	text/html	text/html	text/xml	text/html
 41	mime	application/xhtml+xml	application/xhtml+xml	text/xml	application/xhtml+xml
+42	mime	text/plain	text/plain	application/octet-stream	text/plain
+43	mime	text/html	text/plain	application/octet-stream	text/html
+44	mime	text/css	text/plain	application/octet-stream	text/css
+45	mime	application/x-javascript	text/plain	application/octet-stream	application/x-javascript
+46	mime	text/xml	text/plain	application/octet-stream	text/xml
+47	mime	text/javascript	text/plain	application/octet-stream	text/javascript
