@@ -78,6 +78,7 @@ if (length(experiments)==length(marketFiles)) {
       }
       
       # load raw data, filter according to properties, reduce conflicts calculate age and save the resulting dataset to a file  
+      source("conflictResolution.R")
       dataCleaned <- prepareData(fileName, colNames, marketData, propertyToTake, resolveConflicts, 
                                  afterConflictsResolution, conflictCategory)
       write.table(dataCleaned, file=paste(path,"cleanedData.tsv",sep=""), quote=FALSE, 
@@ -185,9 +186,11 @@ if (length(experiments)==length(marketFiles)) {
       bestModelEstimates <- readRDS(paste(pathMarketElements, "bestModelEstimates.rds",sep=""))
       dataShares <- read.table(paste(path, "adoptionRates.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
       
-      # pick estimated values for selected models and plot them 
-      chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
-      estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+      # pick estimated values for selected models and plot them
+      if (file.exists(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""))) {
+        chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+        estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+      }
       
       crossValidate(dataShares, estimatesFinal, path)        
       

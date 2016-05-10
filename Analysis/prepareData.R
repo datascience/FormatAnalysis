@@ -84,7 +84,7 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   
   png(filename=paste(path, "/statistics/elements.png", sep=""), width = 800, height = 680)
   elPlot <- ggplot(boxDF, aes(x=name, y=percent, fill=category)) + geom_bar(stat="identity") + coord_flip() +
-    scale_fill_brewer(palette = "Set1") + scale_y_continuous(expand=c(0,0))
+    scale_fill_brewer(palette = "Accent") + scale_y_continuous(expand=c(0,0))
   print(elPlot)
   dev.off()
   recordConflicts(pData, propertyToTake, 4)

@@ -1,19 +1,26 @@
 
 #linux
-#fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #mac
-fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
+#fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/Users/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605100800/models"
+syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605100800/models"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
+
 # market definition
-experiments <- c("IMAGES")
-marketFiles <- c("Format markets - IMAGES.tsv")
+experiments <- c("DOCUMENTS-3-no-text")
+marketFiles <- c("Format markets - DOCUMENTS.tsv")
+
+
+# # market definition
+# experiments <- c("IMAGES", "PDFS", "DISTILLER", "HTML", "DOCUMENTS")
+# marketFiles <- c("Format markets - IMAGES.tsv", "Format markets - PDF versions.tsv", "Format markets - DISTILLER.tsv",
+#                  "Format markets - HTML and XHTML versions.tsv", "Format markets - DOCUMENTS.tsv")
 
 #years used to estimate the model
 start <- 1994
