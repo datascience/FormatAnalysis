@@ -422,10 +422,13 @@ crossValidate <- function(marketShare, modelEstimates, path) {
   
   pathCrossValidation <- paste(path,"cross-validation/",sep="")  
   dir.create(pathCrossValidation)
+  dfAllModelsInBounds <- data.frame(age=0:30) 
   for (id in unique(modelEstimates$ID)) {
     name <- modelEstimates[modelEstimates$ID==id,]$name
+    print(paste("Validating ", name))
+    modelID <- modelEstimates[modelEstimates$ID==id,]$modelID
     crossValidationResults <- data.frame(pStart=as.numeric(), qStart=as.numeric(), mStart=as.numeric(), p=as.numeric(),
-                                         q=as.numeric(),m=as.numeric(), year=as.numeric(), real.value=as.numeric(), 
+                                         q=as.numeric(),m=as.numeric(), age=as.numeric(), real.value=as.numeric(), 
                                          predicted.value=as.numeric(), lower=as.numeric(), upper=as.numeric(), 
                                          inBounds=as.numeric())
     data <- marketShare[marketShare$ID==id,]
@@ -444,7 +447,7 @@ crossValidate <- function(marketShare, modelEstimates, path) {
       crossValidationResults[k, "pStart"] <- pStart
       crossValidationResults[k, "qStart"] <- qStart
       crossValidationResults[k, "mStart"] <- mStart
-      crossValidationResults[k, "year"] <- ag
+      crossValidationResults[k, "age"] <- ag
       crossValidationResults[k, "real.value"] <- realValue
       suppressMessages(t <- try(model <- estimateBass(X,Y, pStart, qStart, mStart)))
       if("try-error" %in% class(t)) {
@@ -454,14 +457,13 @@ crossValidate <- function(marketShare, modelEstimates, path) {
       } else {
         estimates <- calculateModelValues(data, model, modelEstimates[modelEstimates$ID == id, ]$modelID, pStart, 
                                           qStart, mStart,"prediction", c(year), isCV=TRUE)
-        print("CROSS VALIDATION")
         predictedValue <- unlist(estimates[1,"predictedValues"])[1]
         low <- unlist(estimates[1,"predictedLow"])[1]
         high <- unlist(estimates[1,"predictedHigh"])[1]
         crossValidationResults[k, "p"] <- coef(model)["p"]
         crossValidationResults[k, "q"] <- coef(model)["q"]
         crossValidationResults[k, "m"] <- coef(model)["m"]
-        print(paste(crossValidationResults[k, "p"],crossValidationResults[k, "q"],crossValidationResults[k, "m"]))
+        #print(paste(crossValidationResults[k, "p"],crossValidationResults[k, "q"],crossValidationResults[k, "m"]))
         crossValidationResults[k, "predicted.value"] <- predictedValue
         crossValidationResults[k, "lower"] <- low
         crossValidationResults[k, "upper"] <- high
@@ -477,8 +479,13 @@ crossValidate <- function(marketShare, modelEstimates, path) {
     pathCVFile <- paste(pathCrossValidation, name, ".tsv", sep="")
     write.table(crossValidationResults, file =pathCVFile, quote=FALSE, 
                 sep="\t", col.names=TRUE, row.names=FALSE )
-    
+    crossValidationResults <- crossValidationResults[,names(crossValidationResults) %in% c("age", "inBounds")]
+    colnames(crossValidationResults) <- c("age", name)
+    dfAllModelsInBounds <- merge(x=dfAllModelsInBounds, y=crossValidationResults, all=TRUE)
   }
+  pathAll <- paste(pathCrossValidation,"joinedResults.tsv", sep="")
+  write.table(dfAllModelsInBounds, file =pathAll, quote=FALSE, 
+              sep="\t", col.names=TRUE, row.names=FALSE )
   
 }
 

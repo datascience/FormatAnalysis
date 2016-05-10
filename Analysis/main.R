@@ -190,6 +190,7 @@ if (length(experiments)==length(marketFiles)) {
       if (file.exists(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""))) {
         chosenModels <- read.table(paste(pathMarketElements, "selectedModelsCV.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+        print(chosenModels)
       }
       
       crossValidate(dataShares, estimatesFinal, path)        

@@ -12,9 +12,14 @@ syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/f
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 
-# market definition
-experiments <- c("DOCUMENTS-3-no-text")
-marketFiles <- c("Format markets - DOCUMENTS.tsv")
+experiments <- c("IMAGES")
+marketFiles <- c("Format markets - IMAGES.tsv")
+
+
+
+# # market definition
+# experiments <- c("DOCUMENTS-3-no-text")
+# marketFiles <- c("Format markets - DOCUMENTS.tsv")
 
 
 # # market definition
