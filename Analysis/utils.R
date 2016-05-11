@@ -110,4 +110,21 @@ recordConflicts <-function(data, properties, x) {
   }
 }
 
+countConflicts <- function(data, properties, x) {
+  numTotal <- sum(data$amount)
+  tempData <- data
+  for (prop in properties) {
+    tempNames <- grep(prop, names(tempData))
+    if (x==1) {
+      tempData <- tempData[apply(tempData[,tempNames], 1 , function(x) length(unique(x))==1),]
+    } else if (x==2) {
+      tempData <- tempData[!is.na(tempData[[prop]]) & !is.null(tempData[[prop]]),]
+    }
+  }
+  nCon <- numTotal - sum(tempData$amount)
+  return (nCon)
+}
+
+
+
 

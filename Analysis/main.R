@@ -81,6 +81,7 @@ if (length(experiments)==length(marketFiles)) {
       source("conflictResolution.R")
       dataCleaned <- prepareData(fileName, colNames, marketData, propertyToTake, resolveConflicts, 
                                  afterConflictsResolution, conflictCategory)
+      
       write.table(dataCleaned, file=paste(path,"cleanedData.tsv",sep=""), quote=FALSE, 
                   sep="\t", col.names=TRUE, row.names=FALSE)
     }

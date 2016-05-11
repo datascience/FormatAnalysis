@@ -41,6 +41,7 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   pData <- pData[!is.na(pData$amount),]
   recordConflicts(pData, propertyToTake, 1)
   
+  
   #unify all equal properties
   for (prop in propertyToTake) {
     print (paste("Unifying according to: ", prop))
@@ -50,7 +51,10 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   }
   
   recordConflicts(pData, propertyToTake, 2)
-  
+  sizeOfTheSegmentBefore <- sum(pData$amount)
+  numConBefore <- countConflicts(pData, propertyToTake, 1)
+    
+    
   # resolving conflicts
   print("Resolving conflicts")
   if (!is.na(resolveConflicts)) {
@@ -61,7 +65,7 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   }
   
   afterResolution()
-  
+  numConAfter <- countConflicts(pData, propertyToTake, 2)
   recordConflicts(pData, propertyToTake, 3)
 
   
@@ -73,20 +77,20 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
     pData[[prop]] <- as.character(pData[[prop]])
   }
   
-  pData[["category"]] <- apply(pData, 1, function(row) conflictCategory(row,propertyToTake))
+ # pData[["category"]] <- apply(pData, 1, function(row) conflictCategory(row,propertyToTake))
   nam <- names(groupData)
   nam <- nam[!(nam %in% c("release.year", "name", "comments", "ID"))]
   pData <- merge(pData,groupData, by=nam)
   
 
-  boxDF <- ddply(pData, "name", transform, percent = amount / sum(amount)*100)
-  boxDF <- aggregate(percent~name+category, data=boxDF, FUN=sum)
-  
-  png(filename=paste(path, "/statistics/elements.png", sep=""), width = 800, height = 680)
-  elPlot <- ggplot(boxDF, aes(x=name, y=percent, fill=category)) + geom_bar(stat="identity") + coord_flip() +
-    scale_fill_brewer(palette = "Accent") + scale_y_continuous(expand=c(0,0))
-  print(elPlot)
-  dev.off()
+#   boxDF <- ddply(pData, "name", transform, percent = amount / sum(amount)*100)
+#   boxDF <- aggregate(percent~name+category, data=boxDF, FUN=sum)
+#   
+#   png(filename=paste(path, "/statistics/elements.png", sep=""), width = 800, height = 680)
+#   elPlot <- ggplot(boxDF, aes(x=name, y=percent, fill=category)) + geom_bar(stat="identity") + coord_flip() +
+#     scale_fill_brewer(palette = "Accent") + scale_y_continuous(expand=c(0,0))
+#   print(elPlot)
+#   dev.off()
   recordConflicts(pData, propertyToTake, 4)
   
   #discard columns that are not needed anymore
@@ -96,6 +100,21 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   #aggregate if there are some duplicate entries
   pData <- aggregate(as.formula(paste("amount~", paste(c(propertyToTake, "year", "amount", "release.year", "name","ID"), collapse="+"))), 
                        FUN=sum, data=pData)  
+  
+  sizeOfTheSegmentAfter <- sum(pData$amount)
+  
+  conflictRules <- read.table(paste(path, "/statistics/rulesUsed.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
+  numOfRules <- nrow(conflictRules)
+  
+  percOfToWA <- (sizeOfTheSegmentBefore / 2572553360) * 100
+  percOfToWAAft <- (sizeOfTheSegmentAfter / 2572553360) * 100
+  percOfConf <- (numConBefore / sizeOfTheSegmentBefore) * 100
+  percOfUNresCon <- (numConAfter / sizeOfTheSegmentBefore) * 100
+  marketStatsDF <- data.frame(property=c("% of total WA", "% of conflicts", "% of unresolved conflicts", 
+                                         "number of custom rules", "% of total WA after cr"), 
+                              value=c(percOfToWA, percOfConf, percOfUNresCon, numOfRules, percOfToWAAft))
+  write.table(marketStatsDF, file=paste(path, "/marketStats.tsv", sep=""), 
+              quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   
   #calculate age
   pData$age <- pData$year - as.numeric(pData$release.year)

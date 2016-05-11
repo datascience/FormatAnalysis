@@ -1,13 +1,13 @@
 
 #linux
-fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+#fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #mac
-#fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
+fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605100800/models"
+syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605110800/models"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
