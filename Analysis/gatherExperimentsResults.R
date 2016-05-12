@@ -1,15 +1,17 @@
 # this script is used to gather all selected models from 
 # experiments 
 
-experiments <- c("IMAGES")
+experiments <- c("PDFS", "DISTILLER", "DOCUMENTS", "IMAGES", "HTML")
+type <- c("VERSION", "TOOL", "FORMAT", "FORMAT", "VERSION")
 
-allEstimaes <- data.frame(market=character(), name=character(), pStart=numeric(), qStart=numeric(), mStart=numeric(), 
+allEstimates <- data.frame(market=character(), type=character(), name=character(), pStart=numeric(), qStart=numeric(), mStart=numeric(), 
                           p=numeric(), q=numeric(), m=numeric(), qprat=numeric(), release.year=numeric(), 
                           ages=numeric(), RMSEreal=numeric())
 
 for (i in 1:length(experiments)) {
  
   experimentName <- experiments[i]
+  exType <- type[i]
   path <- paste("output data/", experimentName, sep="")
   
   # load needed data 
@@ -27,13 +29,22 @@ for (i in 1:length(experiments)) {
   estimatesFinal <- estimatesFinal[,names(estimatesFinal) %in% c("name", "pStart", "qStart", "mStart", 
                                                                  "p", "q", "m", "qprat", "release.year", "ages", "RMSEreal")]
   estimatesFinal$market <- experimentName
-  allEstimaes <- rbind(allEstimates, estimatesFinal)
+  estimatesFinal$type <- exType 
+  allEstimates <- rbind(allEstimates, estimatesFinal)
 }
 
-allEstimaes$TTP <-  (log(allEstimaes$q) - log(allEstimates$p))/(allEstimaes$p+allEstimaes$q)
-allEstimaes$peak <- (allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*q)
-allEstimaes$numPoints <- length(unlist(allEstimaes$ages))
-allEstimates$rmsePeak <- allEstimaes$rmse / allEstimates$peak
+allEstimates$TTP <-  (log(allEstimates$q) - log(allEstimates$p))/(allEstimates$p+allEstimates$q)
+allEstimates$peak <- (allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q)
+allEstimates$numPoints <- unlist(lapply(allEstimates$ages, length))
+allEstimates$rmsePeak <- allEstimates$RMSEreal / allEstimates$peak
+
+# allEstimates <- allEstimates[,names(allEstimates) %in% c("market", "name", "pStart", "qStart", "mStart", 
+#                                                         "p", "q", "m", "qprat", "release.year", "numPoints", "TTP", 
+#                                                         "peak", "RMSEreal", "rmsePeak")]
+
+allEstimates <- allEstimates[,c("market", "name", "type", "pStart", "qStart", "mStart", 
+                                "p", "q", "m", "qprat", "release.year", "numPoints", "TTP", 
+                                "peak", "RMSEreal", "rmsePeak")]
 
 write.table(allEstimates, file=paste("output data/", "allExperiments.tsv", sep=""), 
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
