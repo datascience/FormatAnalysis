@@ -104,7 +104,8 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
     dfComponentsPlot <- data.frame(interval,model,pValue, qValue)
     
     # table with all the info
-    tbl <- tableGrob(info)
+    tbl <- tableGrob(info, rows = NULL, cols = NULL)
+    #tbl <- grid.table(info)
     
     dfClusterTemp <- data.frame(title=rep(title,length(interval)), modelID=rep(modelID,length(interval)), interval=interval, model=model)
     dfClusterAge <- rbind(dfClusterAge, dfClusterTemp)
@@ -165,8 +166,13 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
     if (plotType=="toSelect") {
       
       lay <- rbind(c(1,1,4), c(2,3,4))
-      png(filename=paste(graphFileName, "_", title,"-", modelID, ".png", sep=""), width = 720, height = 480)
-      print(grid.arrange(modelPlot, residualPlot, residualAveragePlot, tbl, layout_matrix=lay))
+      png(filename=paste(graphFileName, "_", title,"-", modelID, ".png", sep=""), width = 960, height = 640)
+      #modelPlot <- modelPlot + theme(plot.margin=unit(c(-0.5,1,1,1), "cm"))
+      #tbl$heights <- unit(rep(1/nrow(tbl), nrow(tbl)), "npc")
+      tbl$heights <- unit(c(0.4, 0.6), "npc")
+      tbl$widths <- unit(rep(1/ncol(tbl), ncol(tbl)), "npc") 
+      print(grid.arrange(modelPlot, residualPlot, residualAveragePlot, tbl, layout_matrix=lay, 
+                         widths=c(0.35, 0.35, 0.3)))
       dev.off()
       
 #       png(filename=paste(pathGraph, timeStamp, "-", title, "-", modelID, "-components.png", sep=""))

@@ -7,13 +7,13 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605110800/models"
+syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605120800/models"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 
-experiments <- c("IMAGES")
-marketFiles <- c("Format markets - IMAGES.tsv")
+experiments <- c("PDFS")
+marketFiles <- c("Format markets - PDF versions.tsv")
 
 
 

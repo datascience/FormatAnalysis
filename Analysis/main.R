@@ -194,7 +194,7 @@ if (length(experiments)==length(marketFiles)) {
         print(chosenModels)
       }
       
-      crossValidate(dataShares, estimatesFinal, path)        
+      crossValidate(dataShares, estimatesFinal, path, experimentName)        
       
     }
   }

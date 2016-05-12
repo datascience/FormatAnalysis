@@ -219,7 +219,6 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
 
 calculateModelValues <- function(marketShare, model, modelID, pStart, qStart, mStart, calculationType ="confidence", predictionYears = NA, isCV=FALSE) {
   
-  print("Calculating model values")
   if (length(unique(marketShare$ID))>1) {
     
     message("Expecting only one market element!")
@@ -418,7 +417,7 @@ makePredictions <- function(marketShare, modelEstimates, chosen, years, path, pa
 
 
 
-crossValidate <- function(marketShare, modelEstimates, path) {
+crossValidate <- function(marketShare, modelEstimates, path, experimentName) {
   
   pathCrossValidation <- paste(path,"cross-validation/",sep="")  
   dir.create(pathCrossValidation)
@@ -449,11 +448,13 @@ crossValidate <- function(marketShare, modelEstimates, path) {
       crossValidationResults[k, "mStart"] <- mStart
       crossValidationResults[k, "age"] <- ag
       crossValidationResults[k, "real.value"] <- realValue
+      print(paste("Cross validation for age ",ag))
       suppressMessages(t <- try(model <- estimateBass(X,Y, pStart, qStart, mStart)))
       if("try-error" %in% class(t)) {
         crossValidationResults[k, "predicted.value"] <- NA
         crossValidationResults[k, "lower"] <- NA
         crossValidationResults[k, "upper"] <- NA
+        crossValidationResults[k, "inBounds"] <- FALSE
       } else {
         estimates <- calculateModelValues(data, model, modelEstimates[modelEstimates$ID == id, ]$modelID, pStart, 
                                           qStart, mStart,"prediction", c(year), isCV=TRUE)
@@ -467,10 +468,14 @@ crossValidate <- function(marketShare, modelEstimates, path) {
         crossValidationResults[k, "predicted.value"] <- predictedValue
         crossValidationResults[k, "lower"] <- low
         crossValidationResults[k, "upper"] <- high
-        if (realValue > low & realValue < high) {
-          crossValidationResults[k, "inBounds"] <- TRUE
-        } else {
+        if (is.nan(low) | is.nan(high)) {
           crossValidationResults[k, "inBounds"] <- FALSE
+        } else {
+          if (realValue > low & realValue < high) {
+            crossValidationResults[k, "inBounds"] <- TRUE
+          } else {
+            crossValidationResults[k, "inBounds"] <- FALSE
+          }
         }
       }
       k <- k + 1
@@ -483,7 +488,7 @@ crossValidate <- function(marketShare, modelEstimates, path) {
     colnames(crossValidationResults) <- c("age", name)
     dfAllModelsInBounds <- merge(x=dfAllModelsInBounds, y=crossValidationResults, all=TRUE)
   }
-  pathAll <- paste(pathCrossValidation,"joinedResults.tsv", sep="")
+  pathAll <- paste(pathCrossValidation, experimentName, "-joinedResults.tsv", sep="")
   write.table(dfAllModelsInBounds, file =pathAll, quote=FALSE, 
               sep="\t", col.names=TRUE, row.names=FALSE )
   
