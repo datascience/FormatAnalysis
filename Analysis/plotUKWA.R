@@ -8,6 +8,6 @@ archPlot <- ggplot(df, aes(x=year, y=amount)) + geom_bar(stat="identity") +
   theme(axis.title=element_blank(),
         legend.text=element_text(face="bold", size=16), axis.text=element_text(size = 20))
   
-png(filename="output data/ukwa.png", width = 480, height = 300, res=50)
+png(filename="output data/ukwa.png", width = 1200, height = 600, res=200)
 print(archPlot)
 dev.off()

@@ -7,7 +7,7 @@ fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures/201605 figures/201605120800/models"
+syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures and other material/201605 figures and other material/201605130800/models"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
@@ -42,11 +42,11 @@ useMovingAverage <- TRUE
 multiplicationFactor <- 1000 
 
 
-#plot settings
-includeInterval <- TRUE
-includeRateOfChange <- FALSE
-includePoints <- TRUE
-includeResidual <- TRUE
+# #plot settings
+# includeInterval <- TRUE
+# includeRateOfChange <- TRUE
+# includePoints <- TRUE
+# includeResidual <- TRUE
 
 # load conflict resolution functions and assign them to variables to be used later
 source('conflictResolution.R')

@@ -12,11 +12,17 @@ png(filename=paste(path, "bass1.png", sep=""))
 #par(mar=c(0.3,0.3,0.3,0.3), font=2)
 
 
-# First model 
-p <- 0.004
-q <- 0.2
-m <- 10
-x <- seq(0,50,len=200)
+# First model
+#originals 
+#p <- 0.004
+#q <- 0.2
+#m <- 10
+
+p <- 0.0490543312
+q <- 0.0626791133
+m <- 16763.90076
+
+x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
@@ -36,7 +42,7 @@ bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="black", parse=TRUE) +
+  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", round(q/p, digits = 1), sep=""), color="black", parse=TRUE, size=7) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 
@@ -45,12 +51,16 @@ bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
 
 
 
+#Second model 
+# originals
+#p <- 0.1
+#q <- 0.9
+#m <- 10
 
-
-p <- 0.1
-q <- 0.9
-m <- 10
-x <- seq(0,10,len=200)
+p <- 0.0181156947
+q <- 0.1123097313
+m <- 3824.768097
+x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
@@ -69,14 +79,20 @@ bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p,sep=""), color="black",
-           parse=TRUE) + 
+  annotate(geom="text", x=0.9*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p),sep=""), color="black",
+           parse=TRUE, size=7) + 
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
-p <- 0.0001
-q <- 0.06
-m <- 10
-x <- seq(0,200,len=200)
+
+#Third model 
+#originals
+#p <- 0.0001
+#q <- 0.06
+#m <- 10
+p <- 0.0087289441
+q <- 0.1577604276
+m <- 19666.98505
+x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
@@ -95,13 +111,21 @@ bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="black", parse=TRUE) +
+  annotate(geom="text", x=0.2*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
-p <- 0.2
-q <- 0.3
-m <- 10
-x <- seq(0,15,len=200)
+
+#Fourth model 
+# original 
+#p <- 0.2
+#q <- 0.3
+#m <- 10
+
+p <- 0.0001705747
+q <- 0.3606003098
+m <- 2781.731363
+
+x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
@@ -120,10 +144,10 @@ bassGraph4<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", q/p, sep=""), color="black", parse=TRUE) +
+  annotate(geom="text", x=0.3*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
-print(grid.arrange(bassGraph4, bassGraph2, bassGraph1, bassGraph3, ncol = 2, nrow = 2))
+print(grid.arrange(bassGraph1, bassGraph2, bassGraph3, bassGraph4, ncol = 2, nrow = 2))
 
 
 dev.off()

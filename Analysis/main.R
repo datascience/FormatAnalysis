@@ -164,7 +164,7 @@ if (length(experiments)==length(marketFiles)) {
     } else {
       if (!dir.exists(paste(path, "/graphs"))) {
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-        plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName)    
+        plotResults(estimatesFinal, "selected", TRUE, FALSE, FALSE, path, experimentName)    
       }
       if (!dir.exists(paste(path, "/prediction", sep=""))) {
         # make predictions and plot prediction results 
