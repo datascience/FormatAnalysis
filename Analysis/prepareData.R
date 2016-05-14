@@ -35,12 +35,21 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
     print (paste("Filtering according to: ", prop))
     tempNames <- grep(prop, names(pData)) 
     tempV <- unique(unlist(groupData[[prop]]))
-    pData <- pData[apply(pData[,tempNames], 1, function(row) any(row %in% tempV)), ]
+    if (TRUE %in% ("-" %in% tempV)) {
+      print("TRUE IS")
+      for (i in tempNames) {
+        pData[is.na(pData[,i]),i] <- "-"
+      }
+    } else {
+      pData <- pData[apply(pData[,tempNames], 1, function(row) any(row %in% tempV)), ]
+    }
   }
   # remove if there are amounts equal to NA 
   pData <- pData[!is.na(pData$amount),]
   recordConflicts(pData, propertyToTake, 1)
   
+  numConBeforeUnify <- countConflicts(pData, propertyToTake, 1)
+  sizeOfTheSegmentBefore <- sum(pData$amount)
   
   #unify all equal properties
   for (prop in propertyToTake) {
@@ -51,7 +60,6 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   }
   
   recordConflicts(pData, propertyToTake, 2)
-  sizeOfTheSegmentBefore <- sum(pData$amount)
   numConBefore <- countConflicts(pData, propertyToTake, 1)
     
     
@@ -73,7 +81,9 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   # filter once more to remove those elements that do not belong to the selected group
   # conflict reduction could have resolved some entries to not needed values
   for (prop in propertyToTake) {
-    pData <- pData[pData[[prop]] %in% groupData[[prop]],]
+    if (!("-" %in% groupData[[prop]])) {
+      pData <- pData[pData[[prop]] %in% groupData[[prop]],]
+    }
     pData[[prop]] <- as.character(pData[[prop]])
   }
   
@@ -108,11 +118,13 @@ prepareData <- function(file, colNames, groupData, propertyToTake, resolveConfli
   
   percOfToWA <- (sizeOfTheSegmentBefore / 2572553360) * 100
   percOfToWAAft <- (sizeOfTheSegmentAfter / 2572553360) * 100
+  percOfConfBeforeUnify <- (numConBeforeUnify / sizeOfTheSegmentBefore) * 100
   percOfConf <- (numConBefore / sizeOfTheSegmentBefore) * 100
   percOfUNresCon <- (numConAfter / sizeOfTheSegmentBefore) * 100
-  marketStatsDF <- data.frame(property=c("% of total WA", "% of conflicts", "% of unresolved conflicts", 
-                                         "number of custom rules", "% of total WA after cr"), 
-                              value=c(percOfToWA, percOfConf, percOfUNresCon, numOfRules, percOfToWAAft))
+  marketStatsDF <- data.frame(property=c("% of total WA", "% of conflicts before merging", "% of conflicts after merging", 
+                                         "% of unresolved conflicts", "number of custom rules", 
+                                         "% of total WA after cr"), 
+                              value=c(percOfToWA, percOfConfBeforeUnify, percOfConf, percOfUNresCon, numOfRules, percOfToWAAft))
   write.table(marketStatsDF, file=paste(path, "/marketStats.tsv", sep=""), 
               quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
   

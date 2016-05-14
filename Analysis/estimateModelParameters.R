@@ -77,8 +77,13 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
       tM <- allEstimates[1,]$m
       
       bestEstimates <- rbind(bestEstimates, allEstimates[1,])
-      allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon | abs(allEstimates$q-tQ)/tQ>epsilon |  
-                                     abs(allEstimates$m-tM)/tM>epsilon,]
+      if (tQ==0) {
+        allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon |  
+                                       abs(allEstimates$m-tM)/tM>epsilon,]  
+      } else {
+        allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon | abs(allEstimates$q-tQ)/tQ>epsilon |  
+                                       abs(allEstimates$m-tM)/tM>epsilon,]
+      }
       if (nrow(allEstimates)==0) break
     }
     
@@ -179,7 +184,7 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
   modelEsPerElement <- data.frame(matrix(vector(),0,frameDimensions, 
                                          dimnames = dimensionNames))
   
-  pickFrame <- data.frame(ID=character(), name=character(), modelID=character())
+  pickFrame <- data.frame(ID=character(), name=character(), modelID=character(), qualityFit=character())
   
   
   uniq <- unique(marketShare$ID)
@@ -187,7 +192,7 @@ calculateBestModelValues <- function(marketShare, bestModels, path) {
   for (i in uniq) {
     data <- marketShare[marketShare$ID==i,]
     name <- data[1,][["name"]]
-    pickFrame <- rbind(pickFrame, data.frame(ID=i, name=name, modelID=NA))
+    pickFrame <- rbind(pickFrame, data.frame(ID=i, name=name, modelID=NA, qualityFit=NA))
     pathElement <- paste(path, name, "/", sep="")
     pathElModels <- paste(pathElement, "models/", sep="")
     models <- bestModels[bestModels$ID==i,]
@@ -421,7 +426,7 @@ crossValidate <- function(marketShare, modelEstimates, path, experimentName) {
   
   pathCrossValidation <- paste(path,"cross-validation/",sep="")  
   dir.create(pathCrossValidation)
-  dfAllModelsInBounds <- data.frame(age=0:30) 
+  dfAllModelsInBounds <- data.frame(age=0:40) 
   for (id in unique(modelEstimates$ID)) {
     name <- modelEstimates[modelEstimates$ID==id,]$name
     print(paste("Validating ", name))

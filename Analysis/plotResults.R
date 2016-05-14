@@ -96,9 +96,11 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       next
     }
     
-    variables <- c("pStart", "p", "pLwr","pUpr", "pBound", "qStart", "q", "qLwr", "qUpr", "qBound", "mStart", "m", 
-                   "mLwr", "mUpr", "mBound", "q/p ratio", "rmse", "rmse-real")
-    values <- c(pStart, p, pLwr, pUpr, pBound, qStart, q, qLwr, qUpr, qBound, mStart, m, mLwr, mUpr, mBound, qpRat, rmse, rmsereal)
+    variables <- c("p", "q", "m","q/p", "RMSE(raw)", "RMSE(avg)", "lower p", "upper p", "range of p", "lower q", 
+                   "upper q", "range of q", "lower m", "upper m", "range of m", "starting p", "starting q", 
+                   "starting m")
+    values <- c(p, q, m, qpRat, rmsereal, rmse, pLwr, pUpr, pBound, qLwr, qUpr, qBound, 
+                mLwr, mUpr, mBound, pStart, qStart, mStart)
     info <- data.frame(variable=variables, value=values)
     
     

@@ -1,7 +1,12 @@
 ID	name	mime	version	release year	comments
-1	HyperText Markup Language version 2.0	text/html	2.0	1995	
-2	HyperText Markup Language version 3.2	text/html	3.2	1997	
-3	HyperText Markup Language version 4.0	text/html	4.0	1998	
-4	HyperText Markup Language version 4.01	text/html	4.01	1999	
-5	Extensible Hypertext Markup Language version 1.0	application/xhtml+xml	1.0	2000	
-6	Extensible Hypertext Markup Language version 1.1	application/xhtml+xml	1.1	2001
+1	HyperText Markup Language version 2.0	text/html	2.0	1995	https://en.wikipedia.org/wiki/HTML
+2	HyperText Markup Language version 3.2	text/html	3.2	1997	https://en.wikipedia.org/wiki/HTML
+3	HyperText Markup Language version 4.0	text/html	4.0	1998	https://en.wikipedia.org/wiki/HTML
+4	HyperText Markup Language version 4.01	text/html	4.01	1999	https://en.wikipedia.org/wiki/HTML
+5	Extensible Hypertext Markup Language version 1.0	application/xhtml+xml	1.0	2000	https://en.wikipedia.org/wiki/XHTML
+6	Extensible Hypertext Markup Language version 1.1	application/xhtml+xml	1.1	2001	https://en.wikipedia.org/wiki/XHTML
+ 					
+ 					
+ 					
+ 					
+ 	 				

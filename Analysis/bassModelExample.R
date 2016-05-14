@@ -159,60 +159,74 @@ dev.off()
 
 
 #only one figure 
-p <- 0.1
-q <- 0.9
-m <- 10
-x <- seq(0,10,len=200)
+
+# original
+# p <- 0.1
+# q <- 0.9
+# m <- 10
+# x <- seq(0,10,len=200)
+
+
+p <- 0.0181156947
+q <- 0.1123097313
+m <- 3824.768097
+x <- seq(0,60,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
 yp <- p*m*(1-(1-exp(-(p+q)*x))/((q/p)*exp(-(p+q)*x)+1))
 yq <- y - yp
+derv <- ((m/p)*(p+q)^3*exp(-(p+q)*x)*((q/p)*exp(-(p+q)*x)-1))/(((q/p)*exp(-(p+q)*x)+1)^3)
+df <- data.frame(x, y, yp, yq, derv)
 
-df <- data.frame(x, y, yp, yq)
+T1 <- -(1/(p+q))*log((2+sqrt(3))*(p/q))
+TP <- -(1/(p+q))*log(p/q)
+T2 <- -(1/(p+q))*log((1/(2+sqrt(3)))*(p/q))
 
+lSize = 0.4
 
 bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") + 
-  geom_line(aes(y=y, colour="col1", linetype="col1"), size=1) + 
-  geom_line(aes(y=yp, colour="col2", linetype="col2"), size=1) + 
-  geom_line(aes(y=yq, color="col3", linetype="col3"), size=1) +
-  scale_y_continuous(expand = c(0,0), limits=c(0,3)) + 
-  scale_x_continuous(expand = c(0,0)) +
+  geom_line(aes(y=y, colour="col1", linetype="col1"), size=0.5) + 
+  geom_line(aes(y=yp, colour="col2", linetype="col2"), size=0.5) + 
+  geom_line(aes(y=yq, color="col3", linetype="col3"), size=0.5) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,1.1*max(y))) + 
+  scale_x_continuous(expand = c(0,0) , limits=c(0,60)) +
   scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="green"),
-                     labels=c("New adoptions","External influence\n(p=0.1)",
-                              "Internal influence\n(q=0.9)")) + 
+                     labels=c("New adoptions","External influence\n(p=0.018)",
+                              "Internal influence\n(q=0.112)")) + 
   scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
-                        labels=c("New adoptions","External influence\n(p=0.1)",
-                                 "Internal influence\n(q=0.9)")) +
-  labs(x="Time", y="Number of adoptions") +
+                        labels=c("New adoptions","External influence\n(p=0.018)",
+                                 "Internal influence\n(q=0.112)")) +
+  labs(x=NULL, y="Adoption rate") + 
+  geom_vline(xintercept = T1, linetype=2, color="gray50", size=lSize) +
+  geom_vline(xintercept = TP, linetype=2, color="gray50", size=lSize) + 
+  geom_vline(xintercept = T2, linetype=2, color="gray50", size=lSize) +
+  geom_hline(yintercept = 0) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(),
-        axis.title=element_text(face="italic",size=16),
+        axis.title=element_text(face="italic",size=10),
         legend.position=c(0.7,0.6), legend.background=element_blank(),
-        legend.text=element_text(face="bold", size=16), 
-        legend.key=element_blank(), legend.key.width=unit(3.5,"line"), 
-        legend.key.height=unit(3,"line"))
+        legend.text=element_text(face="bold", size=8), 
+        legend.key=element_blank(), legend.key.width=unit(1.5,"line"), 
+        legend.key.height=unit(1.5,"line") , plot.margin=unit(c(0,2,-0.5,1.5),"mm"))
 
-png(filename=paste(path, "bass3.png", sep=""))
-print(bassGraph)
+bassDerv <- ggplot(df, aes(x=x, y=derv)) +
+  geom_area(fill="gray", alpha=0.3) +
+  geom_line(aes(linetype="line1")) + labs(x="Time", y="Change rate") + scale_x_continuous(expand = c(0,0)) +
+  scale_linetype_manual(name="", values= c("line1"="dotted"), labels=c("Change rate")) +
+  scale_y_continuous(expand = c(0,0), limits = c(1.1*min(derv), 1.1*max(derv))) + 
+  geom_vline(xintercept = T1, linetype=2, color="gray50", size=lSize) +
+  geom_vline(xintercept = TP, linetype=2, color="gray50", size=lSize) + 
+  geom_vline(xintercept = T2, linetype=2, color="gray50", size=lSize) +
+  #geom_hline(yintercept = 1.1*min(derv)) +
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_text(face="italic",size=10),
+        legend.position=c(0.7,0.8), legend.background=element_blank(),
+        legend.text=element_text(face="bold", size=8), 
+        legend.key=element_blank(), legend.key.width=unit(1.5,"line"), 
+        legend.key.height=unit(1.5,"line"),
+        plot.margin=unit(c(-0.5,2,1,1.5),"mm"))
+
+png(filename=paste(path, "bass3.png", sep=""), width=1800, height=1200, res=300)
+print(grid.arrange(bassGraph, bassDerv))
+#print(bassGraph)
 dev.off()
   
 
-# #layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
-# par(fig=c(0,1,0,1), oma=c(0,0,0,0), mar=c(5.5,2.5,2.0,2.0), font=2, mgp=c(0.8,1,0))
-# plot(NULL, xlim=c(0,10), ylim=c(0,max(y)+0.1*max(y)),
-#      xaxt='n', yaxt='n', xlab="Time", ylab="New adopters", xaxs="i", yaxs="i", 
-#      cex.lab = 1.5)
-# lines(x,y, lwd=3)
-# polygon(c(x,rev(x)), c(rep(0,length(x)),rev(yp)), col='gray85', border=NA)
-# lines(x,yp, lty=3, col="red", lwd=3)
-# lines(x,yq, lty=2, col="blue", lwd=3)
-# text(4,2.7, labels="New adopters", adj = c(0,0), cex = 1.5)
-# arrows(3.9,2.75,x[50]+0.1,y[50]+0.001,length=0.15,angle=30, lwd = 2)
-# text(7.0,0.5, labels="Innovators", adj = c(0,0), cex = 1.5)
-# arrows(7.9,0.45,x[65]-1,yp[65],length=0.15,angle=30, lwd = 2)
-# text(5.5,1.8, labels="Imitators", adj = c(0,0), cex = 1.5)
-# arrows(6.2,1.75,x[70]-1,yq[70],length=0.15,angle=30, lwd = 2)
-# par(xpd=TRUE)
-# legend(-0.5, -0.3, c("External influence (p=0.1)  ", "Internal influence (q=0.9)"), 
-#        col=c("blue", "red"), lwd=c(3,3), lty=c(2,3), xpd=TRUE, horiz = TRUE, 
-#        inset = c(0,0), bty = "n", cex = 1.2)
-# dev.off()

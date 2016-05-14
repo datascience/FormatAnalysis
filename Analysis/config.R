@@ -1,19 +1,28 @@
 
 #linux
-#fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
+fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #mac
-fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
+#fileName <- "/Users/kresimir/Projects/Format Analysis/fmts-cleaned.tsv"
 #test
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures and other material/201605 figures and other material/201605130800/models"
+syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures and other material/201605 figures and other material/201605141100/models"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 
-experiments <- c("PDFS")
-marketFiles <- c("Format markets - PDF versions.tsv")
+#experiments <- c("DISTILLER-TEST")
+#marketFiles <- c("Format markets - DISTILLER.tsv")
+
+
+ experiments <- c("ARCHIVE-2", "AUDIO-2", "BMPS-2", "DISTILLER-2", "DOCUMENTS-2", 
+                  "FLASH-2", "GIFS-2", "HTML-2", "IMAGES-2", "PDFS-2", "VIDEO-2")
+ marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv", 
+                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv", 
+                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv", 
+                  "Format markets - PDF versions.tsv", "Format markets - VIDEO.tsv")
+
 
 
 

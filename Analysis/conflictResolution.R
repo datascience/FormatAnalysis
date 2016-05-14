@@ -49,7 +49,7 @@ conflictResolution <- function(row, prop) {
   }
   
   #if tika and droid agree then pick that value
-  if (row[2]==row[3] & !is.na(row[2]) & row[2]!="application/octet-stream" & row[2]!=" ") {
+  if (row[2]==row[3] & !is.na(row[2]) & row[2]!="application/octet-stream" & row[2]!=" " & row[2]!="-") {
     cResolution[cResolution$prop==prop & cResolution$type=="tikadroid",]$amount <<- 
       as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="tikadroid",]$amount) + amount
     #cResolution[nrow(cResolution)+1,] <<- c(prop, "tika=droid", amount)
@@ -58,7 +58,7 @@ conflictResolution <- function(row, prop) {
   }
   
   #if only one tool managed to return a value pick that value
-  test <- row[!is.na(row) & row!=" " & row!="" & row!="application/octet-stream"]
+  test <- row[!is.na(row) & row!=" " & row!="" & row!="-" & row!="application/octet-stream"]
   if (length(test)==1) {
     cResolution[cResolution$prop==prop & cResolution$type=="one tool",]$amount <<- 
       as.numeric(cResolution[cResolution$prop==prop & cResolution$type=="one tool",]$amount) + amount
