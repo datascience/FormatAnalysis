@@ -60,10 +60,15 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
     allEstimates <- allEstimates[!is.na(allEstimates$p) & !is.na(allEstimates$q) & !is.na(allEstimates$m),]
     allEstimates <- allEstimates[allEstimates$p<=1,]
     print(nrow(allEstimates))
-    #check the peak 
-    allEstimates <- allEstimates[((-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)>0 &  
+    
+    # #check the peak and allow negative peaks 
+    allEstimates <- allEstimates[((-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)>0 &
                                      (allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor) |
                                    (-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)<0,]
+
+    #check the peak and do not allow negative peaks
+    #allEstimates <- allEstimates[allEstimates$m*(allEstimates$p+allEstimates$q)^2/(4*allEstimates$q) <= multiplicationFactor,]
+    
     
     allEstimates <- allEstimates[order(allEstimates$RMSE),]
     

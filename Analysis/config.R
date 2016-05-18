@@ -12,15 +12,15 @@ syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/f
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 
-experiments <- c("DOCUMENTS-2")
+experiments <- c("DOCUMENTS-2-TESTPEAK")
 marketFiles <- c("Format markets - DOCUMENTS.tsv")
 
 
- # experiments <- c("ARCHIVE-2", "AUDIO-2", "BMPS-2", "DISTILLER-2", "DOCUMENTS-2", 
+ # experiments <- c("ARCHIVE-2", "AUDIO-2", "BMPS-2", "DISTILLER-2", "DOCUMENTS-2",
  #                  "FLASH-2", "GIFS-2", "HTML-2", "IMAGES-2", "PDFS-2", "VIDEO-2")
- # marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv", 
- #                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv", 
- #                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv", 
+ # marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv",
+ #                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv",
+ #                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv",
  #                  "Format markets - PDF versions.tsv", "Format markets - VIDEO.tsv")
  # 
 
