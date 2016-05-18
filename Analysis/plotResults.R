@@ -234,7 +234,8 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
     }
     
   png(filename=paste(allModelsName, "_allmodels-ages.png", sep=""), width = 1800, height=1200, res=300)
-  clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""))) + geom_line() +
+  clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
+                                          linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
     scale_color_grey() +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=6), legend.title=element_blank(),
@@ -243,7 +244,8 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
   dev.off()
   
   png(filename=paste(allModelsName,  "_allmodels-years.png", sep=""), width = 1800, height=1200, res=300)
-  clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""))) + geom_line() +
+  clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
+                                           linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
     scale_color_grey() +
     theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
           legend.text=element_text(size=6), legend.title=element_blank(), 
