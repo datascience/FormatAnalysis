@@ -177,7 +177,7 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       png(filename=paste(graphFileName, "_", title,"-", modelID, ".png", sep=""), width = 1800, height = 1200, res = 300)
       #modelPlot <- modelPlot + theme(plot.margin=unit(c(-0.5,1,1,1), "cm"))
       tbl$heights <- unit(rep(1/nrow(tbl), nrow(tbl)), "npc")
-      tbl$widths <- unit(c(0.4, 0.6), "npc")
+      tbl$widths <- unit(c(0.5, 0.5), "npc")
       #tbl$widths <- unit(rep(1/ncol(tbl), ncol(tbl)), "npc") 
       print(grid.arrange(modelPlot, residualPlot, residualAveragePlot, tbl, layout_matrix=lay, 
                          widths=c(0.35, 0.35, 0.3)))
