@@ -59,31 +59,31 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
     #filtering to get the best models
     allEstimates <- allEstimates[!is.na(allEstimates$p) & !is.na(allEstimates$q) & !is.na(allEstimates$m),]
     allEstimates <- allEstimates[allEstimates$p<=1,]
-    
+    print(nrow(allEstimates))
     #check the peak 
-    allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor,]
+    allEstimates <- allEstimates[((-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)>0 &  
+                                     (allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor) |
+                                   (-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)<0,]
     
     allEstimates <- allEstimates[order(allEstimates$RMSE),]
     
-    bestEstimates <- data.frame(ID=numeric(), modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
+    bestEstimates <- data.frame(modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
                                 p=numeric(), q=numeric(), m=numeric(), RMSE=numeric())
     
     # more advanced way to pick good models
     # lots of the models are actually equal so we need to avoid proposing equal models
     epsilon <- 0.1
+    print(nrow(allEstimates))
     for (cnt in 1:5) {
       tP <- allEstimates[1,]$p
       tQ <- allEstimates[1,]$q
       tM <- allEstimates[1,]$m
       
       bestEstimates <- rbind(bestEstimates, allEstimates[1,])
-      if (tQ==0) {
-        allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon |  
-                                       abs(allEstimates$m-tM)/tM>epsilon,]  
-      } else {
-        allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon | abs(allEstimates$q-tQ)/tQ>epsilon |  
-                                       abs(allEstimates$m-tM)/tM>epsilon,]
-      }
+      print(bestEstimates)
+      print(paste(tP, tQ, tM))
+      allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon | abs(allEstimates$q-tQ)/tQ>epsilon |  
+                                     abs(allEstimates$m-tM)/tM>epsilon,]
       if (nrow(allEstimates)==0) break
     }
     
@@ -505,7 +505,7 @@ estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)
   #fit <- nls(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, algorithm="port", start=list(p=sP,q=sQ,m=sM), lower = c(0,0,0)) 
   fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=sP,q=sQ,m=sM),
-               control = list(maxiter=1000), lower = c(0,0,0)) 
+               control = list(maxiter=1000), lower = c(0.000001,0.000001,0.000001)) 
   return (fit)
 }
 
