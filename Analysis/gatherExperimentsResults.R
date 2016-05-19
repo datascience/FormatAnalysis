@@ -1,8 +1,13 @@
 # this script is used to gather all selected models from 
 # experiments 
 
-experiments <- c("PDFS", "DISTILLER", "DOCUMENTS", "IMAGES", "HTML")
-type <- c("VERSION", "TOOL", "FORMAT", "FORMAT", "VERSION")
+#experiments <- c("PDFS", "DISTILLER", "DOCUMENTS", "IMAGES", "HTML")
+#type <- c("VERSION", "TOOL", "FORMAT", "FORMAT", "VERSION")
+
+experiments <- c("ARCHIVE-2", "AUDIO-2", "BMPS-2", "DISTILLER-2", "DOCUMENTS-2",
+                 "FLASH-2", "GIFS-2", "HTML-2", "IMAGES-2", "PDFS-2", "VIDEO-2")
+type <- c("VERSION", "FORMAT", "VERSION", "TOOL", "FORMAT", "VERSION", "VERSION", 
+          "VERSION", "FORMAT", "VERSION", "FORMAT")
 
 allEstimates <- data.frame(market=character(), type=character(), name=character(), pStart=numeric(), qStart=numeric(), mStart=numeric(), 
                           p=numeric(), q=numeric(), m=numeric(), qprat=numeric(), release.year=numeric(), 
@@ -135,7 +140,7 @@ scDF3$qprat <- as.numeric(scDF3$qprat)
 scatterPlotQPRat <- ggplot(scDF3, aes(x=release.year, y=qprat, color=market)) + geom_point() +
   geom_smooth(method = "lm", se=FALSE, linetype=3)
 png(filename = "output data/scatterPlotQPRatsLin.png", width = 1800, height = 900, res=300)
-print(scaterPlotQPRat)
+print(scatterPlotQPRat)
 dev.off()
 
 scatterPlotQPRat2 <- ggplot(scDF3, aes(x=release.year, y=qprat, color=market)) + geom_point() +

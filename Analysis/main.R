@@ -162,7 +162,7 @@ if (length(experiments)==length(marketFiles)) {
     if (TRUE %in% is.na(chosenModels$modelID)) {
       message(paste("Please select models for ", experimentName, " experiment!\n", sep=""))
     } else {
-      if (!dir.exists(paste(path, "/graphs"))) {
+      if (!dir.exists(paste(path, "/graphs", sep=""))) {
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
         plotResults(estimatesFinal, "selected", TRUE, FALSE, FALSE, path, experimentName)    
       }
