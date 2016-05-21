@@ -59,38 +59,65 @@ estimateModelParameters <- function(pData, start, end, useMovingAverage, multipl
     #filtering to get the best models
     allEstimates <- allEstimates[!is.na(allEstimates$p) & !is.na(allEstimates$q) & !is.na(allEstimates$m),]
     allEstimates <- allEstimates[allEstimates$p<=1,]
-    print(nrow(allEstimates))
     
-    # #check the peak and allow negative peaks 
-    allEstimates <- allEstimates[((-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)>0 &
-                                     (allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor) |
-                                   (-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)<0,]
-
-    #check the peak and do not allow negative peaks
-    #allEstimates <- allEstimates[allEstimates$m*(allEstimates$p+allEstimates$q)^2/(4*allEstimates$q) <= multiplicationFactor,]
+    # first check if there are any models with positive peaks 
+    #allEstimates <- allEstimates[(allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor,]
+    
+    allEstimatesZero <- allEstimates[allEstimates$p==0 | allEstimates$q==0 | allEstimates$m==0,]
+    if (nrow(allEstimatesZero)>0) {
+      allEstimatesZero <- allEstimatesZero[order(allEstimatesZero$RMSE),]
+      allEstimatesZero <- allEstimatesZero[1,]
+    }
+    allEstimates <- allEstimates[!(allEstimates$p==0 | allEstimates$q==0 | allEstimates$m==0),]
     
     
+    allEstimatesPositive <- allEstimates[((-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)>0 &
+                                    (allEstimates$m*(allEstimates$p+allEstimates$q)^2)/(4*allEstimates$q) <= multiplicationFactor),]
+    allEstimatesPositive <- allEstimatesPositive[order(allEstimatesPositive$RMSE),]
+    bestEstimatesPositive <- data.frame(modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
+                                p=numeric(), q=numeric(), m=numeric(), RMSE=numeric())
+    epsilon <- 0.1
+    for (cnt in 1:5) {
+      tP <- allEstimatesPositive[1,]$p
+      tQ <- allEstimatesPositive[1,]$q
+      tM <- allEstimatesPositive[1,]$m
+      
+      bestEstimatesPositive <- rbind(bestEstimatesPositive, allEstimatesPositive[1,])
+      allEstimatesPositive <- allEstimatesPositive[abs(allEstimatesPositive$p-tP)/tP>epsilon | 
+                                                     abs(allEstimatesPositive$q-tQ)/tQ>epsilon |  
+                                                      abs(allEstimatesPositive$m-tM)/tM>epsilon,]
+      if (nrow(allEstimatesPositive)==0) break
+    }
+    allEstimatesPositive <- bestEstimatesPositive
+    
+    allEstimatesNegative <- allEstimates[(-1/(allEstimates$p+allEstimates$q))*log(allEstimates$p/allEstimates$q)<0,]
+    allEstimatesNegative <- allEstimatesNegative[order(allEstimatesNegative$RMSE),]
+    allEstimatesNegative <- allEstimatesNegative[1,]
+    
+    allEstimates <- rbind(allEstimatesZero, allEstimatesNegative, allEstimatesPositive)
     allEstimates <- allEstimates[order(allEstimates$RMSE),]
     
     bestEstimates <- data.frame(modelID=numeric(), pStart=numeric(), qStart=numeric(), mStart=numeric(),
                                 p=numeric(), q=numeric(), m=numeric(), RMSE=numeric())
-    
+    if (nrow(allEstimates)>=5) {
+      bestEstimates <- allEstimates[1:5,]
+    } else {
+      bestEstimates <- allEstimates
+    }
+        
     # more advanced way to pick good models
     # lots of the models are actually equal so we need to avoid proposing equal models
-    epsilon <- 0.1
-    print(nrow(allEstimates))
-    for (cnt in 1:5) {
-      tP <- allEstimates[1,]$p
-      tQ <- allEstimates[1,]$q
-      tM <- allEstimates[1,]$m
-      
-      bestEstimates <- rbind(bestEstimates, allEstimates[1,])
-      print(bestEstimates)
-      print(paste(tP, tQ, tM))
-      allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon | abs(allEstimates$q-tQ)/tQ>epsilon |  
-                                     abs(allEstimates$m-tM)/tM>epsilon,]
-      if (nrow(allEstimates)==0) break
-    }
+    # epsilon <- 0.1
+    # for (cnt in 1:5) {
+    #   tP <- allEstimates[1,]$p
+    #   tQ <- allEstimates[1,]$q
+    #   tM <- allEstimates[1,]$m
+    #   
+    #   bestEstimates <- rbind(bestEstimates, allEstimates[1,])
+    #   allEstimates <- allEstimates[abs(allEstimates$p-tP)/tP>epsilon | abs(allEstimates$q-tQ)/tQ>epsilon |  
+    #                                  abs(allEstimates$m-tM)/tM>epsilon,]
+    #   if (nrow(allEstimates)==0) break
+    # }
     
     bestEstimates <- bestEstimates[!is.na(bestEstimates$modelID),]
     write.table(bestEstimates, file = paste(pathElement, "best.tsv", sep=""), quote=FALSE, 
@@ -510,7 +537,7 @@ estimateBass <- function(X,Y, sP, sQ, sM) {
   f <- data.frame(x=X, y=Y)
   #fit <- nls(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, algorithm="port", start=list(p=sP,q=sQ,m=sM), lower = c(0,0,0)) 
   fit <- nlsLM(y ~ m*((p+q)^2/p)*((exp(-(p+q)*x))/(1+(q/p)*exp(-(p+q)*x))^2), data=f, start=list(p=sP,q=sQ,m=sM),
-               control = list(maxiter=1000), lower = c(0.000001,0.000001,0.000001)) 
+               control = list(maxiter=1000), lower = c(0.0,0.0,0.0)) 
   return (fit)
 }
 
