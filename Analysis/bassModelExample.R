@@ -7,7 +7,7 @@ path <- paste("output data/")
 
 
 #output four main patterns of the Bass model
-png(filename=paste(path, "bass1.png", sep=""))
+#png(filename=paste(path, "bass1.png", sep=""))
 #layout(matrix(c(1, 2, 3,4), 2, 2, byrow = TRUE), heights = c(1.5, 1.5, 1.5, 1.5))
 #par(mar=c(0.3,0.3,0.3,0.3), font=2)
 
@@ -57,9 +57,9 @@ bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
 #q <- 0.9
 #m <- 10
 
-p <- 0.0181156947
-q <- 0.1123097313
-m <- 3824.768097
+p <- 0.0073622453
+q <- 0.1843805408
+m <- 12823.87403
 x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
@@ -79,7 +79,7 @@ bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=0.9*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p),sep=""), color="black",
+  annotate(geom="text", x=0.2*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p),sep=""), color="black",
            parse=TRUE, size=7) + 
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
@@ -89,9 +89,9 @@ bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
 #p <- 0.0001
 #q <- 0.06
 #m <- 10
-p <- 0.0087289441
-q <- 0.1577604276
-m <- 19666.98505
+p <- 0.013595435
+q <- 0.1415115735
+m <- 21283.91046
 x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
@@ -111,7 +111,7 @@ bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=0.2*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
+  annotate(geom="text", x=0.15*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
 
@@ -121,9 +121,9 @@ bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
 #q <- 0.3
 #m <- 10
 
-p <- 0.0001705747
-q <- 0.3606003098
-m <- 2781.731363
+p <- 0.0002193225
+q <- 0.3718790702
+m <- 1948.277493
 
 x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
@@ -147,7 +147,8 @@ bassGraph4<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   annotate(geom="text", x=0.3*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
 
-print(grid.arrange(bassGraph1, bassGraph2, bassGraph3, bassGraph4, ncol = 2, nrow = 2))
+png(filename=paste(path, "bass1.png", sep=""), width=1880, height=1200, res = 300)
+print(grid.arrange(bassGraph1, bassGraph3, bassGraph2, bassGraph4, ncol = 2, nrow = 2))
 
 
 dev.off()
@@ -167,9 +168,9 @@ dev.off()
 # x <- seq(0,10,len=200)
 
 
-p <- 0.0181156947
-q <- 0.1123097313
-m <- 3824.768097
+p <- 0.013595435
+q <- 0.1415115735
+m <- 21283.91046
 x <- seq(0,60,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
@@ -191,11 +192,11 @@ bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_y_continuous(expand = c(0,0), limits = c(0,1.1*max(y))) + 
   scale_x_continuous(expand = c(0,0) , limits=c(0,60)) +
   scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="green"),
-                     labels=c("New adoptions","External influence\n(p=0.018)",
-                              "Internal influence\n(q=0.112)")) + 
+                     labels=c("New adoptions","External influence\n(p=0.013)",
+                              "Internal influence\n(q=0.141)")) + 
   scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
-                        labels=c("New adoptions","External influence\n(p=0.018)",
-                                 "Internal influence\n(q=0.112)")) +
+                        labels=c("New adoptions","External influence\n(p=0.013)",
+                                 "Internal influence\n(q=0.141)")) +
   labs(x=NULL, y="Adoption rate") + 
   geom_vline(xintercept = T1, linetype=2, color="gray50", size=lSize) +
   geom_vline(xintercept = TP, linetype=2, color="gray50", size=lSize) + 

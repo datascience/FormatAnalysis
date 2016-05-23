@@ -4,8 +4,8 @@
 #experiments <- c("PDFS-2", "DISTILLER-2", "DOCUMENTS", "IMAGES", "HTML")
 #type <- c("VERSION", "TOOL", "FORMAT", "FORMAT", "VERSION")
 
-experiments <- c("ARCHIVE-2", "AUDIO-2", "BMPS-2", "DISTILLER-2", "DOCUMENTS-2",
-                 "FLASH-2", "GIFS-2", "HTML-2", "IMAGES-2", "PDFS-2", "VIDEO-2")
+experiments <- c("ARCHIVE", "AUDIO", "BMPS", "DISTILLER", "DOCUMENTS",
+                 "FLASH", "GIFS", "HTML", "IMAGES", "PDFS", "VIDEO")
 type <- c("VERSION", "FORMAT", "VERSION", "TOOL", "FORMAT", "VERSION", "VERSION", 
           "VERSION", "FORMAT", "VERSION", "FORMAT")
 
@@ -30,7 +30,7 @@ write.table(allCVResults, file=paste("output data/", "allCVResults.tsv", sep="")
             quote=FALSE, sep="\t", col.names=TRUE, row.names=FALSE)
 
 
-dfAllCV <- data.frame(product=character(78), total=numeric(78), positive=numeric(78))
+dfAllCV <- data.frame(product=character(69), total=numeric(69), positive=numeric(69))
 dfAllCV$product <- names(allCVResults[,!(names(allCVResults)=="age")])
 dfAllCV$total <- apply(allCVResults[,!(names(allCVResults)=="age")], 2, function(x) sum(!is.na(x)))
 dfAllCV$positive <- apply(allCVResults[,!(names(allCVResults)=="age")], 2, function(x) length(x[x==TRUE & !is.na(x)]))

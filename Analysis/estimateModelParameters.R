@@ -509,6 +509,7 @@ crossValidate <- function(marketShare, modelEstimates, path, experimentName) {
           crossValidationResults[k, "inBounds"] <- FALSE
         } else {
           if (realValue > low & realValue < high) {
+          #if (abs(predictedValue - realValue)/realValue <=0.2){
             crossValidationResults[k, "inBounds"] <- TRUE
           } else {
             crossValidationResults[k, "inBounds"] <- FALSE

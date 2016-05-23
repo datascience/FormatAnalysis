@@ -164,7 +164,7 @@ if (length(experiments)==length(marketFiles)) {
     } else {
       if (!dir.exists(paste(path, "/graphs", sep=""))) {
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-        plotResults(estimatesFinal, "selected", TRUE, FALSE, FALSE, path, experimentName)    
+        plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName)    
       }
       if (!dir.exists(paste(path, "/prediction", sep=""))) {
         # make predictions and plot prediction results 
@@ -191,6 +191,7 @@ if (length(experiments)==length(marketFiles)) {
       if (file.exists(paste(pathMarketElements, "selectedModels.tsv", sep=""))) {
         chosenModels <- read.table(paste(pathMarketElements, "selectedModels.tsv", sep=""), header=TRUE, sep="\t", stringsAsFactors=FALSE)
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
+        estimatesFinal <- estimatesFinal[estimatesFinal$qualityFit=="GOOD" | estimatesFinal$qualityFit=="EXCELLENT",]
         print(chosenModels)
       }
       

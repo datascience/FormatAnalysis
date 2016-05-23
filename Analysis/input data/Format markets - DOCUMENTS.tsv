@@ -13,9 +13,8 @@ ID	name	mime	release year	comments
 12	Microsoft Publisher Document File	application/x-mspublisher	1991	http://www.online-convert.com/file-format/pub  https://en.wikipedia.org/wiki/Microsoft_Publisher
 13	Rich Text Format	application/rtf	1987	http://www.online-convert.com/file-format/rtf
 14	StarOffice Writer Document	application/vnd.sun.xml.writer	1985	http://www.online-convert.com/file-format/sxw
-15	Raw text file 	text/plain		https://en.wikipedia.org/wiki/Text_file  http://www.online-convert.com/file-format/txt
-16	WordPerfect Document File 5.1	application/wordperfect5.1	1989	https://en.wikipedia.org/wiki/WordPerfect, https://www.nationalarchives.gov.uk/PRONOM/Format/proFormatSearch.aspx?status=detailReport&id=737
-17	WordPerfect Document File	application/wordperfect,application/x-wpwin	1979	http://www.online-convert.com/file-format/wpd  https://en.wikipedia.org/wiki/WordPerfect
-18	Microsoft Works file format	application/vnd.ms-works	1988	https://en.wikipedia.org/wiki/Microsoft_Works  http://www.online-convert.com/file-format/wps
-19	Microsoft XML Paper Specification (XPS)	application/vnd.ms-xpsdocument		
-20	Open XML Paper Specification (OpenXPS)	application/oxps,application/vnd.ms-xpsdocument	2006	https://en.wikipedia.org/wiki/Open_XML_Paper_Specification
+15	WordPerfect Document File 5.1	application/wordperfect5.1	1989	https://en.wikipedia.org/wiki/WordPerfect, https://www.nationalarchives.gov.uk/PRONOM/Format/proFormatSearch.aspx?status=detailReport&id=737
+16	WordPerfect Document File	application/wordperfect,application/x-wpwin	1979	http://www.online-convert.com/file-format/wpd  https://en.wikipedia.org/wiki/WordPerfect
+17	Microsoft Works file format	application/vnd.ms-works	1988	https://en.wikipedia.org/wiki/Microsoft_Works  http://www.online-convert.com/file-format/wps
+18	Microsoft XML Paper Specification (XPS)	application/vnd.ms-xpsdocument		
+19	Open XML Paper Specification (OpenXPS)	application/oxps,application/vnd.ms-xpsdocument	2006	https://en.wikipedia.org/wiki/Open_XML_Paper_Specification

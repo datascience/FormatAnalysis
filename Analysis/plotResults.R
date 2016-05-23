@@ -205,7 +205,7 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
         print(grid.arrange(modelPlot, changePlot))
         dev.off()
       }else {
-        png(filename=paste(graphFileName, "_", title, ".png", sep=""))
+        png(filename=paste(graphFileName, "_", title, ".png", sep=""), width=1800, height=1200, res=300)
         print(modelPlot)
         dev.off()
       }
