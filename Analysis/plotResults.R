@@ -205,7 +205,7 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
         print(grid.arrange(modelPlot, changePlot))
         dev.off()
       }else {
-        png(filename=paste(graphFileName, "_", title, ".png", sep=""), width=1800, height=1200, res=300)
+        png(filename=paste(graphFileName, "_", title, ".png", sep=""), width=1800, height=900, res=300)
         print(modelPlot)
         dev.off()
       }
@@ -233,25 +233,52 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       allModelsName <- graphFileName
     }
     
-  png(filename=paste(allModelsName, "_allmodels-ages.png", sep=""), width = 1800, height=1200, res=300)
-  clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
-                                          linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
-    scale_color_grey() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
-          legend.text=element_text(size=6), legend.title=element_blank(),
-          legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="age", y="adoption rate")
-  print(clusterPlot)
-  dev.off()
-  
-  png(filename=paste(allModelsName,  "_allmodels-years.png", sep=""), width = 1800, height=1200, res=300)
-  clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
-                                           linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
-    scale_color_grey() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
-          legend.text=element_text(size=6), legend.title=element_blank(), 
-          legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="harvest year", y="adoption rate")
-  print(clusterPlot)
-  dev.off()
+    if (plotType=="toSelect") {
+      
+      png(filename=paste(allModelsName, "_allmodels-ages.png", sep=""), width = 1800, height=900, res=300)
+      clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
+                                              linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
+        scale_color_grey(start = 0.0, end = 0.50) +
+        theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
+              legend.text=element_text(size=6), legend.title=element_blank(),
+              legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="age", y="adoption rate")
+      print(clusterPlot)
+      dev.off()
+      
+      png(filename=paste(allModelsName,  "_allmodels-years.png", sep=""), width = 1800, height=900, res=300)
+      clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
+                                               linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
+        scale_color_grey(start = 0.0, end = 0.50) +
+        theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
+              legend.text=element_text(size=6), legend.title=element_blank(), 
+              legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="harvest year", y="adoption rate")
+      print(clusterPlot)
+      dev.off()
+      
+    } else {
+      
+      png(filename=paste(allModelsName, "_allmodels-ages.png", sep=""), width = 1800, height=900, res=300)
+      clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title, 
+                                              linetype=title)) + geom_line() +
+        scale_color_grey(start = 0.0, end = 0.50) +
+        theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
+              legend.text=element_text(size=6), legend.title=element_blank(),
+              legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="age", y="adoption rate")
+      print(clusterPlot)
+      dev.off()
+      
+      png(filename=paste(allModelsName,  "_allmodels-years.png", sep=""), width = 1800, height=900, res=300)
+      clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title, 
+                                               linetype=title)) + geom_line() +
+        scale_color_grey(start = 0.0, end = 0.50) +
+        theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
+              legend.text=element_text(size=6), legend.title=element_blank(), 
+              legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="harvest year", y="adoption rate")
+      print(clusterPlot)
+      dev.off()
+      
+    }
+    
     
   }
   

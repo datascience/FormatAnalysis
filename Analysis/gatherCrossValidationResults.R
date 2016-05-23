@@ -35,10 +35,12 @@ dfAllCV$product <- names(allCVResults[,!(names(allCVResults)=="age")])
 dfAllCV$total <- apply(allCVResults[,!(names(allCVResults)=="age")], 2, function(x) sum(!is.na(x)))
 dfAllCV$positive <- apply(allCVResults[,!(names(allCVResults)=="age")], 2, function(x) length(x[x==TRUE & !is.na(x)]))
 dfAllCV$ratio <- dfAllCV$positive/dfAllCV$total
-
-
+dfAllCV$num <- 1
+dfAllCV <- aggregate(num~total+ratio, data=dfAllCV, FUN = sum)
 library(ggplot2)
-plot <- ggplot(dfAllCV, aes(x=total, y=ratio)) + geom_point()
+plot <- ggplot(dfAllCV, aes(x=total, y=ratio, size=num)) + geom_point() + 
+  labs(x="number of points", y="success rate") + 
+  theme(legend.position="none")
 png(filename = "output data/CVresults.png", width = 1800, height = 900, res=300)
 print(plot)
 dev.off()

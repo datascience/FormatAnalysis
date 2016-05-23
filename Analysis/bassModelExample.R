@@ -194,7 +194,7 @@ bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="green"),
                      labels=c("New adoptions","External influence\n(p=0.013)",
                               "Internal influence\n(q=0.141)")) + 
-  scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="dashed"),
+  scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="longdash"),
                         labels=c("New adoptions","External influence\n(p=0.013)",
                                  "Internal influence\n(q=0.141)")) +
   labs(x=NULL, y="Adoption rate") + 

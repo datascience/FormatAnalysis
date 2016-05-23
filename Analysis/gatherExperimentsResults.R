@@ -84,14 +84,17 @@ dev.off()
 scDF <- allEstimates
 #scDF <- allEstimates[,c("market", "type", "p", "q", "numPoints", "rmsePeak", "qualityFit", "TTP")]
 scDF <- scDF[scDF$qualityFit=="GOOD" | scDF$qualityFit=="EXCELLENT",]
-#scDf <- scDF[scDF$numPoints >= 7, ]
+scDF <- scDF[scDF$numPoints >= 6, ]
 #scDF <- scDF[scDF$qualityFit=="EXCELLENT",]
 scDF <- scDF[scDF$TTP>0,]
+
 #scDF <- scDF[!(scDF$rmsePeak>0.3 | scDF$numPoints<7),]
 hulls <- ddply(scDF, "type", findHull)
-scatterPlotMarket <- ggplot(scDF, aes(x=q, y=p, color=type, fill=type)) + geom_point() + 
-  geom_polygon(data=hulls, alpha=0.3, color=NA)
-png(filename = paste(pathDir, "qpAllType.png", sep=""), width = 1800, height = 900, res=300)
+scatterPlotMarket <- ggplot(scDF, aes(x=q, y=p, color=type, fill=type, shape=type)) + geom_point() + 
+  geom_polygon(data=hulls, alpha=0.2, color=NA) + labs(color="", fill="", shape="") + 
+  theme(legend.position="bottom", plot.margin=unit(c(1,2,2.0,0), "mm"), 
+        legend.margin=unit(c(-3.0,0,0,0), "mm"))
+png(filename = paste(pathDir, "qpAllType.png", sep=""), width = 1800, height = 1200, res=300)
 print(scatterPlotMarket)
 dev.off()
 
@@ -111,7 +114,8 @@ myTicks <- seq(miY, maY, 5)
 scDF2$release.year <- as.numeric(scDF2$release.year)
 scatterPlotPeak <- ggplot(scDF2, aes(x=release.year, y=TTP, color=type, size=peak)) + geom_point() +
   labs(x="release year", y="time to peak", size="peak (max=1000)") + 
-  scale_x_continuous(breaks = myTicks) 
+  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#66c2a5", "#fc8d62",
+  "#8da0cb"))
 png(filename = paste(pathDir,"bubblePeak.png", sep=""), width = 1800, height = 900, res=300)
 print(scatterPlotPeak)
 dev.off()
@@ -136,9 +140,12 @@ png(filename = paste(pathDir,"scatterPlotQPRatsLin.png", sep=""), width = 1800, 
 print(scatterPlotQPRat)
 dev.off()
 
-scatterPlotQPRat2 <- ggplot(scDF3, aes(x=release.year, y=qprat, color=market)) + geom_point() +
+scatterPlotQPRat2 <- ggplot(scDF3, aes(x=release.year, y=qprat, color=market, shape=market)) + geom_point() +
   geom_smooth(method = "nls", formula = y~exp(a*x-b), method.args=list(start=c(a=1,b=1995)),  se=FALSE, linetype=3) +
-  scale_y_continuous(limits = c(0,250)) + theme(legend.position="bottom")
+  scale_y_continuous(limits = c(0,250)) +  scale_shape_manual(values=c(15,16,17,18)) + 
+  labs(x="release year", y="q-p ratio", color="", shape="") +
+  theme(legend.position="bottom", plot.margin=unit(c(1,2,2.0,0), "mm"), 
+        legend.margin=unit(c(-3.0,0,0,0), "mm"))
 png(filename = paste(pathDir, "scatterQPRatsExp.png", sep=""), width = 1800, height = 900, res=300)
 print(scatterPlotQPRat2)
 dev.off()

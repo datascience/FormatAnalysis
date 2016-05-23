@@ -7,7 +7,7 @@ fileName <- "/home/kresimir/Projects/FormatAnalysis/fmts-cleaned.tsv"
 #fileName <- "/home/kresimir/Projects/FormatAnalysis/test.tsv"
 
 #sync folder for gathering all plots 
-syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures and other material/201605 figures and other material/201605211200/models"
+syncFolder <- "/home/kresimir/Dropbox/Work/Projects/BenchmarkDP/formatanalysis/figures and other material/201605 figures and other material/201605231200/models"
 
 colNames <- c("server", "tika", "droid", "year", "amount")
 
