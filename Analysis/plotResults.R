@@ -219,8 +219,6 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       dev.off()
       
       
-      
-      
     }
     
   }

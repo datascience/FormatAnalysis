@@ -65,22 +65,23 @@ library(ggplot2)
 library(plyr)
 
 
-# scatter plot q-p for all the GOOD and EXCELLENT fits. 
-# groupping is done by market 
-findHull <- function(df) df[chull(df$q, df$p),]
-scDF <- allEstimates[,c("market", "type", "p", "q", "numPoints", "rmsePeak", "qualityFit", "TTP")]
-scDF <- scDF[scDF$qualityFit=="GOOD" | scDF$qualityFit=="EXCELLENT",]
-scDF <- scDF[scDF$TTP>0,]
-hulls <- ddply(scDF, "market", findHull)
-scatterPlotMarket <- ggplot(scDF, aes(x=q, y=p, color=market, fill=market)) + geom_point() + 
-  geom_polygon(data=hulls, alpha=0.3, color=NA)
-png(filename = paste(pathDir, "qpAllMarket.png", sep=""), width = 1800, height = 900, res=300)
-print(scatterPlotMarket)
-dev.off()
+# # scatter plot q-p for all the GOOD and EXCELLENT fits. 
+# # groupping is done by market 
+# findHull <- function(df) df[chull(df$q, df$p),]
+# scDF <- allEstimates[,c("market", "type", "p", "q", "numPoints", "rmsePeak", "qualityFit", "TTP")]
+# scDF <- scDF[scDF$qualityFit=="GOOD" | scDF$qualityFit=="EXCELLENT",]
+# scDF <- scDF[scDF$TTP>0,]
+# hulls <- ddply(scDF, "market", findHull)
+# scatterPlotMarket <- ggplot(scDF, aes(x=q, y=p, color=market, fill=market)) + geom_point() + 
+#   geom_polygon(data=hulls, alpha=0.3, color=NA)
+# png(filename = paste(pathDir, "qpAllMarket.png", sep=""), width = 1800, height = 900, res=300)
+# print(scatterPlotMarket)
+# dev.off()
 
 
 # scatter plot q-p for all the GOOD and EXCELLENT fits. 
 # groupping is done by type 
+findHull <- function(df) df[chull(df$q, df$p),]
 scDF <- allEstimates
 #scDF <- allEstimates[,c("market", "type", "p", "q", "numPoints", "rmsePeak", "qualityFit", "TTP")]
 scDF <- scDF[scDF$qualityFit=="GOOD" | scDF$qualityFit=="EXCELLENT",]
@@ -88,13 +89,12 @@ scDF <- scDF[scDF$numPoints >= 6, ]
 #scDF <- scDF[scDF$qualityFit=="EXCELLENT",]
 scDF <- scDF[scDF$TTP>0,]
 
-#scDF <- scDF[!(scDF$rmsePeak>0.3 | scDF$numPoints<7),]
 hulls <- ddply(scDF, "type", findHull)
 scatterPlotMarket <- ggplot(scDF, aes(x=q, y=p, color=type, fill=type, shape=type)) + geom_point() + 
   geom_polygon(data=hulls, alpha=0.2, color=NA) + labs(color="", fill="", shape="") + 
   theme(legend.position="bottom", plot.margin=unit(c(1,2,2.0,0), "mm"), 
         legend.margin=unit(c(-3.0,0,0,0), "mm"))
-png(filename = paste(pathDir, "qpAllType.png", sep=""), width = 1800, height = 1200, res=300)
+png(filename = paste(pathDir, "QPAllType.png", sep=""), width = 1800, height = 1200, res=300)
 print(scatterPlotMarket)
 dev.off()
 
@@ -113,10 +113,13 @@ maY <- as.numeric(max(scDF2$release.year))
 myTicks <- seq(miY, maY, 5)
 scDF2$release.year <- as.numeric(scDF2$release.year)
 scatterPlotPeak <- ggplot(scDF2, aes(x=release.year, y=TTP, color=type, size=peak)) + geom_point() +
-  labs(x="release year", y="time to peak", size="peak (max=1000)") + 
-  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#66c2a5", "#fc8d62",
-  "#8da0cb"))
-png(filename = paste(pathDir,"bubblePeak.png", sep=""), width = 1800, height = 900, res=300)
+  labs(x="release year", y="time to peak", color="type:", size="peak (max=1000):") + 
+  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#2c7fb8",
+  "#253494")) + theme(legend.position="bottom", 
+                      legend.background=element_blank(), legend.key=element_blank(), 
+                      plot.margin=unit(c(0,2,-1.0,1.0), "mm"), 
+                      legend.box="horizontal")
+png(filename = paste(pathDir,"TTPOverTime.png", sep=""), width = 1800, height = 900, res=300)
 print(scatterPlotPeak)
 dev.off()
 
@@ -127,7 +130,8 @@ scDF3 <- allEstimates
 scDF3 <- scDF3[scDF3$qualityFit=="GOOD" | scDF3$qualityFit=="EXCELLENT",]
 #scDF3 <- scDF3[scDf3$TTP>0,]
 scDF3 <- scDF3[scDF3$qprat < 1000,]
-scDF3 <- scDF3[scDF3$market %in% c("PDFS","DISTILLER","HTML","FLASH"),]
+scDF3 <- scDF3[scDF3$market %in% c("PDFS","HTML","FLASH"),]
+scDF3[scDF3$market=="PDFS",]$market <- "PDF"
 #scDF3 <- scDF3[scDF3$qualityFit=="EXCELLENT",]
 #scDF3 <- scDF3[scDF3$market %in% c("DISTILLER","PDFS","HTML"),]
 #scDF3 <- scDF3[!(scDF3$market=="DISTILLER" & scDF3$release.year==1993),]
@@ -135,18 +139,18 @@ scDF3 <- scDF3[scDF3$market %in% c("PDFS","DISTILLER","HTML","FLASH"),]
 scDF3$release.year <- as.numeric(scDF3$release.year)
 scDF3$qprat <- as.numeric(scDF3$qprat)
 scatterPlotQPRat <- ggplot(scDF3, aes(x=release.year, y=qprat, color=market)) + geom_point() + 
-  geom_smooth(method = "lm", se=FALSE, linetype=3)
-png(filename = paste(pathDir,"scatterPlotQPRatsLin.png", sep=""), width = 1800, height = 900, res=300)
-print(scatterPlotQPRat)
-dev.off()
+  geom_smooth(method = "lm", se=FALSE, linetype=3) + scale_x_continuous(limits=c(1992,2006))
+# png(filename = paste(pathDir,"scatterPlotQPRatsLin.png", sep=""), width = 1800, height = 900, res=300)
+# print(scatterPlotQPRat)
+# dev.off()
 
 scatterPlotQPRat2 <- ggplot(scDF3, aes(x=release.year, y=qprat, color=market, shape=market)) + geom_point() +
   geom_smooth(method = "nls", formula = y~exp(a*x-b), method.args=list(start=c(a=1,b=1995)),  se=FALSE, linetype=3) +
   scale_y_continuous(limits = c(0,250)) +  scale_shape_manual(values=c(15,16,17,18)) + 
   labs(x="release year", y="q-p ratio", color="", shape="") +
   theme(legend.position="bottom", plot.margin=unit(c(1,2,2.0,0), "mm"), 
-        legend.margin=unit(c(-3.0,0,0,0), "mm"))
-png(filename = paste(pathDir, "scatterQPRatsExp.png", sep=""), width = 1800, height = 900, res=300)
+        legend.margin=unit(c(-3.0,0,0,0), "mm")) + scale_x_continuous(limits=c(1992,2005))
+png(filename = paste(pathDir, "QPRatsExponential.png", sep=""), width = 1800, height = 900, res=300)
 print(scatterPlotQPRat2)
 dev.off()
 
@@ -168,68 +172,68 @@ scDF4$m <- log10(scDF4$m)
 scatterPlotPQM <- ggplot(scDF4, aes(x=q, y=p, shape=sizeGroup)) + geom_point() +
   scale_shape_manual(values = c(4, 1, 15)) + labs(shape="Market potential") +
   scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2)) +
-  theme(legend.position=c(0.88,0.75))
-png(filename = paste(pathDir,"scatterPlotPQClusterPQM.png", sep=""), width = 1800, height = 900, res=300)
+  theme(legend.position=c(0.85,0.60))
+png(filename = paste(pathDir,"PQMarketPotential.png", sep=""), width = 1800, height = 900, res=300)
 print(scatterPlotPQM)
 dev.off()
 
 
-# scatter plot p-q to compare excellent vs good fits 
-scDF5 <- allEstimates
-scDF5 <- scDF5[scDF5$qualityFit=="GOOD" | scDF5$qualityFit=="EXCELLENT",]
-scDF5 <- scDF5[scDF5$TTP>0,]
-# scDF5$sizeGroup <- NA
-# scDF4[scDF4$m<100,]$sizeGroup <- "small"
-# scDF4[scDF4$m>100 & scDF4$m<2000,]$sizeGroup <- "medium"
-# scDF4[scDF4$m>2000,]$sizeGroup <- "large"
-# scDF4$m <- log10(scDF4$m)
-scatterPlotGoodExcel <- ggplot(scDF5, aes(x=q, y=p, shape=qualityFit)) + geom_point() +
-  scale_shape_manual(values = c(4, 16)) + labs(shape="Fit quality") 
-  #scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2))
-png(filename = paste(pathDir,"scatterPlotGoodExcel.png", sep=""), width = 1800, height = 900, res=300)
-print(scatterPlotGoodExcel)
-dev.off()
-
-
-# scatter plot release year-number of Points to compare excellent vs good fits 
-scDF6 <- allEstimates
-scDF6 <- scDF6[scDF6$qualityFit=="GOOD" | scDF6$qualityFit=="EXCELLENT",]
-scDF6 <- scDF6[scDF6$TTP>0,]
-# scDF5$sizeGroup <- NA
-# scDF4[scDF4$m<100,]$sizeGroup <- "small"
-# scDF4[scDF4$m>100 & scDF4$m<2000,]$sizeGroup <- "medium"
-# scDF4[scDF4$m>2000,]$sizeGroup <- "large"
-# scDF4$m <- log10(scDF4$m)
-scatterPlotGENumPoints <- ggplot(scDF6, aes(x=numPoints, y=release.year, shape=qualityFit)) + geom_point() +
-  scale_shape_manual(values = c(4, 16)) + labs(shape="Fit quality") 
-#scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2))
-png(filename = paste(pathDir,"scatterPlotGENumPoints.png", sep=""), width = 1800, height = 900, res=300)
-print(scatterPlotGENumPoints)
-dev.off()
-
-
-
-# scatter plot to explore the speed of the lifecycle to release years
-scDF <- allEstimates
-scDF <- scDF[scDF$qualityFit=="GOOD" | scDF$qualityFit=="EXCELLENT",]
-#scDF <- scDF[scDF$qualityFit=="EXCELLENT",]
-scDF <- scDF[scDF$TTP>0,]
-scDF$sizeGroup <- NA
-scDF[scDF$m<100,]$sizeGroup <- "small"
-scDF[scDF$m>100 & scDF$m<2000,]$sizeGroup <- "medium"
-scDF[scDF$m>2000,]$sizeGroup <- "large"
-scDF <- scDF[scDF$release.year>=1990,]
-miY <- as.numeric(min(scDF$release.year))
-maY <- as.numeric(max(scDF$release.year))
-myTicks <- seq(miY, maY, 5)
-scDF$release.year <- as.numeric(scDF$release.year)
-scatterPlotLifeCycle <- ggplot(scDF, aes(x=release.year, y=TTdif, shape=sizeGroup, color=type)) + geom_point() +
-   labs(shape="Type") 
-#+ scale_x_continuous(breaks = myTicks)
-#scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2))
-png(filename = paste(pathDir,"scatterPlotLifeCycle.png", sep=""), width = 1800, height = 900, res=300)
-print(scatterPlotLifeCycle)
-dev.off()
+# # scatter plot p-q to compare excellent vs good fits
+# scDF5 <- allEstimates
+# scDF5 <- scDF5[scDF5$qualityFit=="GOOD" | scDF5$qualityFit=="EXCELLENT",]
+# scDF5 <- scDF5[scDF5$TTP>0,]
+# # scDF5$sizeGroup <- NA
+# # scDF4[scDF4$m<100,]$sizeGroup <- "small"
+# # scDF4[scDF4$m>100 & scDF4$m<2000,]$sizeGroup <- "medium"
+# # scDF4[scDF4$m>2000,]$sizeGroup <- "large"
+# # scDF4$m <- log10(scDF4$m)
+# scatterPlotGoodExcel <- ggplot(scDF5, aes(x=q, y=p, shape=qualityFit)) + geom_point() +
+#   scale_shape_manual(values = c(4, 16)) + labs(shape="Fit quality")
+#   #scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2))
+# png(filename = paste(pathDir,"scatterPlotGoodExcel.png", sep=""), width = 1800, height = 900, res=300)
+# print(scatterPlotGoodExcel)
+# dev.off()
+# 
+# 
+# # scatter plot release year-number of Points to compare excellent vs good fits 
+# scDF6 <- allEstimates
+# scDF6 <- scDF6[scDF6$qualityFit=="GOOD" | scDF6$qualityFit=="EXCELLENT",]
+# scDF6 <- scDF6[scDF6$TTP>0,]
+# # scDF5$sizeGroup <- NA
+# # scDF4[scDF4$m<100,]$sizeGroup <- "small"
+# # scDF4[scDF4$m>100 & scDF4$m<2000,]$sizeGroup <- "medium"
+# # scDF4[scDF4$m>2000,]$sizeGroup <- "large"
+# # scDF4$m <- log10(scDF4$m)
+# scatterPlotGENumPoints <- ggplot(scDF6, aes(x=numPoints, y=release.year, shape=qualityFit)) + geom_point() +
+#   scale_shape_manual(values = c(4, 16)) + labs(shape="Fit quality") 
+# #scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2))
+# png(filename = paste(pathDir,"scatterPlotGENumPoints.png", sep=""), width = 1800, height = 900, res=300)
+# print(scatterPlotGENumPoints)
+# dev.off()
+# 
+# 
+# 
+# # scatter plot to explore the speed of the lifecycle to release years
+# scDF <- allEstimates
+# scDF <- scDF[scDF$qualityFit=="GOOD" | scDF$qualityFit=="EXCELLENT",]
+# #scDF <- scDF[scDF$qualityFit=="EXCELLENT",]
+# scDF <- scDF[scDF$TTP>0,]
+# scDF$sizeGroup <- NA
+# scDF[scDF$m<100,]$sizeGroup <- "small"
+# scDF[scDF$m>100 & scDF$m<2000,]$sizeGroup <- "medium"
+# scDF[scDF$m>2000,]$sizeGroup <- "large"
+# scDF <- scDF[scDF$release.year>=1990,]
+# miY <- as.numeric(min(scDF$release.year))
+# maY <- as.numeric(max(scDF$release.year))
+# myTicks <- seq(miY, maY, 5)
+# scDF$release.year <- as.numeric(scDF$release.year)
+# scatterPlotLifeCycle <- ggplot(scDF, aes(x=release.year, y=TTdif, shape=sizeGroup, color=type)) + geom_point() +
+#    labs(shape="Type") 
+# #+ scale_x_continuous(breaks = myTicks)
+# #scale_x_continuous(limits = c(0,2.0)) + scale_y_continuous(limits = c(0,0.2))
+# png(filename = paste(pathDir,"scatterPlotLifeCycle.png", sep=""), width = 1800, height = 900, res=300)
+# print(scatterPlotLifeCycle)
+# dev.off()
 
 
 

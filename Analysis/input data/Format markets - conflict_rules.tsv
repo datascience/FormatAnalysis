@@ -46,3 +46,15 @@ ID	property	server	tika	droid	resolveTo
 45	mime	application/x-javascript	text/plain	application/octet-stream	application/x-javascript
 46	mime	text/xml	text/plain	application/octet-stream	text/xml
 47	mime	text/javascript	text/plain	application/octet-stream	text/javascript
+48	mime	video/x-ms-asf	text/plain	application/octet-stream	application/octet-stream
+49	mime	video/x-ms-asf	text/html	application/octet-stream	application/octet-stream
+50	mime	video/x-ms-wmv	video/x-ms-asf	audio/x-ms-wma	video/x-ms-asf
+51	mime	application/octet-stream{		video/3gpp	video/3gpp
+52	mime	application/octet-stream		video/3gpp	video/3gpp
+53	mime	application/octet-stream		video/3gpp	video/3gpp
+54	mime	application/octet-streami		video/3gpp	video/3gpp
+55	mime	application/octet-stream�(i��9:ȷ�		video/3gpp	video/3gpp
+56	mime	application/octet-streamn		video/3gpp	video/3gpp
+57	mime	text/plain	video/mp4	application/octet-stream	application/octet-stream
+58	mime	application/vnd.rn-realmedia	text/plain	application/octet-stream	application/octet-stream
+59	mime	text/plain	video/x-ms-asf	audio/x-ms-wma	application/octet-stream

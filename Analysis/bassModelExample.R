@@ -43,7 +43,8 @@ bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", round(q/p, digits = 1), sep=""), color="black", parse=TRUE, size=7) +
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
+        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
 
 
 
@@ -81,7 +82,8 @@ bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=0.2*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p),sep=""), color="black",
            parse=TRUE, size=7) + 
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
+        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
 
 
 #Third model 
@@ -112,7 +114,8 @@ bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=0.15*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
+        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
 
 
 #Fourth model 
@@ -145,9 +148,10 @@ bassGraph4<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=0.3*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), plot.margin=unit(c(1.0,0.2,0.0,0.2), "line"))
+  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
+        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
 
-png(filename=paste(path, "bass1.png", sep=""), width=1880, height=1200, res = 300)
+png(filename=paste(path, "bass1.png", sep=""), width=1800, height=1200, res = 300)
 print(grid.arrange(bassGraph1, bassGraph3, bassGraph2, bassGraph4, ncol = 2, nrow = 2))
 
 
@@ -192,11 +196,11 @@ bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_y_continuous(expand = c(0,0), limits = c(0,1.1*max(y))) + 
   scale_x_continuous(expand = c(0,0) , limits=c(0,60)) +
   scale_color_manual(name="", values = c("col1"="black", "col2"="red", "col3"="green"),
-                     labels=c("New adoptions","External influence\n(p=0.013)",
-                              "Internal influence\n(q=0.141)")) + 
+                     labels=c("New adoptions","External influence\n(p=0.014)",
+                              "Internal influence\n(q=0.14)")) + 
   scale_linetype_manual(name="", values = c("col1"="solid", "col2"="dashed", "col3"="longdash"),
-                        labels=c("New adoptions","External influence\n(p=0.013)",
-                                 "Internal influence\n(q=0.141)")) +
+                        labels=c("New adoptions","External influence\n(p=0.014)",
+                                 "Internal influence\n(q=0.14)")) +
   labs(x=NULL, y="Adoption rate") + 
   geom_vline(xintercept = T1, linetype=2, color="gray50", size=lSize) +
   geom_vline(xintercept = TP, linetype=2, color="gray50", size=lSize) + 
