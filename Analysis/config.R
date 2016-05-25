@@ -12,17 +12,17 @@ syncFolder <- "/home/kresimir/Dropbox/formatanalysis (1)/figures and other mater
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 
- # experiments <- c("VIDEO")
- # marketFiles <- c("Format markets - VIDEO.tsv")
+experiments <- c("HTML-2")
+marketFiles <- c("Format markets - HTML and XHTML versions.tsv")
 
 
- experiments <- c("ARCHIVE", "AUDIO", "BMPS", "DISTILLER", "DOCUMENTS",
-                  "FLASH", "GIFS", "HTML", "IMAGES", "PDFS", "VIDEO")
- marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv",
-                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv",
-                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv",
-                  "Format markets - PDF versions.tsv", "Format markets - VIDEO.tsv")
-
+ # experiments <- c("ARCHIVE", "AUDIO", "BMPS", "DISTILLER", "DOCUMENTS",
+ #                  "FLASH", "GIFS", "HTML", "IMAGES", "PDFS", "VIDEO")
+ # marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv",
+ #                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv",
+ #                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv",
+ #                  "Format markets - PDF versions.tsv", "Format markets - VIDEO.tsv")
+ # 
 
 
 

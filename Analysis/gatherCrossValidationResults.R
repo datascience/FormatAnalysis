@@ -39,7 +39,7 @@ dfAllCV$num <- 1
 dfAllCV <- aggregate(num~total+ratio, data=dfAllCV, FUN = sum)
 library(ggplot2)
 plot <- ggplot(dfAllCV, aes(x=total, y=ratio, size=num)) + geom_point() + 
-  labs(x="number of points", y="success rate") + 
+  labs(x="number of data points", y="success rate") + 
   theme(legend.position="none")
 png(filename = "output data/CVresults.png", width = 1800, height = 900, res=300)
 print(plot)
