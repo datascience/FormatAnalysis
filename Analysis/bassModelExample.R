@@ -91,9 +91,15 @@ bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
 #p <- 0.0001
 #q <- 0.06
 #m <- 10
-p <- 0.013595435
-q <- 0.1415115735
-m <- 21283.91046
+#PDF data 
+#p <- 0.013595435
+#q <- 0.1415115735
+#m <- 21283.91046
+
+#Tiff data 
+p <- 0.0189265836
+q <- 0.2396313844
+m <- 9.4543939076
 x <- seq(0,30,len=200)
 y <- m*((p+q)^2/p)*((exp(-(p+q)*x))/(((q/p)*exp(-(p+q)*x) + 1 )^2))
 q1 <- 0
@@ -113,7 +119,7 @@ bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   geom_line(aes(y=yq), size=1, linetype=2, color="green") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
-  annotate(geom="text", x=0.15*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
+  annotate(geom="text", x=0.8*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
   theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
         plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
 
