@@ -248,12 +248,14 @@ scatterPlotMarket <-
     color = type,
     fill = type,
     shape = type
-  )) + geom_point() +
+  )) + geom_point(size=2) +
   geom_polygon(data = hulls,
                alpha = 0.2,
                color = NA) + labs(color = "",
                                   fill = "",
                                   shape = "") +
+  scale_shape_manual(values =
+                       c(15,17,19)) +
   theme(
     legend.position = "bottom",
     plot.margin = unit(c(1, 2, 2.0, 0), "mm"),
@@ -296,7 +298,7 @@ scatterPlotPeak <-
        y = "time to peak",
        color = "type:",
        size = "peak (max=1000):") +
-  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#EBB249",
+  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#2c7fb8",
                                                                        "#253494")) + theme(
                                                                          legend.position = "bottom",
                                                                          legend.background = element_blank(),
@@ -315,6 +317,8 @@ dev.off()
 corelationTTPRel <- cor(scDF2$release.year, scDF2$TTP)
 print(paste("Corelation release year time to peak ", corelationTTPRel))
 
+
+# c("#41b6c4", "#2c7fb8","#253494")
 scatterPlotPeak2 <-
   ggplot(scDF2, aes(
     x = release.year,
@@ -329,8 +333,7 @@ scatterPlotPeak2 <-
        y = "time to peak",
        color = "type:",
        size = "peak (max=1000):") +
-  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#EBB249",
-                                                                       "#253494")) + theme(
+  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#2c7fb8","#253494")) + theme(
                                                                          legend.position = "bottom",
                                                                          legend.background = element_blank(),
                                                                          legend.key = element_blank(),
@@ -338,7 +341,7 @@ scatterPlotPeak2 <-
                                                                          legend.box = "horizontal"
                                                                        )
 png(
-  filename = paste(pathDir, "TTPOverTime2.png", sep = ""),
+  filename = paste(pathDir, "TTPOverTimeLM.png", sep = ""),
   width = 1800,
   height = 900,
   res = 300
@@ -383,16 +386,17 @@ scatterPlotQPRat2 <-
            y = qprat,
            color = market,
            shape = market
-         )) + geom_point() +
+         )) + geom_point(size=2) +
   geom_smooth(
     method = "nls",
     formula = y ~ exp(a * x - b),
     method.args = list(start = c(a = 1, b = 1995)),
     se = FALSE,
-    linetype = 3
+    linetype = 3,
+    size = 0.5
   ) +
   scale_y_continuous(limits = c(0, 250)) +  scale_shape_manual(values =
-                                                                 c(15, 16, 17, 18)) +
+                                                                 c(15,16,17,18)) +
   labs(
     x = "release year",
     y = "q/p ratio",
