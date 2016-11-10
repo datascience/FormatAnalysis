@@ -136,13 +136,13 @@ if (length(experiments)==length(marketFiles)) {
       graphAllModels(dataShares, bestModelEstimates, pathMarketElements, experimentName)
       file.create(fileGraphsDone)
         # sync graphs to the selected folder 
-        for (name in unique(dataShares$name) ) {
-          pathFrom <- paste(pathMarketElements, name, "/graphs", sep="")
-          print(pathFrom)
-          file.copy(from=list.files(pathFrom, full.names = TRUE) , to=syncFolder, 
-                    overwrite = TRUE, recursive = TRUE, 
-                    copy.mode = TRUE)
-        }
+        # for (name in unique(dataShares$name) ) {
+        #   pathFrom <- paste(pathMarketElements, name, "/graphs", sep="")
+        #   print(pathFrom)
+        #   file.copy(from=list.files(pathFrom, full.names = TRUE) , to=syncFolder, 
+        #             overwrite = TRUE, recursive = TRUE, 
+        #             copy.mode = TRUE)
+        # }
     }
     
   }

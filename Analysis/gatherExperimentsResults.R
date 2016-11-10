@@ -227,6 +227,16 @@ library(plyr)
 # print(scatterPlotMarket)
 # dev.off()
 
+source('config.R')
+
+themeMain <- themeMain + theme(axis.ticks=element_line(color="gray", linetype = 2, size = 0.2), 
+                                axis.text = element_text(size=9),
+                                axis.title = element_text(size=9),
+                                plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"), 
+                                panel.background=element_blank(),
+                                panel.grid.major = element_line(color="gray", linetype = 2, size = 0.2),
+                                panel.grid.minor = element_blank(),
+                                legend.key = element_rect(colour = NA))
 
 # scatter plot q-p for all the GOOD and EXCELLENT fits.
 # groupping is done by type
@@ -241,32 +251,18 @@ scDF <- scDF[scDF$numPoints >= 6,]
 scDF <- scDF[scDF$TTP > 0, ]
 
 hulls <- ddply(scDF, "type", findHull)
-scatterPlotMarket <-
-  ggplot(scDF, aes(
-    x = q,
-    y = p,
-    color = type,
-    fill = type,
-    shape = type
-  )) + geom_point(size=2) +
-  geom_polygon(data = hulls,
-               alpha = 0.2,
-               color = NA) + labs(color = "",
-                                  fill = "",
-                                  shape = "") +
-  scale_shape_manual(values =
-                       c(15,17,19)) +
+scatterPlotMarket <-ggplot(scDF, aes(x = q, y = p, color = type, fill = type, shape = type)) + 
+  geom_point(size=2) +
+  geom_polygon(data = hulls, alpha = 0.2, color = NA) + labs(color = "", fill = "", shape = "") +
+  scale_shape_manual(values = c(15,17,19)) + 
+  scale_color_manual(values = c("#B01C2D", "#4D5E31", "#211B94")) + 
+  themeMain + 
   theme(
     legend.position = "bottom",
     plot.margin = unit(c(1, 2, 2.0, 0), "mm"),
-    legend.margin = unit(c(-3.0, 0, 0, 0), "mm")
-  )
-png(
-  filename = paste(pathDir, "QPAllType.png", sep = ""),
-  width = 1800,
-  height = 1200,
-  res = 300
-)
+    legend.margin = unit(c(-3.0, 0, 0, 0), "mm"),
+    axis.title.y = element_text(angle=0))
+png(filename = paste(pathDir, "QPAllType.png", sep = ""), width = 1800, height = 1200, res = 300)
 print(scatterPlotMarket)
 dev.off()
 
@@ -287,31 +283,18 @@ miY <- as.numeric(min(scDF2$release.year))
 maY <- as.numeric(max(scDF2$release.year))
 myTicks <- seq(miY, maY, 5)
 scDF2$release.year <- as.numeric(scDF2$release.year)
-scatterPlotPeak <-
-  ggplot(scDF2, aes(
-    x = release.year,
-    y = TTP,
-    color = type,
-    size = peak
-  )) + geom_point() +
-  labs(x = "release year",
-       y = "time to peak",
-       color = "type:",
-       size = "peak (max=1000):") +
-  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#2c7fb8",
-                                                                       "#253494")) + theme(
-                                                                         legend.position = "bottom",
-                                                                         legend.background = element_blank(),
-                                                                         legend.key = element_blank(),
-                                                                         plot.margin = unit(c(0, 2, -1.0, 1.0), "mm"),
-                                                                         legend.box = "horizontal"
-                                                                       )
-png(
-  filename = paste(pathDir, "TTPOverTime.png", sep = ""),
-  width = 1800,
-  height = 900,
-  res = 300
-)
+scatterPlotPeak <- ggplot(scDF2, aes(x = release.year, y = TTP, color = type, size = peak)) + 
+  geom_point() +
+  labs(x = "release year", y = "time to peak", color = "type:", size = "peak (max=1000):") +
+  scale_x_continuous(breaks = myTicks) + 
+  scale_color_manual(values = c("#41b6c4", "#2c7fb8", "#253494")) + 
+  themeMain +
+  theme(legend.position = "bottom", 
+        legend.background = element_blank(), 
+        legend.key = element_blank(), 
+        plot.margin = unit(c(0, 2, -1.0, 1.0), "mm"),
+        legend.box = "horizontal")
+png(filename = paste(pathDir, "TTPOverTime.png", sep = ""), width = 1800, height = 900, res = 300)
 print(scatterPlotPeak)
 dev.off()
 corelationTTPRel <- cor(scDF2$release.year, scDF2$TTP)
@@ -319,27 +302,22 @@ print(paste("Corelation release year time to peak ", corelationTTPRel))
 
 
 # c("#41b6c4", "#2c7fb8","#253494")
-scatterPlotPeak2 <-
-  ggplot(scDF2, aes(
-    x = release.year,
-    y = TTP,
-    color = type,
-    size = peak
-  )) + geom_point() + 
-  geom_smooth(method = "lm",
-              se = FALSE,
-              linetype = 3, size=0.5) +
+c("#053C75", "#1667BA", "#c6dbef")
+scatterPlotPeak2 <- ggplot(scDF2, aes(x = release.year,y = TTP, color = type, size = peak)) + geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, linetype = 3, size=0.5) +
   labs(x = "release year",
        y = "time to peak",
        color = "type:",
        size = "peak (max=1000):") +
-  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#41b6c4", "#2c7fb8","#253494")) + theme(
-                                                                         legend.position = "bottom",
-                                                                         legend.background = element_blank(),
-                                                                         legend.key = element_blank(),
-                                                                         plot.margin = unit(c(0, 2, -1.0, 1.0), "mm"),
-                                                                         legend.box = "horizontal"
-                                                                       )
+  scale_x_continuous(breaks = myTicks) + scale_color_manual(values = c("#0B5CB0", "#053463", "#5094D9")) + 
+  themeMain +
+  theme(legend.position = "bottom", 
+        legend.title = element_text(size=9),
+        legend.text = element_text(size=9),
+        legend.background = element_blank(), 
+        legend.key = element_blank(), 
+        plot.margin = unit(c(0, 2, -1.0, 1.0), "mm"),
+        legend.box = "horizontal")
 png(
   filename = paste(pathDir, "TTPOverTimeLM.png", sep = ""),
   width = 1800,
@@ -379,41 +357,31 @@ scatterPlotQPRat <-
 # print(scatterPlotQPRat)
 # dev.off()
 
-scatterPlotQPRat2 <-
-  ggplot(scDF3,
-         aes(
-           x = release.year,
-           y = qprat,
-           color = market,
-           shape = market
-         )) + geom_point(size=2) +
-  geom_smooth(
-    method = "nls",
+scatterPlotQPRat2 <-ggplot(scDF3, aes(x = release.year, y = qprat, shape = market)) + 
+  geom_point(size=2) +
+  geom_smooth(method = "nls", 
     formula = y ~ exp(a * x - b),
     method.args = list(start = c(a = 1, b = 1995)),
     se = FALSE,
     linetype = 3,
-    size = 0.5
-  ) +
-  scale_y_continuous(limits = c(0, 250)) +  scale_shape_manual(values =
-                                                                 c(15,16,17,18)) +
-  labs(
-    x = "release year",
-    y = "q/p ratio",
-    color = "",
-    shape = ""
-  ) +
+    color = "black",
+    size = 0.5) +
+  scale_y_continuous(limits = c(0, 250)) +  
+  scale_shape_manual(values = c(15,16,17,18)) +
+  scale_color_manual(values = c("#B01C2D", "#4D5E31", "#211B94")) + 
+  labs(x = "release year", y = "q/p ratio", color = "", shape = "") +
+  themeMain + 
   theme(
     legend.position = "bottom",
     plot.margin = unit(c(1, 2, 2.0, 0), "mm"),
-    legend.margin = unit(c(-3.0, 0, 0, 0), "mm")
+    legend.margin = unit(c(-3.0, 0, 0, 0), "mm"), 
+    legend.background = element_blank(), 
+    legend.key = element_blank()
   ) + scale_x_continuous(limits = c(1992, 2005))
-png(
-  filename = paste(pathDir, "QPRatsExponential.png", sep = ""),
+png(filename = paste(pathDir, "QPRatsExponential.png", sep = ""),
   width = 1800,
   height = 900,
-  res = 300
-)
+  res = 300)
 print(scatterPlotQPRat2)
 dev.off()
 
@@ -433,17 +401,19 @@ scDF4[scDF4$m < 100, ]$sizeGroup <- "small"
 scDF4[scDF4$m > 100 & scDF4$m < 2000, ]$sizeGroup <- "medium"
 scDF4[scDF4$m > 2000, ]$sizeGroup <- "large"
 scDF4$m <- log10(scDF4$m)
-scatterPlotPQM <-
-  ggplot(scDF4, aes(x = q, y = p, shape = sizeGroup)) + geom_point() +
-  scale_shape_manual(values = c(15, 1, 4)) + labs(shape = "Market potential") +
-  scale_x_continuous(limits = c(0, 2.0)) + scale_y_continuous(limits = c(0, 0.2)) +
-  theme(legend.position = c(0.88, 0.75))
-png(
-  filename = paste(pathDir, "PQMarketPotential.png", sep = ""),
-  width = 1800,
-  height = 900,
-  res = 300
-)
+scatterPlotPQM <- ggplot(scDF4, aes(x = q, y = p, shape = sizeGroup)) + 
+  geom_point() +
+  scale_shape_manual(values = c(15, 1, 4)) + 
+  labs(shape = "Market potential") +
+  scale_x_continuous(limits = c(0, 2.0)) + 
+  scale_y_continuous(limits = c(0, 0.2)) +
+  themeMain + 
+  theme(legend.position = c(0.88, 0.75), 
+       # legend.key = element_rect(colour = NA), 
+        axis.title.y = element_text(angle=0), 
+        legend.background = element_rect(fill="white"),
+        legend.key = element_blank())
+png(filename = paste(pathDir, "PQMarketPotential.png", sep = ""), width = 1800, height = 900, res = 300)
 print(scatterPlotPQM)
 dev.off()
 

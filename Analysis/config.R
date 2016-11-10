@@ -12,17 +12,20 @@ syncFolder <- "/home/kresimir/Dropbox/formatanalysis (1)/figures and other mater
 colNames <- c("server", "tika", "droid", "year", "amount")
 
 
-experiments <- c("HTML-2")
-marketFiles <- c("Format markets - HTML and XHTML versions.tsv")
+#experiments <- c("HTML-2")
+#marketFiles <- c("Format markets - HTML and XHTML versions.tsv")
 
+# experiments <- c("PDFS figures", "GIFS figures", "HTML figures", "DOCUMENTS figures", "DISTILLER figures", "IMAGES figures")
+# marketFiles <- c("Format markets - PDF versions.tsv", "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv",
+#                  "Format markets - DOCUMENTS.tsv", "Format markets - DISTILLER.tsv", "Format markets - IMAGES.tsv")
 
- # experiments <- c("ARCHIVE", "AUDIO", "BMPS", "DISTILLER", "DOCUMENTS",
- #                  "FLASH", "GIFS", "HTML", "IMAGES", "PDFS", "VIDEO")
- # marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv",
- #                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv",
- #                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv",
- #                  "Format markets - PDF versions.tsv", "Format markets - VIDEO.tsv")
- # 
+ experiments <- c("ARCHIVE", "AUDIO", "BMPS", "DISTILLER", "DOCUMENTS",
+                  "FLASH", "GIFS", "HTML", "IMAGES", "PDFS", "VIDEO")
+ marketFiles <- c("Format markets - ARCHIVE.tsv", "Format markets - AUDIO.tsv", "Format markets - BMPS.tsv",
+                  "Format markets - DISTILLER.tsv", "Format markets - DOCUMENTS.tsv", "Format markets - FLASH versions.tsv",
+                  "Format markets - GIFS.tsv", "Format markets - HTML and XHTML versions.tsv", "Format markets - IMAGES.tsv",
+                  "Format markets - PDF versions.tsv", "Format markets - VIDEO.tsv")
+
 
 
 
@@ -62,3 +65,30 @@ source('conflictResolution.R')
 resolveConflicts <- conflictResolution
 afterConflictsResolution <- afterResolution
 conflictCategory <- conflictCategoryDetermination
+
+
+
+
+
+
+#plot parameters
+
+themeMain <- theme(axis.ticks=element_line(color="gray", linetype = 2, size = 0.2), 
+                   axis.text = element_text(size=9),
+                   axis.title = element_text(size=9),
+                   plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"), 
+                   panel.background=element_blank(),
+                   panel.grid.major = element_line(color="gray", linetype = 2, size = 0.2),
+                   panel.grid.minor = element_blank(),
+                   legend.key = element_rect(colour = NA),
+                   axis.text=element_text(size = 15),
+                   panel.background = element_blank(),
+                   axis.line.x = element_line(color="black", size = 0.4),
+                   axis.line.y = element_line(color="black", size = 0.4))
+
+
+
+
+
+
+

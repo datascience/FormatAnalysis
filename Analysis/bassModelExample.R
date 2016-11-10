@@ -4,13 +4,20 @@ library(gridExtra)
 
 path <- paste("output data/")
 
-
+source('config.R')
 
 #output four main patterns of the Bass model
 #png(filename=paste(path, "bass1.png", sep=""))
 #layout(matrix(c(1, 2, 3,4), 2, 2, byrow = TRUE), heights = c(1.5, 1.5, 1.5, 1.5))
 #par(mar=c(0.3,0.3,0.3,0.3), font=2)
 
+
+themeFour <- themeMain + theme(axis.ticks=element_blank(), 
+                   axis.text=element_blank(), 
+                   axis.title=element_blank(), 
+                   plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"), 
+                   #panel.grid.major = panel.grid.major = element_line(color="gray", linetype = 2, size = 0.2),
+                   panel.background=element_blank())
 
 # First model
 #originals 
@@ -43,8 +50,7 @@ bassGraph1<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=max(df$x)-0.2*max(df$x), y=max(df$y)- 0.2*max(df$y), label=paste("frac(q,p)==", round(q/p, digits = 1), sep=""), color="black", parse=TRUE, size=7) +
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
-        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
+  themeFour
 
 
 
@@ -82,8 +88,7 @@ bassGraph2<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=0.2*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p),sep=""), color="black",
            parse=TRUE, size=7) + 
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
-        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
+  themeFour
 
 
 #Third model 
@@ -120,8 +125,7 @@ bassGraph3<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=0.8*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
-        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
+  themeFour
 
 
 #Fourth model 
@@ -154,8 +158,7 @@ bassGraph4<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0), limits=c(0,1.1*max(df$y))) +
   annotate(geom="text", x=0.3*max(df$x), y=0.8*max(df$y), label=paste("frac(q,p)==", round(q/p), sep=""), color="black", parse=TRUE, size=7) +
-  theme(axis.ticks=element_blank(), axis.text=element_blank(), axis.title=element_blank(), 
-        plot.margin=unit(c(0.0,0.0,0.0,0.0), "mm"))
+  themeFour
 
 png(filename=paste(path, "bass1.png", sep=""), width=1800, height=1200, res = 300)
 print(grid.arrange(bassGraph1, bassGraph3, bassGraph2, bassGraph4, ncol = 2, nrow = 2))
@@ -217,7 +220,13 @@ bassGraph<- ggplot(df, aes(x = x)) + geom_area(aes(y=yp), fill="gray75") +
         legend.position=c(0.7,0.6), legend.background=element_blank(),
         legend.text=element_text(face="bold", size=8), 
         legend.key=element_blank(), legend.key.width=unit(1.5,"line"), 
-        legend.key.height=unit(1.5,"line") , plot.margin=unit(c(0,2,-0.5,1.5),"mm"))
+        legend.key.height=unit(1.5,"line") , plot.margin=unit(c(0,2,-0.5,1.5),"mm"), 
+        panel.background = element_blank(),
+        axis.line.x = element_line(color="black", size = 0.4),
+        axis.line.y = element_line(color="black", size = 0.4), 
+        axis.ticks = element_blank(),
+        panel.grid.major = element_line(color="gray", linetype = 2, size = 0.2),
+        panel.grid.minor = element_blank())
 
 bassDerv <- ggplot(df, aes(x=x, y=derv)) +
   geom_area(fill="gray", alpha=0.3) +
@@ -233,7 +242,13 @@ bassDerv <- ggplot(df, aes(x=x, y=derv)) +
         legend.text=element_text(face="bold", size=8), 
         legend.key=element_blank(), legend.key.width=unit(1.5,"line"), 
         legend.key.height=unit(1.5,"line"),
-        plot.margin=unit(c(-0.5,2,1,1.5),"mm"))
+        plot.margin=unit(c(-0.5,2,1,1.5),"mm"), 
+        panel.background = element_blank(),
+        axis.line.x = element_line(color="black", size = 0.4),
+        axis.line.y = element_line(color="black", size = 0.4), 
+        axis.ticks = element_blank(),
+        panel.grid.major = element_line(color="gray", linetype = 2, size = 0.2),
+        panel.grid.minor = element_blank())
 
 png(filename=paste(path, "bass3.png", sep=""), width=1800, height=1200, res=300)
 print(grid.arrange(bassGraph, bassDerv))

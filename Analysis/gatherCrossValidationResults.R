@@ -4,6 +4,8 @@
 #experiments <- c("PDFS-2", "DISTILLER-2", "DOCUMENTS", "IMAGES", "HTML")
 #type <- c("VERSION", "TOOL", "FORMAT", "FORMAT", "VERSION")
 
+source('config.R')
+
 experiments <- c("ARCHIVE", "AUDIO", "BMPS", "DISTILLER", "DOCUMENTS",
                  "FLASH", "GIFS", "HTML", "IMAGES", "PDFS", "VIDEO")
 type <- c("VERSION", "FORMAT", "VERSION", "TOOL", "FORMAT", "VERSION", "VERSION", 
@@ -11,6 +13,7 @@ type <- c("VERSION", "FORMAT", "VERSION", "TOOL", "FORMAT", "VERSION", "VERSION"
 
 
 allCVResults <- NA
+
 
 for (i in 1:length(experiments)) {
   
@@ -39,8 +42,9 @@ dfAllCV$num <- 1
 dfAllCV <- aggregate(num~total+ratio, data=dfAllCV, FUN = sum)
 library(ggplot2)
 plot <- ggplot(dfAllCV, aes(x=total, y=ratio, size=num)) + geom_point() + 
-  labs(x="number of data points", y="success rate") + 
-  theme(legend.position="none")
+  labs(x="number of data points", y="success rate") +
+  themeMain + 
+  theme(legend.position="none") 
 png(filename = "output data/CVresults.png", width = 1800, height = 900, res=300)
 print(plot)
 dev.off()

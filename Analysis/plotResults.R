@@ -110,7 +110,7 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
     dfComponentsPlot <- data.frame(interval,model,pValue, qValue)
     
     # table with all the info
-    tableTheme <- ttheme_default(core=list(fg_params=list(cex =1.0)))
+    tableTheme <- ttheme_default(core=list(fg_params=list(cex =1.0), bg_params=list(fill=NA)))
     info <- format(info, scientific=TRUE, digits=4, drop0trailing=TRUE)
     tbl <- tableGrob(info, rows = NULL, cols = NULL, theme = tableTheme)
     #tbl <- grid.table(info)
@@ -129,12 +129,12 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
                                            alpha=0.2) + coord_cartesian(ylim=c(0,yUpperLimit))
     }
     modelPlot <- modelPlot + geom_line(data=dfModel, aes(x=interval, y=model)) +
-      scale_x_continuous(expand = c(0,0))
+      scale_x_continuous(expand = c(0,0), limits = c(0,30.5)) + scale_y_continuous(expand = c(0,0))
     if (includePoints) {
       modelPlot <- modelPlot + geom_point(data=dfPoints, aes(x=ages, y=percentages))
     }
     modelPlot <- modelPlot + labs(x="age", y="adoption rate")
-    
+    modelPlot <- modelPlot + themeMain
     # change plot 
     dfChange <- data.frame(interval, derv)
     changePlot <- ggplot(dfChange, aes(x=interval, y=derv)) +
@@ -163,11 +163,17 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
     
     # residual plot 
     dfResidual <- data.frame(prediction, residual)
-    residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + geom_point() + labs(x="fitted value", y="residual")
-    
+    residualPlot <- ggplot(dfResidual, aes(x=prediction, y=residual)) + 
+      geom_point() + 
+      labs(x="fitted value", y="residual") +
+      themeMain
+
     # average residual plot 
     dfResidual <- data.frame(prediction, residualAverage)
-    residualAveragePlot <- ggplot(dfResidual, aes(x=prediction, y=residualAverage)) + geom_point() + labs(x="fitted value", y="residual(average)")
+    residualAveragePlot <- ggplot(dfResidual, aes(x=prediction, y=residualAverage)) + 
+      geom_point() + 
+      labs(x="fitted value", y="residual(average)") +
+      themeMain
 
     
     
@@ -237,6 +243,9 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
                                               linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
         scale_color_grey(start = 0.0, end = 0.50) +
+        scale_x_continuous(expand=c(0,0), limits = c(0,31)) +
+        scale_y_continuous(expand=c(0,0)) +
+        themeMain + 
         theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
               legend.text=element_text(size=6), legend.title=element_blank(),
               legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="age", y="adoption rate")
@@ -247,6 +256,9 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=paste(title,"-",modelID,sep=""), 
                                                linetype=paste(title,"-",modelID,sep=""))) + geom_line() +
         scale_color_grey(start = 0.0, end = 0.50) +
+        scale_x_continuous(expand=c(0,0)) +
+        scale_y_continuous(expand=c(0,0)) +
+        themeMain + 
         theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
               legend.text=element_text(size=6), legend.title=element_blank(), 
               legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="harvest year", y="adoption rate")
@@ -256,9 +268,12 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
     } else {
       
       png(filename=paste(allModelsName, "_allmodels-ages.png", sep=""), width = 1800, height=900, res=300)
-      clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, colour=title, 
+      clusterPlot <- ggplot(dfClusterAge, aes(x=interval, y=model, color=title, 
                                               linetype=title)) + geom_line() +
         scale_color_grey(start = 0.0, end = 0.50) +
+        scale_x_continuous(expand=c(0,0), limits = c(0,31)) +
+        scale_y_continuous(expand=c(0,0)) +
+        themeMain + 
         theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
               legend.text=element_text(size=6), legend.title=element_blank(),
               legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="age", y="adoption rate")
@@ -269,6 +284,9 @@ plotResults <- function(pData,  plotType="toSelect", includeRateOfChange, includ
       clusterPlot <- ggplot(dfClusterYear, aes(x=interval, y=model, colour=title, 
                                                linetype=title)) + geom_line() +
         scale_color_grey(start = 0.0, end = 0.50) +
+        scale_x_continuous(expand=c(0,0)) +
+        scale_y_continuous(expand=c(0,0)) +
+        themeMain + 
         theme(legend.position=c(1,1), legend.justification=c(1,1), legend.background=element_rect(fill="white"),
               legend.text=element_text(size=6), legend.title=element_blank(), 
               legend.key=element_blank(), legend.key.height = unit(0.7,"line")) + labs(x="harvest year", y="adoption rate")
