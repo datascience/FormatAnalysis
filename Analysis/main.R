@@ -164,12 +164,14 @@ if (length(experiments)==length(marketFiles)) {
     } else {
       if (!dir.exists(paste(path, "/graphs", sep=""))) {
         estimatesFinal <- merge(bestModelEstimates,chosenModels, by=c("ID", "modelID", "name"))
-        plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName)    
+        plotResults(estimatesFinal, "selected", FALSE, TRUE, TRUE, path, experimentName) 
+        saveRDS(estimatesFinal, paste(path, "/graphs/estimatesFinal.rds", sep=""))
       }
       if (!dir.exists(paste(path, "/prediction", sep=""))) {
         # make predictions and plot prediction results 
         predictions <- makePredictions(dataShares, estimatesFinal, chosenModels, predictionYears, path, pathMarketElements)
         plotResults(predictions, "predicted", FALSE, TRUE, TRUE, paste(path,"/prediction",sep=""), experimentName)
+        saveRDS(predictions, paste(path, "/prediction/predictionEstimates.rds", sep=""))
       }
     }
   }
